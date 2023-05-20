@@ -1,0 +1,10 @@
+{
+    "dependencies": {
+        "express": "4.18.2",
+        "lm_random": "^1.0.0",
+        "webpack": "^5.83.1"
+    },
+    "devDependencies": {
+        "webpack-cli": "^5.1.1"
+    }
+}
