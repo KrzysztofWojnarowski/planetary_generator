@@ -1,8 +1,10 @@
 const path = require('path');
 
 module.exports = {
+    mode:"development",
+    devtool:"eval-source-map",
     resolve: {
-        extensions: [".js"]
+        extensions: [".js"],
     },
     entry: './src/js/index.js',
     output: {

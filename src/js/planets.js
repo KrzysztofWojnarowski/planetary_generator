@@ -9,30 +9,33 @@ export default class Planets {
 
     prototypes = {
         star: {
-            m: 0.5,
-            dm: 0.3,
+            m: 9,
+            dm: 0.0000000003,
             r: 50,
             positionRadiusDelta: 100,
-            speedDelta: 0.001
+            speedDelta: 0
         },
         planet: {
-            m: 0.00001,
-            dm: 0.000009,
+            m: 0.0000001,
+            dm: 0.000000000009,
             r: 50,
-            positionRadiusDelta: 800,
-            speedDelta: 100
+            positionRadiusDelta: 500,
+            speedDelta: 0.7
 
         }
     }
 
-    spawnEmpty() {
+    spawnEmpty(type) {
         return {
+            type: type,
             x: 0,
             y: 0,
             r: 0,
             m: 0,
             vx: 0,
-            vy: 0
+            vy: 0,
+            fx: 0,
+            fy: 0
         }
     }
 
@@ -56,8 +59,7 @@ export default class Planets {
         let protoData = this.prototypes[type];
         let radiusDelta = protoData.positionRadiusDelta;
         let speedDelta = protoData.speedDelta;
-        let rand = this.rand;
-        let planet = this.spawnEmpty();
+        let planet = this.spawnEmpty(type);
         planet.x = this.#deltaRandomized(radiusDelta);
         planet.y = this.#deltaRandomized(radiusDelta);
         planet.r = protoData.r;
@@ -68,9 +70,8 @@ export default class Planets {
     }
 
     buildSystem(starsCount, planetsCount) {
-        return {
-            planets: this.#buildBodyArray("planet", planetsCount),
-            stars: this.#buildBodyArray("star", starsCount)
-        }
+        let planets = this.#buildBodyArray("planet", planetsCount);
+        let stars = this.#buildBodyArray("star", starsCount);
+        return planets.concat(stars);
     }
 }
