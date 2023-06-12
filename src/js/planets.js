@@ -1,26 +1,31 @@
-import Random from "lm_random/random";
 
 export default class Planets {
-    constructor() {
-        this.rand = new Random();
-        this.rand.seed(0.5);
-        this.rand.warmUp();
+    constructor(randomizer) {
+        this.rand = randomizer;
     }
 
     prototypes = {
         star: {
-            m: 9,
+            m: 50,
             dm: 0.0000000003,
-            r: 50,
+            r: 20,
             positionRadiusDelta: 100,
             speedDelta: 0
         },
         planet: {
-            m: 0.0000001,
-            dm: 0.000000000009,
-            r: 50,
-            positionRadiusDelta: 500,
-            speedDelta: 0.7
+            m: 0.0001,
+            dm: 0.09,
+            r: 5,
+            positionRadiusDelta: 200,
+            speedDelta: 0.09
+
+        },
+        moon: {
+            m: 0.00009,
+            dm: 0.000007,
+            r: 2,
+            positionRadiusDelta: 200,
+            speedDelta: 0.08
 
         }
     }
@@ -69,9 +74,10 @@ export default class Planets {
         return planet;
     }
 
-    buildSystem(starsCount, planetsCount) {
+    buildSystem(starsCount, planetsCount,moonCount=0) {
         let planets = this.#buildBodyArray("planet", planetsCount);
         let stars = this.#buildBodyArray("star", starsCount);
-        return planets.concat(stars);
+        let moons = this.#buildBodyArray("moon",moonCount);
+        return planets.concat(stars).concat(moons);
     }
 }

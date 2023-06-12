@@ -22,20 +22,26 @@ export default class Engine {
 
    restart(){
       let planets = this.#planets;
-      this.store.system = planets.buildSystem(3, 16);
+      this.store.system = planets.buildSystem(1, 19,100);
    }
 
    applyPhysics() {
-
       return this.store.system.map(a => {
-         let f = [0, 0];
-       
+         let f = [0, 0];    
+         let colided = false;
+         let ret = Object.assign({}, a);
+         ret.markForRemoval=false;
          this.store.system.forEach(b => {
             if (a !== b) {
                f = this.#physics.vectorSum(f, this.#physics.calculateForce(a, b));
+               colided = this.#physics.isCollision(a,b) && b.m>a.m;
+               if (colided){
+                  ret.markForRemoval=true;
+               }
+               //TODO: Write elegant collide effect as an abstract behavior script
+               
             }
          });
-         let ret = Object.assign({}, a);
          ret.fx = f[0];
          ret.fy = f[1];
          let newPosition = this.#physics.calculatePosition(ret);
@@ -44,10 +50,14 @@ export default class Engine {
          ret.y= newPosition[1];
          ret.vx= newVelocity[0];
          ret.vy = newVelocity[1];
+         ret.markForRemoval&& console.log("toRemove");
          return ret;
       });
    }
    update() {
-      this.store.system = this.applyPhysics(this.store.system);
+      let system = this.applyPhysics(this.store.system);
+      this.store.system = system.filter(c=>!c.markForRemoval);
+      
+      
    }
 }

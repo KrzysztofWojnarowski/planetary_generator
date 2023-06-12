@@ -3,14 +3,22 @@ import Physics from "./physics.js";
 import Stage from "./stage.js";
 import Camera from "./camera.js";
 import Planets from "./planets.js";
+import Config from "./config.js";
+import Random from "lm_random/random";
+
 function app() {
-    let camera = new Camera()
-    let engine = new Engine(new Physics(), new Planets);
+    const config = new Config();
+    let random = new Random();
+    random.seed(0.5);
+    random.warmUp();
+    let camera = new Camera(config.camera);
+    let engine = new Engine(new Physics(config.physics), new Planets(random));
     let stage = new Stage(document.querySelector("#canvas").getContext("2d"), camera);
     engine.init();
     engine.store.system.forEach(element => {
         stage.add(element);
     });
+    console.log(engine.store.system);
     stage.applyFill();
     stage.applyStroke();
     document.addEventListener("keypress", e => {
@@ -30,8 +38,10 @@ function app() {
                 break;
             case "r": engine.restart();
             break;    
-
-
+            case "z":camera.rotate([0,0.1]);
+            break;
+            case "x":camera.rotate([0.1,0]);
+            break;
         }
     }
     );

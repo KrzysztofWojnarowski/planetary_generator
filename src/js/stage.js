@@ -13,15 +13,12 @@ export default class Stage {
     setSize(w, h) {
         this.#size = [x, y];
     }
-  
-
     setStroke(stroke) {
         this.#stroke = stroke;
     }
     setFill(fill) {
         this.#fill = fill;
-    }
-    
+    }  
     applyStroke() {
         this.#context.strokeStyle = this.#stroke;
     }
@@ -39,16 +36,15 @@ export default class Stage {
         let camera = this.camera;
         let offset = camera.position;
         let zoom = camera.zoom;
+        let angle = camera.angle;
         this.#context.clearRect(0,0,size[0], size[1]);
-        this.#context.fillText(objects[4].fx+" / "+objects[4].fy,100,100);
         objects.forEach(e => {
-            this.#context.beginPath();       
-            let xs =( e.x - 5 );
-            let ys =(e.y - 5);
-            let w = 10;
-            let h = 10;
+            this.#context.beginPath(); 
+            let radius = e.r;
+            e.type==="star"&&camera.moveTo(800-e.x,400-e.y);
+
             this.#context.fillStyle = e.type=="planet"?"blue":"red";
-            this.#context.rect(zoom*(offset[0]+xs),zoom*(offset[1]+ys), zoom*w, zoom*h);
+            this.#context.arc(Math.cos(angle[0])*zoom*(offset[0]+e.x),Math.sin(angle[1])*zoom*(offset[1]+e.y),zoom*radius, 0,Math.PI*2);
             this.#context.closePath();
             this.#context.fill();
         }
