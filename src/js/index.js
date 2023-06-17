@@ -7,6 +7,12 @@ import Config from "./config.js";
 import Random from "lm_random/random";
 import EffectManager from "./effectManager.js";
 import Effects from "./effects.js";
+import assetList from "./assetList.js";
+import Sprite from "./sprite.js";
+import prebuild from "./prebuild.js";
+import Builder from "./builder.js";
+import Background from "./background.js";
+
 
 function app() {
     const config = new Config();
@@ -16,16 +22,30 @@ function app() {
     let camera = new Camera(config.camera);
     let physics = new Physics(config.physics);
     let planets = new Planets(random);
-    let effectManager = new EffectManager(physics, new Effects());
+    let effects = new Effects();
+    let effectManager = new EffectManager(physics, effects);
     let engine = new Engine(physics, planets, effectManager);
-    let stage = new Stage(document.querySelector("#canvas").getContext("2d"), camera);
-    engine.init();
+    let canvas = document.querySelector("#canvas").getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let stage = new Stage(canvas, camera);
+    let builder = new Builder(planets);
+    let system = [];
+    prebuild.forEach(element => {
+        system.push(builder.build(element));
+
+    });
+
+    engine.init(canvas, system);
     engine.store.system.forEach(element => {
         stage.add(element);
     });
-    console.log(engine.store.system);
-    stage.applyFill();
-    stage.applyStroke();
+
+    let background = new Background();
+    
+    stage.setBackground(builder.buildBackground(background));
+
+
     document.addEventListener("keypress", e => {
         e.preventDefault();
         switch (e.key) {
@@ -56,8 +76,13 @@ function app() {
 
     }
     function redraw() {
-        engine.update();
-        stage.redraw(engine.store.system);
+        if (stage.isLoaded(engine.store.system)&&background.isLoaded()) {
+            engine.update();
+
+            stage.redraw(engine.store.system);
+        }else{
+            console.log("loading");
+        }
         animate();
 
     }

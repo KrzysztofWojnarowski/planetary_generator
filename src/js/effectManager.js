@@ -11,11 +11,10 @@ export default class EffectManager {
         this.#effects = effects;
         this.#physics = physics;
     }
-
-
     applyCollision(a, b) {
-        let colided = this.#physics.isCollision(a, b) && b.m > a.m;
+        let colided = this.#physics.isCollision(a, b) && b.m >= a.m;
         if (colided) {
+           
             let momentum = this.#effects.collisionEffect(a, b);
             b.m = momentum.m;
             b.vx = momentum.v[0];

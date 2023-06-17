@@ -5,8 +5,8 @@ export default class Camera {
     angle =[0,Math.PI/2];
 
     constructor(config = {
-        position:[5000,5000],
-        zoom:0.5,
+        position:[0,0],
+        zoom:1,
         angle:[0,Math.PI/2]
     }){
         this.position = config.position;
@@ -20,11 +20,11 @@ export default class Camera {
         this.position[1] += vector[1];
     }
     zoomIn() {
-        this.zoom *= 1.1;
+        this.zoom *= 2;
     }
 
     zoomOut() {
-        this.zoom *= 0.9
+        this.zoom *= 0.5
     }
 
     rotate(angle){

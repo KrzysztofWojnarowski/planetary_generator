@@ -8,31 +8,36 @@ export default class Engine {
       system: [],
    }
    #physics = {};
-   #planets = {};
    #effectManager ={};
+   #planets = {}
    constructor(physics,planets,effectManager) {
       this.#physics = physics;
       this.#planets = planets;
       this.#effectManager = effectManager;
    }
 
-   init() {
+   init(canvas,system) {
       this.restart();
-      let canvas = document.querySelector("canvas");
-      this.store.context = canvas.getContext("2d");
+      this.store.context = canvas;
+      this.loadSystem(system);
+   }
+
+   loadSystem(system){
+      this.store.system = system;
    }
 
    restart(){
-      let planets = this.#planets;
-      this.store.system = planets.buildSystem(1, 19,100);
+      
    }
 
    applyPhysics() {
-      return this.store.system.map(a => {
+      return this.store.system.map(celestialPrim => {
+         let a = celestialPrim.getPlanet();
          let f = [0, 0];    
          let ret = Object.assign({}, a);
          ret.markForRemoval=false;
-         this.store.system.forEach(b => {
+         this.store.system.forEach(celestialSec => {
+            let b =celestialSec.getPlanet();
             if (a !== b) {
                let mutated = this.#effectManager.applyCollision(a,b);
                ret = mutated[0];
@@ -47,12 +52,13 @@ export default class Engine {
          ret.y= newPosition[1];
          ret.vx= newVelocity[0];
          ret.vy = newVelocity[1];
-         return ret;
+         celestialPrim.setPlanet(ret);
+         return celestialPrim;
       });
    }
    update() {
       let system = this.applyPhysics(this.store.system);
-      this.store.system = system.filter(c=>!c.markForRemoval);
+      this.store.system = system.filter(c=>!c.getPlanet().markForRemoval);
       
       
    }

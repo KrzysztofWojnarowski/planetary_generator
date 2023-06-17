@@ -52,7 +52,7 @@ export default class Physics {
     isCollision(objectA,objectB){
         const distance = this.calculateDistance(objectA,objectB);
         let radius = objectA.r+objectB.r;
-        return distance[0]*distance[0]<radius*radius && distance[1]*distance[1]<radius*radius;
+        return (distance[0]*distance[0]<radius*radius) && (distance[1]*distance[1]<radius*radius);
     }
 
 }

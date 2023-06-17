@@ -1,7 +1,7 @@
 export default class Config {
 
     camera = {
-        position: [100, 100],
+        position: [0, 0],
         zoom: 1,
         angle: [0, Math.PI / 2]
     }
