@@ -41,7 +41,7 @@ export default class Stage {
         objects.forEach(e => {
             this.#context.beginPath(); 
             let radius = e.r;
-            e.type==="star"&&camera.moveTo(800-e.x,400-e.y);
+            e.type==="star"&&console.log(e.m);
 
             this.#context.fillStyle = e.type=="planet"?"blue":"red";
             this.#context.arc(Math.cos(angle[0])*zoom*(offset[0]+e.x),Math.sin(angle[1])*zoom*(offset[1]+e.y),zoom*radius, 0,Math.PI*2);

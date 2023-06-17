@@ -13,11 +13,11 @@ export default class Planets {
             speedDelta: 0
         },
         planet: {
-            m: 0.0001,
+            m: 0.01,
             dm: 0.09,
             r: 5,
             positionRadiusDelta: 200,
-            speedDelta: 0.09
+            speedDelta: 0.05
 
         },
         moon: {
@@ -25,7 +25,7 @@ export default class Planets {
             dm: 0.000007,
             r: 2,
             positionRadiusDelta: 200,
-            speedDelta: 0.08
+            speedDelta: 0.0008
 
         }
     }

@@ -9,9 +9,11 @@ export default class Engine {
    }
    #physics = {};
    #planets = {};
-   constructor(physics,planets) {
+   #effectManager ={};
+   constructor(physics,planets,effectManager) {
       this.#physics = physics;
       this.#planets = planets;
+      this.#effectManager = effectManager;
    }
 
    init() {
@@ -28,18 +30,13 @@ export default class Engine {
    applyPhysics() {
       return this.store.system.map(a => {
          let f = [0, 0];    
-         let colided = false;
          let ret = Object.assign({}, a);
          ret.markForRemoval=false;
          this.store.system.forEach(b => {
             if (a !== b) {
+               let mutated = this.#effectManager.applyCollision(a,b);
+               ret = mutated[0];
                f = this.#physics.vectorSum(f, this.#physics.calculateForce(a, b));
-               colided = this.#physics.isCollision(a,b) && b.m>a.m;
-               if (colided){
-                  ret.markForRemoval=true;
-               }
-               //TODO: Write elegant collide effect as an abstract behavior script
-               
             }
          });
          ret.fx = f[0];
@@ -50,7 +47,6 @@ export default class Engine {
          ret.y= newPosition[1];
          ret.vx= newVelocity[0];
          ret.vy = newVelocity[1];
-         ret.markForRemoval&& console.log("toRemove");
          return ret;
       });
    }

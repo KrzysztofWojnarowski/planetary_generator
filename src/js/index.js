@@ -5,6 +5,8 @@ import Camera from "./camera.js";
 import Planets from "./planets.js";
 import Config from "./config.js";
 import Random from "lm_random/random";
+import EffectManager from "./effectManager.js";
+import Effects from "./effects.js";
 
 function app() {
     const config = new Config();
@@ -12,7 +14,10 @@ function app() {
     random.seed(0.5);
     random.warmUp();
     let camera = new Camera(config.camera);
-    let engine = new Engine(new Physics(config.physics), new Planets(random));
+    let physics = new Physics(config.physics);
+    let planets = new Planets(random);
+    let effectManager = new EffectManager(physics, new Effects());
+    let engine = new Engine(physics, planets, effectManager);
     let stage = new Stage(document.querySelector("#canvas").getContext("2d"), camera);
     engine.init();
     engine.store.system.forEach(element => {
@@ -37,11 +42,11 @@ function app() {
             case "e": camera.zoomOut();
                 break;
             case "r": engine.restart();
-            break;    
-            case "z":camera.rotate([0,0.1]);
-            break;
-            case "x":camera.rotate([0.1,0]);
-            break;
+                break;
+            case "z": camera.rotate([0, 0.1]);
+                break;
+            case "x": camera.rotate([0.1, 0]);
+                break;
         }
     }
     );

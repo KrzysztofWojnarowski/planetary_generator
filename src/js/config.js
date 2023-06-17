@@ -8,11 +8,11 @@ export default class Config {
     system={
         planetCount:12,
         starCount:2,
-        moonCount:10
+        moonCount:0
     }
     physics={
-        G:0.0000001,
-        dt:8
+        G:0.00005,
+        dt:30
     }
 
 }
