@@ -33,7 +33,6 @@ export default class Stage {
         context.drawImage(backgroundImage,position[0],position[1],size[0],size[1]);
     }
 
-
     redraw(objects) {
         let context = this.#context;
         context.reset();
