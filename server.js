@@ -3,7 +3,6 @@ const path = require("path");
 let app = express();
 let distPath = path.join(__dirname,"dist");
 let assetsPath = path.join(distPath,"assets");
-console.log(assetsPath);
 app.use("/assets",express.static(assetsPath));
 app.use("/dist",express.static(distPath));
 app.get("/",function(req,res){

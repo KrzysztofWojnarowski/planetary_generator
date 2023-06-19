@@ -1,7 +1,7 @@
 export default class Celestial {
 
 
-    #planet = {};
+    #body = {};
     #sprite = {};
     #frame = 1;
     #frameCount = 1;
@@ -10,7 +10,7 @@ export default class Celestial {
     #frameSize = [200,200];
 
     constructor(sprite, planet) {
-        this.#planet = planet;
+        this.#body = planet;
         this.#sprite = sprite;
 
     }
@@ -32,7 +32,7 @@ export default class Celestial {
         let image = this.#sprite.getImage();
         let frame = this.getNextFrame();
         let dimension = this.#sprite.getFrame(frame, this.#frameSize[0], this.#frameSize[1]);
-        let planet = this.#planet;
+        let planet = this.#body;
         context.save();
         context.translate(planet.x-planet.r, planet.y-planet.r);
         context.drawImage(image,
@@ -46,8 +46,8 @@ export default class Celestial {
             planet.r*4);
         context.restore();
     }
-    getPlanet() {
-        return this.#planet;
+    getBody() {
+        return this.#body;
     }
     getSprite() {
         return this.#sprite;
@@ -65,7 +65,7 @@ export default class Celestial {
         this.#frameCount = frameCount;
     }
 
-    setPlanet(planet) {
-        this.#planet = planet;
+    setBody(planet) {
+        this.#body = planet;
     }
 }

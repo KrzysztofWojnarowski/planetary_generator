@@ -1,5 +1,6 @@
 import Celestial from "./celestial";
 import Sprite from "./sprite";
+import SpaceShip from "./spaceship";
 
 
 export default class Builder {
@@ -31,10 +32,20 @@ export default class Builder {
     }
 
     buildBackground(background){
-        background.load("url").then(image=>{
+        background.load().then(image=>{
             background.setImage(image);
             background.setLoaded(true);
         });
         return background;
+    }
+
+    buildShip(){
+        let ship = new SpaceShip();
+        ship.load().then(image=>{
+            ship.setImage(image);
+            ship.setLoaded(true);
+        });
+        return ship;
+
     }
 }

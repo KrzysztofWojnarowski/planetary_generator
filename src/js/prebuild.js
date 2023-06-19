@@ -3,8 +3,8 @@ export default [
         label:"Sun",
         type:"star",
         frameCount:49,
-        x:500,
-        y:300,
+        x:0,
+        y:0,
         m:8,
         r:30,
         image:"assets/8.png",
@@ -22,8 +22,8 @@ export default [
         r:7,
         image:"assets/6.png",
         frameSize:[100,100],
-        vx:0.016,
-        vy:-0.001
+        vx:-0.016,
+        vy:0.0091
     },
     {
         label:"Earth",
@@ -31,12 +31,12 @@ export default [
         frameCount:49,
         x:700,
         y:100,
-        m:0.00005,
+        m:0.0000005,
         r:10,
         image:"assets/3.png",
         frameSize:[100,100],
-        vx:-0.01,
-        vy:-0.004
+        vx:0.0051,
+        vy:-0.0094
     },
     {
         label:"Mars",
@@ -44,7 +44,7 @@ export default [
         frameCount:49,
         x:300,
         y:100,
-        m:0.00005,
+        m:0.0000005,
         r:10,
         image:"assets/4.png",
         frameSize:[100,100],
@@ -55,14 +55,14 @@ export default [
         label:"Saturn",
         type:"planet",
         frameCount:49,
-        x:800,
-        y:500,
-        m:0.00005,
+        x:100,
+        y:300,
+        m:0.000000000005,
         r:10,
         image:"assets/5.png",
         frameSize:[300,300],
-        vx:-0.0001,
-        vy:-0.007
+        vx:0.01,
+        vy:-0.0007
     }
 
 ];

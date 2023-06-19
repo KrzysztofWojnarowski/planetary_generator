@@ -9,10 +9,8 @@ export default class Engine {
    }
    #physics = {};
    #effectManager ={};
-   #planets = {}
-   constructor(physics,planets,effectManager) {
+   constructor(physics,effectManager) {
       this.#physics = physics;
-      this.#planets = planets;
       this.#effectManager = effectManager;
    }
 
@@ -32,12 +30,12 @@ export default class Engine {
 
    applyPhysics() {
       return this.store.system.map(celestialPrim => {
-         let a = celestialPrim.getPlanet();
-         let f = [0, 0];    
+         let a = celestialPrim.getBody();
+         let f = [0,0];    
          let ret = Object.assign({}, a);
          ret.markForRemoval=false;
          this.store.system.forEach(celestialSec => {
-            let b =celestialSec.getPlanet();
+            let b =celestialSec.getBody();
             if (a !== b) {
                let mutated = this.#effectManager.applyCollision(a,b);
                ret = mutated[0];
@@ -52,13 +50,13 @@ export default class Engine {
          ret.y= newPosition[1];
          ret.vx= newVelocity[0];
          ret.vy = newVelocity[1];
-         celestialPrim.setPlanet(ret);
+         celestialPrim.setBody(ret);
          return celestialPrim;
       });
    }
    update() {
       let system = this.applyPhysics(this.store.system);
-      this.store.system = system.filter(c=>!c.getPlanet().markForRemoval);
+      this.store.system = system.filter(c=>!c.getBody().markForRemoval);
       
       
    }

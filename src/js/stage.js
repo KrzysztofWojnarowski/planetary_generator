@@ -2,7 +2,7 @@ export default class Stage {
 
     container = [];
     #context = {};
-#background = {};
+    #background = {};
     camera = {};
     constructor(context, camera) {
         this.#context = context;
@@ -19,18 +19,18 @@ export default class Stage {
         return system.reduce((e, f) => e && f.getSprite().isLoaded(), true);
 
     }
-    setBackground(background){
+    setBackground(background) {
         this.#background = background;
     }
 
-    drawBackground(){
+    drawBackground() {
         const background = this.#background;
         const backgroundImage = background.getImage();
         const position = background.position;
         const size = background.size
         const context = this.#context;
-        context.fillRect(0,0,size[0],size[1]);
-        context.drawImage(backgroundImage,position[0],position[1],size[0],size[1]);
+        context.fillRect(0, 0, size[0], size[1]);
+        context.drawImage(backgroundImage, position[0], position[1], size[0], size[1]);
     }
 
 
