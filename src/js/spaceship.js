@@ -12,9 +12,7 @@ export default class SpaceShip {
     force = 0;
     body = new PhysicalBody();
     throttle = 0;
-    powerQuantum = 1e-37;
-
-
+    powerQuantum = 1e-18;
     constructor() {
         this.body.m = this.#mesh.m;
         this.body.x = this.position[0];
@@ -22,6 +20,8 @@ export default class SpaceShip {
         this.body.r = this.#mesh.r;
         this.vx = 0;
         this.vy = 0;
+        this.maxSpeed = this.#mesh.maxSpeed;
+        this.powerQuantum = this.#mesh.powerQuantum;
     }
 
     getBody() {
@@ -75,15 +75,16 @@ export default class SpaceShip {
     }
 
     throttleUp() {
-        this.throttle=1;
+        if (this.#mesh.power > this.throttle)
+            this.throttle += 1;
     }
 
     throttleDown() {
-        this.throttle=0;
+        this.throttle *= 0.4;
     }
 
-    decreaseThrottleTick(){
-        this.throttle*=0.9;
+    throttleRelax() {
+        this.throttle *= 0.9;
     }
 
     //TODO: Come up with something more reasonable
@@ -92,14 +93,14 @@ export default class SpaceShip {
         this.body.fx += throttleFactor * Math.cos(this.rotation);
         this.body.fy += throttleFactor * Math.sin(this.rotation);
         let v = physics.calculateSpeed(this.getBody());
-        this.body.vx = v[0];
-        this.body.vy = v[1];
+        this.body.vx = Math.abs(v[0]) > this.maxSpeed ? this.maxSpeed * (v[0] / Math.abs(v[0])) : v[0];
+        this.body.vy = Math.abs(v[1]) > this.maxSpeed ? this.maxSpeed * (v[1] / Math.abs(v[1])) : v[1];
         let p = physics.calculatePosition(this.getBody());
         this.body.x = p[0];
         this.body.y = p[1];
-        //this.decreaseThrottleTick();
-        
-        
+        this.throttleRelax();
+
     }
+    onCollision(){}
 
 }

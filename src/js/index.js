@@ -11,6 +11,7 @@ import prebuild from "./prebuild.js";
 import Builder from "./builder.js";
 import Background from "./background.js";
 import KeyboardHandler from "./keyboardHandler.js";
+import Canvas from "./canvas.js";
 
 
 function app() {
@@ -24,18 +25,20 @@ function app() {
     let effects = new Effects();
     let effectManager = new EffectManager(physics, effects);
     let engine = new Engine(physics, effectManager);
-    let canvasDom = document.querySelector("#canvas");
-
-    camera.moveTo(
-        window.innerWidth / 2,
-        window.innerHeight / 2
-
+    let canvas = new Canvas(document.querySelector("#canvas"));
+    canvas.setDimension(
+        window.innerWidth,
+        window.innerHeight
     );
-    let canvas = canvasDom.getContext("2d");
 
-    canvas.canvas.width = window.innerWidth;
-    canvas.canvas.height = window.innerHeight;
-    let stage = new Stage(canvas, camera);
+    const canvasDimension = canvas.getDimension();
+    camera.setVisibleWindow(canvasDimension[0], canvasDimension[1]);
+    camera.moveTo(
+        canvasDimension[0] / 2,
+        canvasDimension[1] / 2
+    );
+
+    let stage = new Stage(canvas.getContext(), camera);
     let builder = new Builder(planets);
     let system = [];
     prebuild.forEach(element => {
@@ -44,7 +47,7 @@ function app() {
     });
     let ship = builder.buildShip();
     system.push(ship);
-    engine.init(canvas, system);
+    engine.init(canvas.getContext(), system);
     engine.store.system.forEach(element => {
         stage.add(element);
     });
@@ -53,9 +56,9 @@ function app() {
 
     stage.setBackground(builder.buildBackground(background));
 
-   let keyboardHandler = new KeyboardHandler();
-   keyboardHandler.bindCameraKeys(camera,document);
-   keyboardHandler.bindShipKeys(ship,document);
+    let keyboardHandler = new KeyboardHandler();
+    keyboardHandler.bindCameraKeys(camera, document);
+    keyboardHandler.bindShipKeys(ship, document);
     camera.lockOn(ship.getBody());
 
 
@@ -65,7 +68,7 @@ function app() {
 
     }
     function redraw() {
-        if (stage.isLoaded(engine.store.system) && background.isLoaded()&&ship.isLoaded()) {
+        if (stage.isLoaded(engine.store.system) && background.isLoaded() && ship.isLoaded()) {
             engine.update();
             ship.update(physics);
             camera.update();

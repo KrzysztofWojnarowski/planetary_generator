@@ -11,7 +11,7 @@ export default class Config {
         moonCount:0
     }
     physics={
-        G:0.00005,
+        G:1e-4,
         dt:30
     }
 

@@ -9,9 +9,11 @@ export default {
         energy:100,
         energyCapacity:1000,
         effectiveRange:100,
-        power:100,
-        m:1e-32,
-        r:3,    
+        power:1,
+        m:1e-4,
+        r:3,
+        maxSpeed:0.1,
+        powerQuantum:1e-10    
     }
 
 

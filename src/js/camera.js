@@ -4,6 +4,11 @@ export default class Camera {
     zoom = 0.1;
     angle = [0, Math.PI / 2];
     target = {};
+    width = 0;
+    height = 0;
+    velocity = [0, 0];
+    allowedRange = [this.width*0.4,this.height*0.4];
+
 
     constructor(config = {
         position: [0, 0],
@@ -13,6 +18,15 @@ export default class Camera {
         this.position = config.position;
         this.zoom = config.zoom;
         this.angle = config.angle;
+    }
+    setVisibleWindow(w, h) {
+        this.width = w;
+        this.height = h;
+        this.setAllowedRange();
+    }
+
+    setAllowedRange(){
+       this.allowedRange = [this.width*0.4,this.height*0.4];
     }
 
 
@@ -41,19 +55,45 @@ export default class Camera {
     }
 
     update() {
-        return;
-        if (typeof this.target.x === typeof this.target.y === "Undefined") return;
-        let tx = this.target.x;
-        let ty = this.target.y;
-        if (tx<100 || tx>900){
-            this.moveTo(-tx + 500,this.position[1]);
+        let range = this.getRange();
+        let cameraPosition = this.position;
+        if (range[0]>this.allowedRange[0]){
+            cameraPosition = [
+                cameraPosition[0] +(this.allowedRange[0]-range[0]),
+                cameraPosition[1]
+            ]
         }
-        if (ty<100 || ty>900){
-            this.moveTo(this.position[0],-ty + 500);
+        if (range[0]<-this.allowedRange[0]){
+            cameraPosition = [
+                cameraPosition[0] +(-this.allowedRange[0]-range[0]),
+                cameraPosition[1]
+            ]
         }
-         
 
+        if (range[1]<-this.allowedRange[1]){
+            cameraPosition = [
+                cameraPosition[0],
+                cameraPosition[1] +(-this.allowedRange[1]-range[1]),
+            ]
+        }
+        if (range[1]>this.allowedRange[1]){
+            cameraPosition = [
+                cameraPosition[0],
+                cameraPosition[1] +(this.allowedRange[1]-range[1]),
+            ]
+        }
+
+        
+        this.moveTo(cameraPosition[0], cameraPosition[1]);
     }
+
+    getRange() {
+        return [
+            this.position[0] + this.target.x-this.width/2,
+            this.position[1] + this.target.y-this.height/2
+        ];
+    }
+
 
 
 }
