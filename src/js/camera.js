@@ -7,7 +7,7 @@ export default class Camera {
     width = 0;
     height = 0;
     velocity = [0, 0];
-    allowedRange = [this.width*0.4,this.height*0.4];
+    allowedRange = [this.width*0.2,this.height*0.2];
 
 
     constructor(config = {
@@ -26,7 +26,7 @@ export default class Camera {
     }
 
     setAllowedRange(){
-       this.allowedRange = [this.width*0.4,this.height*0.4];
+       this.allowedRange = [this.width*0.2,this.height*0.2];
     }
 
 
@@ -92,6 +92,15 @@ export default class Camera {
             this.position[0] + this.target.x-this.width/2,
             this.position[1] + this.target.y-this.height/2
         ];
+    }
+    getPosition(){
+        return this.position;
+    }
+    getDimension(){
+        return [
+            this.width,
+            this.height
+        ]
     }
 
 

@@ -12,6 +12,7 @@ import Builder from "./builder.js";
 import Background from "./background.js";
 import KeyboardHandler from "./keyboardHandler.js";
 import Canvas from "./canvas.js";
+import Hud from "./hud.js";
 
 
 function app() {
@@ -48,18 +49,14 @@ function app() {
     let ship = builder.buildShip();
     system.push(ship);
     engine.init(canvas.getContext(), system);
-    engine.store.system.forEach(element => {
-        stage.add(element);
-    });
-
     let background = new Background();
-
     stage.setBackground(builder.buildBackground(background));
-
     let keyboardHandler = new KeyboardHandler();
     keyboardHandler.bindCameraKeys(camera, document);
     keyboardHandler.bindShipKeys(ship, document);
     camera.lockOn(ship.getBody());
+    let hud= new Hud(camera);
+    hud.watchSystem(system);
 
 
 
@@ -73,7 +70,7 @@ function app() {
             ship.update(physics);
             camera.update();
 
-            stage.redraw(engine.store.system.concat([ship]));
+            stage.redraw(engine.store.system.concat([ship]).concat(hud));
         } else {
             console.log("loading");
         }

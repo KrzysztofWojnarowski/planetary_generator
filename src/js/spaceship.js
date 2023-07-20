@@ -76,14 +76,20 @@ export default class SpaceShip {
 
     throttleUp() {
         if (this.#mesh.power > this.throttle)
-            this.throttle += 1;
+            this.throttle += 0.5;
+        else
+            this.throttle = this.#mesh.power;
     }
 
     throttleDown() {
         this.throttle *= 0.4;
+        
     }
-
+    
     throttleRelax() {
+        if (this.throttle < 0.01)
+            this.throttle = 0;
+        else
         this.throttle *= 0.9;
     }
 
@@ -101,6 +107,10 @@ export default class SpaceShip {
         this.throttleRelax();
 
     }
-    onCollision(){}
+    onCollision() { }
+
+    getThrottle() {
+        return this.throttle;
+    }
 
 }

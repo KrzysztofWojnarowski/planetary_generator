@@ -14,5 +14,6 @@ export default class Config {
         G:1e-4,
         dt:30
     }
+    windowSize=[1200,800]
 
 }
