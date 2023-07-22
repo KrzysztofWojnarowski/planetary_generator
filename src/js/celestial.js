@@ -1,3 +1,5 @@
+import EventSystem from "./eventSystem";
+
 export default class Celestial {
 
 
@@ -12,6 +14,7 @@ export default class Celestial {
     constructor(sprite, planet) {
         this.#body = planet;
         this.#sprite = sprite;
+        this.eventSystem = new EventSystem(this);
 
     }
 

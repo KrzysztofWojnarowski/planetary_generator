@@ -14,6 +14,10 @@ export default class Engine {
       this.#effectManager = effectManager;
    }
 
+   getPhysics(){
+      return this.#physics;
+   }
+
    init(canvas,system) {
       this.restart();
       this.store.context = canvas;
@@ -56,6 +60,11 @@ export default class Engine {
    }
    update() {
       let system = this.applyPhysics(this.store.system);
+      system.forEach(c=>{
+         let shallStay = !c.getBody().markForRemoval;
+         let es = c.eventSystem;
+         shallStay?es.triggerEvent("onUpdate",this):es.triggerEvent("onRemove",this);
+      });
       this.store.system = system.filter(c=>!c.getBody().markForRemoval);
       
       

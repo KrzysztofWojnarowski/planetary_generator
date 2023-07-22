@@ -13,6 +13,7 @@ import Background from "./background.js";
 import KeyboardHandler from "./keyboardHandler.js";
 import Canvas from "./canvas.js";
 import Hud from "./hud.js";
+import SpaceShip from "./spaceship.js";
 
 
 function app() {
@@ -57,8 +58,12 @@ function app() {
     camera.lockOn(ship.getBody());
     let hud= new Hud(camera);
     hud.watchSystem(system);
-
-
+    ship.eventSystem.addListener("onRemove",(e,s)=>{
+        e.getBody().markForRemoval=true;
+    });
+    ship.eventSystem.addListener("onUpdate",(e,s)=>{
+        e.update(s.getPhysics());
+    });
 
     function animate() {
         window.requestAnimationFrame(redraw);
@@ -67,10 +72,9 @@ function app() {
     function redraw() {
         if (stage.isLoaded(engine.store.system) && background.isLoaded() && ship.isLoaded()) {
             engine.update();
-            ship.update(physics);
             camera.update();
-
-            stage.redraw(engine.store.system.concat([ship]).concat(hud));
+            hud.update(engine.store.system);
+            stage.redraw(engine.store.system.concat(hud));
         } else {
             console.log("loading");
         }

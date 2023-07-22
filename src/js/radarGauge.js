@@ -11,10 +11,14 @@ export default class RadarGauge{
     draw(context){
         this.drawRadar(context);
         context.translate(150,150);
-        context.beginPath();
-        context.strokeStyle="red";
+        context.fillStyle="rgba(100,20,20,0.9)";
         this.obstacles.forEach(e=>this.drawObstacle(context,e));
-        context.stroke();
+    }
+
+    update(system){
+        this.obstacles=[];
+        system.forEach(e=>this.addObstacle(e)
+        )
     }
 
     getRelativePosition(obstacle){
@@ -53,9 +57,11 @@ export default class RadarGauge{
         let obstaclePosition = this.getRelativePosition(obstacle);
         //@TODO: Put radarScale as constant into config
         let scale = 0.08;
-        if (this.inRange(obstacle,1000000)){
+        if (this.inRange(obstacle,1000)){
             context.moveTo(obstaclePosition[0]*scale,obstaclePosition[1]*scale);
-            context.arc(obstaclePosition[0]*scale,obstaclePosition[1]*scale,1,0,2*Math.PI);
+            context.beginPath();
+            context.arc(obstaclePosition[0]*scale,obstaclePosition[1]*scale,obstacle.r*scale,0,2*Math.PI);
+            context.fill();
         }
     }
 

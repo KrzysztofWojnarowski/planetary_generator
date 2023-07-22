@@ -25,30 +25,22 @@ export default class Hud {
         this.watchList.push(object);
     }
     watchSystem(system){
-
         let radar = new RadarGauge();
         let throttleGauge = new ThrottleGauge();
         system.forEach(e=>{
-            console.log(e.constructor.name);
             switch (e.constructor.name){
                 case "SpaceShip":
-                    console.log("observing radar");
                     radar.setObserved(e);
                     throttleGauge.setObserved(e);
                 break;
-                case "Celestial":
-                    radar.addObstacle(e);
-                    console.log(radar);
-                    break;
+                
             }
             this.gaugeList = [radar,throttleGauge];
         });
     }
-
-    
-
-
-
-
-
+    update(system){
+        this.gaugeList.forEach(e=>{
+            e.update(system);
+        });
+    }
 }

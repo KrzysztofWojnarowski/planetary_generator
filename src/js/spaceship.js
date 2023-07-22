@@ -1,3 +1,4 @@
+import EventSystem from "./eventSystem";
 import PhysicalBody from "./physicalbody";
 import spaceshiptypes from "./spaceshiptypes";
 
@@ -22,6 +23,7 @@ export default class SpaceShip {
         this.vy = 0;
         this.maxSpeed = this.#mesh.maxSpeed;
         this.powerQuantum = this.#mesh.powerQuantum;
+        this.eventSystem = new EventSystem(this);
     }
 
     getBody() {
@@ -112,5 +114,4 @@ export default class SpaceShip {
     getThrottle() {
         return this.throttle;
     }
-
 }
