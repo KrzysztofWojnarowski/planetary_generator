@@ -40,8 +40,6 @@ export default class Stage {
         this.drawBackground();
         let camera = this.camera;
         let offset = camera.position;
-        //let zoom = camera.zoom;
-        //context.scale(zoom, zoom);
         context.translate(offset[0], offset[1]);
         objects.forEach(e => {
             e.draw(context);

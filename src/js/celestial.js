@@ -37,14 +37,13 @@ export default class Celestial {
         let dimension = this.#sprite.getFrame(frame, this.#frameSize[0], this.#frameSize[1]);
         let planet = this.#body;
         context.save();
-        context.translate(planet.x-planet.r, planet.y-planet.r);
         context.drawImage(image,
             dimension.x,
             dimension.y,
             dimension.w,
             dimension.h,
-            0,
-            0,
+            planet.x-2*planet.r,
+            planet.y-2*planet.r,
             planet.r*4,
             planet.r*4);
         context.restore();
