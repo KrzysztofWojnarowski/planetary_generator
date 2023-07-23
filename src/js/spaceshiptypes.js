@@ -13,7 +13,7 @@ export default {
         m:1e-4,
         r:3,
         maxSpeed:0.1,
-        powerQuantum:1e-4    
+        powerQuantum:1e-9    
     }
 
 

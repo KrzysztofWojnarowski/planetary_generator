@@ -3,6 +3,12 @@ import PhysicalBody from "./physicalbody";
 import spaceshiptypes from "./spaceshiptypes";
 
 export default class SpaceShip {
+    keyboardState={
+        arrowUp:false,
+        arrowDown:false,
+        arrowLeft:false,
+        arrowRight:false
+    }
     url = "assets/pngegg.png";
     #isLoaded = false;
     #image = {};
@@ -14,6 +20,7 @@ export default class SpaceShip {
     body = new PhysicalBody();
     throttle = 0;
     powerQuantum = 1e-18;
+    throttleFactor =0;
     constructor() {
         this.body.m = this.#mesh.m;
         this.body.x = this.position[0];
@@ -87,6 +94,12 @@ export default class SpaceShip {
         this.throttle *= 0.4;
         
     }
+    turnLeft(){
+        this.rotation-=0.03;
+    }
+    turnRight(){
+        this.rotation+=0.03;
+    }
     
     throttleRelax() {
         if (this.throttle < 0.01)
@@ -97,6 +110,7 @@ export default class SpaceShip {
 
     //TODO: Come up with something more reasonable
     update(physics) {
+        this.handleKeyboardState();
         let throttleFactor = this.throttle * this.powerQuantum;
         this.body.fx += throttleFactor * Math.cos(this.rotation);
         this.body.fy += throttleFactor * Math.sin(this.rotation);
@@ -106,12 +120,52 @@ export default class SpaceShip {
         let p = physics.calculatePosition(this.getBody());
         this.body.x = p[0];
         this.body.y = p[1];
-        this.throttleRelax();
 
     }
     onCollision() { }
 
     getThrottle() {
         return this.throttle;
+    }
+
+    handleKeyboardState(){
+        this.keyboardState.arrowUp && this.throttleUp();
+        !this.keyboardState.arrowUp && this.throttleRelax();
+        this.keyboardState.arrowDown && this.throttleDown();
+        this.keyboardState.arrowLeft && this.turnLeft(); 
+        this.keyboardState.arrowRight && this.turnRight();
+    }
+
+    keyPressed(key){
+        !this.keyboardState[key] && (this.keyboardState[key]=true);
+    }
+
+    keyReleased(key){
+        this.keyboardState[key] && (this.keyboardState[key]=false);
+    }
+
+    handleArrowUpPress(){
+      this.keyPressed("arrowUp");
+    }
+    handleArrowDownPress(){
+        this.keyPressed("arrowDown");
+    }
+    handleArrowLeftPress(){
+        this.keyPressed("arrowLeft");
+    }
+    handleArrowRightPress(){
+        this.keyPressed("arrowRight");
+    }
+    handleArrowUpRelease(){
+        this.keyReleased("arrowUp");
+    }
+    handleArrowDownRelease(){
+        this.keyReleased("arrowDown");
+    }
+    handleArrowLeftRelease(){
+        this.keyReleased("arrowLeft");
+    }
+    handleArrowRightRelease(){
+        this.keyReleased("arrowRight");
     }
 }
