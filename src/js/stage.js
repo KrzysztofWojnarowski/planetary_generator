@@ -22,22 +22,10 @@ export default class Stage {
     setBackground(background) {
         this.#background = background;
     }
-
-    drawBackground() {
-        const background = this.#background;
-        const backgroundImage = background.getImage();
-        const position = background.position;
-        const size = background.size
-        const context = this.#context;
-        context.fillRect(0, 0, size[0], size[1]);
-        context.drawImage(backgroundImage, position[0], position[1], size[0], size[1]);
-    }
-
-
     redraw(objects) {
         let context = this.#context;
         context.reset();
-        this.drawBackground();
+        this.#background.draw(context);
         let camera = this.camera;
         let offset = camera.position;
         context.translate(offset[0], offset[1]);

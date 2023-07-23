@@ -49,7 +49,8 @@ function app() {
     });
     let ship = builder.buildShip();
     system.push(ship);
-    engine.init(canvas.getContext(), system);
+    const context = canvas.getContext("2d");
+    engine.init(context, system);
     let background = new Background();
     stage.setBackground(builder.buildBackground(background));
     let keyboardHandler = new KeyboardHandler();
@@ -63,6 +64,7 @@ function app() {
     });
     ship.eventSystem.addListener("onUpdate",(e,s)=>{
         e.update(s.getPhysics());
+        background.update(e.getBody());
     });
 
     function animate() {
