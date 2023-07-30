@@ -1,6 +1,6 @@
-import EventSystem from "./eventSystem";
-import PhysicalBody from "./physicalbody";
-import spaceshiptypes from "./spaceshiptypes";
+import EventSystem from "../engine/eventSystem";
+import PhysicalBody from "../engine/physicalbody";
+import spaceshiptypes from "../spaceshiptypes";
 
 export default class SpaceShip {
     keyboardState={
@@ -31,6 +31,8 @@ export default class SpaceShip {
         this.maxSpeed = this.#mesh.maxSpeed;
         this.powerQuantum = this.#mesh.powerQuantum;
         this.eventSystem = new EventSystem(this);
+        this.eventSystem.registerEvent("onCollided");
+        this.eventSystem.addListener("onCollided",this.onCollision);
     }
 
     getBody() {
@@ -122,7 +124,9 @@ export default class SpaceShip {
         this.body.y = p[1];
 
     }
-    onCollision() { }
+    onCollision(e,f) {
+      //  console.log(e,f);
+     }
 
     getThrottle() {
         return this.throttle;

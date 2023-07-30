@@ -1,6 +1,9 @@
-import Celestial from "./celestial";
-import Sprite from "./sprite";
-import SpaceShip from "./spaceship";
+import Celestial from "./game/celestial";
+import Sprite from "./engine/sprite";
+import SpaceShip from "./game/spaceship";
+import Explode from "./game/explode";
+import ImageLoader from "./engine/imageLoader";
+import gameImages from "./game/gameImages";
 
 
 export default class Builder {
@@ -9,6 +12,15 @@ export default class Builder {
     constructor(planets) {
         this.#planets = planets;
     }
+
+    buildAssets(){
+        const loader = new ImageLoader();
+        loader.setAssetList(gameImages);
+        loader.loadImages();
+        return loader;
+    }
+
+
 
     build(presets) {
         let planet = this.#planets.spawnEmpty(presets.type);
@@ -37,6 +49,15 @@ export default class Builder {
             background.setLoaded(true);
         });
         return background;
+    }
+    buildExplosion(){
+        let explosion = new Explode();
+        explosion.sprite.load(explosion.url).then(image=>{
+            explosion.sprite.setImage(image);
+            explosion.sprite.setLoaded(true);
+
+        });
+        return explosion;
     }
 
     buildShip(){

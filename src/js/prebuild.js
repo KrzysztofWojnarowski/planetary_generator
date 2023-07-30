@@ -5,7 +5,7 @@ export default [
         frameCount:49,
         x:0,
         y:0,
-        m:5,
+        m:100,
         r:120,
         image:"assets/8.png",
         frameSize:[200,200],

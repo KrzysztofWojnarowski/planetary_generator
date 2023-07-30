@@ -16,4 +16,10 @@ export default class EventSystem{
             element(this.owner,source);
         });
     }
+    registerEvent(eventName){
+        this.eventList[eventName] = [];
+    }
+    getRegisteredEvents(){
+        return this.eventList;
+    }
 }

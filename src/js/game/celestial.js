@@ -1,4 +1,4 @@
-import EventSystem from "./eventSystem";
+import EventSystem from "../engine/eventSystem";
 
 export default class Celestial {
 
@@ -9,16 +9,25 @@ export default class Celestial {
     #frameCount = 1;
     #speed = 3;
     #tick = 0;
-    #frameSize = [200,200];
+    #frameSize = [200, 200];
 
     constructor(sprite, planet) {
         this.#body = planet;
         this.#sprite = sprite;
         this.eventSystem = new EventSystem(this);
+        this.eventSystem.registerEvent("onCollided");
+        this.eventSystem.addListener("onCollided", (f, e) => {
+            let ptb = e.physicsTargets;
+            let k  = e.effectManager.applyCollision(ptb[0].getBody(), ptb[1].getBody())[1];
+            if (this.#body.m<k.m){
+                this.#body.markForRemoval=true;
+            }
+        });
+
 
     }
 
-    setFrameSize(frameSize){
+    setFrameSize(frameSize) {
         this.#frameSize = frameSize;
     }
 
@@ -42,10 +51,10 @@ export default class Celestial {
             dimension.y,
             dimension.w,
             dimension.h,
-            planet.x-2*planet.r,
-            planet.y-2*planet.r,
-            planet.r*4,
-            planet.r*4);
+            planet.x - 2 * planet.r,
+            planet.y - 2 * planet.r,
+            planet.r * 4,
+            planet.r * 4);
         context.restore();
     }
     getBody() {

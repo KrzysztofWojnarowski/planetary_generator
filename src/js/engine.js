@@ -1,4 +1,4 @@
-import Physics from "./physics.js";
+import Physics from "./engine/physics.js";
 import Planets from "./planets.js";
 
 export default class Engine {
@@ -8,65 +8,64 @@ export default class Engine {
       system: [],
    }
    #physics = {};
-   #effectManager ={};
-   constructor(physics,effectManager) {
+   physicsTargets = [];
+   effectManager = {};
+   constructor(physics, effectManager) {
       this.#physics = physics;
-      this.#effectManager = effectManager;
+      this.effectManager = effectManager;
    }
 
-   getPhysics(){
+   getPhysics() {
       return this.#physics;
    }
 
-   init(canvas,system) {
+   init(canvas, system) {
       this.restart();
       this.store.context = canvas;
       this.loadSystem(system);
    }
 
-   loadSystem(system){
+   loadSystem(system) {
       this.store.system = system;
    }
 
-   restart(){
-      
+   restart() {
+
    }
 
    applyPhysics() {
       return this.store.system.map(celestialPrim => {
          let a = celestialPrim.getBody();
-         let f = [0,0];    
+         let f = [0, 0];
          let ret = Object.assign({}, a);
-         ret.markForRemoval=false;
          this.store.system.forEach(celestialSec => {
-            let b =celestialSec.getBody();
-            if (a !== b) {
-               let mutated = this.#effectManager.applyCollision(a,b);
-               ret = mutated[0];
-               f = this.#physics.vectorSum(f, this.#physics.calculateForce(a, b));
+            let b = celestialSec.getBody();
+            if (celestialPrim!=celestialSec){
+               this.physicsTargets = [celestialPrim,celestialSec,ret];
+               if(this.#physics.isCollision(a,b)){
+                  celestialPrim.eventSystem.triggerEvent("onCollided",this);
+               }else{
+                 f = this.#physics.vectorSum(f, this.#physics.calculateForce(a, b));
+                 
+               }
             }
          });
-         ret.fx = f[0];
-         ret.fy = f[1];
+         a.fx = f[0];
+         a.fy = f[1];
          let newPosition = this.#physics.calculatePosition(ret);
          let newVelocity = this.#physics.calculateSpeed(ret);
-         ret.x=newPosition[0];
-         ret.y= newPosition[1];
-         ret.vx= newVelocity[0];
-         ret.vy = newVelocity[1];
-         celestialPrim.setBody(ret);
+         a.x = newPosition[0];
+         a.y = newPosition[1];
+         a.vx = newVelocity[0];
+         a.vy = newVelocity[1];
+         celestialPrim.eventSystem.triggerEvent("onUpdate", this);
          return celestialPrim;
       });
    }
    update() {
       let system = this.applyPhysics(this.store.system);
-      system.forEach(c=>{
-         let shallStay = !c.getBody().markForRemoval;
-         let es = c.eventSystem;
-         shallStay?es.triggerEvent("onUpdate",this):es.triggerEvent("onRemove",this);
-      });
-      this.store.system = system.filter(c=>!c.getBody().markForRemoval);
-      
-      
+      this.store.system = system.filter(c => !c.getBody().markForRemoval);
+
+
    }
 }

@@ -2,6 +2,16 @@ export default class Sprite {
 
     #spriteImage = {};
     #isLoaded = false;
+    image={}
+
+    frameRows = 1;
+    framesInRow = 1;
+    currentFrame = 0;
+
+
+    bindImage(image){
+        this.image = image;
+    }
        
     load(url) {
         return new Promise(resolve => {
