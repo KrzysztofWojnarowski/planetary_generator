@@ -1,13 +1,15 @@
 import EventSystem from "../engine/eventSystem";
 import PhysicalBody from "../engine/physicalbody";
 import spaceshiptypes from "../spaceshiptypes";
+import Explode from "./explode";
+import Entity from "../engine/entity";
 
 export default class SpaceShip {
-    keyboardState={
-        arrowUp:false,
-        arrowDown:false,
-        arrowLeft:false,
-        arrowRight:false
+    keyboardState = {
+        arrowUp: false,
+        arrowDown: false,
+        arrowLeft: false,
+        arrowRight: false
     }
     url = "assets/pngegg.png";
     #isLoaded = false;
@@ -20,8 +22,10 @@ export default class SpaceShip {
     body = new PhysicalBody();
     throttle = 0;
     powerQuantum = 1e-18;
-    throttleFactor =0;
+    throttleFactor = 0;
+    physics = {};
     constructor() {
+        this.entity = new Entity();
         this.body.m = this.#mesh.m;
         this.body.x = this.position[0];
         this.body.y = this.position[1];
@@ -32,7 +36,19 @@ export default class SpaceShip {
         this.powerQuantum = this.#mesh.powerQuantum;
         this.eventSystem = new EventSystem(this);
         this.eventSystem.registerEvent("onCollided");
-        this.eventSystem.addListener("onCollided",this.onCollision);
+        this.eventSystem.addListener("onCollided", this.onCollision);
+        this.eventSystem.addListener("onRemove", this.onRemove);
+        this.eventSystem.addListener("onUpdate", (e, s) => {
+            e.update(s.getPhysics());
+            s.background.eventSystem.triggerEvent("onUpdate", this);
+        });
+    }
+
+    onRemove(e, s) {
+        e.getBody().markForRemoval = true;
+    }
+    onUpdate(e, s) {
+        e.update(s.getPhysics());
     }
 
     getBody() {
@@ -94,20 +110,20 @@ export default class SpaceShip {
 
     throttleDown() {
         this.throttle *= 0.4;
-        
+
     }
-    turnLeft(){
-        this.rotation-=0.03;
+    turnLeft() {
+        this.rotation -= 0.03;
     }
-    turnRight(){
-        this.rotation+=0.03;
+    turnRight() {
+        this.rotation += 0.03;
     }
-    
+
     throttleRelax() {
         if (this.throttle < 0.01)
             this.throttle = 0;
         else
-        this.throttle *= 0.9;
+            this.throttle *= 0.9;
     }
 
     //TODO: Come up with something more reasonable
@@ -124,52 +140,62 @@ export default class SpaceShip {
         this.body.y = p[1];
 
     }
-    onCollision(e,f) {
-      //  console.log(e,f);
-     }
+    onCollision(e, f,g) {
+
+        e.body.markForRemoval = true;
+        let explosion = new Explode();
+        const body = e.getBody();
+        explosion.sprite.setImage(g.loader.getGameImages().explosionSheet.getImage());
+        explosion.animation.position = [
+            body.x,body.y
+        ];
+        explosion.animation.size = [200,200];
+        g.store.system.push(explosion);
+        g.registerAnimation(explosion);
+    }
 
     getThrottle() {
         return this.throttle;
     }
 
-    handleKeyboardState(){
+    handleKeyboardState() {
         this.keyboardState.arrowUp && this.throttleUp();
         !this.keyboardState.arrowUp && this.throttleRelax();
         this.keyboardState.arrowDown && this.throttleDown();
-        this.keyboardState.arrowLeft && this.turnLeft(); 
+        this.keyboardState.arrowLeft && this.turnLeft();
         this.keyboardState.arrowRight && this.turnRight();
     }
 
-    keyPressed(key){
-        !this.keyboardState[key] && (this.keyboardState[key]=true);
+    keyPressed(key) {
+        !this.keyboardState[key] && (this.keyboardState[key] = true);
     }
 
-    keyReleased(key){
-        this.keyboardState[key] && (this.keyboardState[key]=false);
+    keyReleased(key) {
+        this.keyboardState[key] && (this.keyboardState[key] = false);
     }
 
-    handleArrowUpPress(){
-      this.keyPressed("arrowUp");
+    handleArrowUpPress() {
+        this.keyPressed("arrowUp");
     }
-    handleArrowDownPress(){
+    handleArrowDownPress() {
         this.keyPressed("arrowDown");
     }
-    handleArrowLeftPress(){
+    handleArrowLeftPress() {
         this.keyPressed("arrowLeft");
     }
-    handleArrowRightPress(){
+    handleArrowRightPress() {
         this.keyPressed("arrowRight");
     }
-    handleArrowUpRelease(){
+    handleArrowUpRelease() {
         this.keyReleased("arrowUp");
     }
-    handleArrowDownRelease(){
+    handleArrowDownRelease() {
         this.keyReleased("arrowDown");
     }
-    handleArrowLeftRelease(){
+    handleArrowLeftRelease() {
         this.keyReleased("arrowLeft");
     }
-    handleArrowRightRelease(){
+    handleArrowRightRelease() {
         this.keyReleased("arrowRight");
     }
 }

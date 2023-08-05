@@ -5,6 +5,8 @@ export default class Animation {
     dimension = [0,0];
     sprite = {};
     postUpdates = [];
+    framesInRow = 0;
+    currentFrame = 0;
 
     bindSprite(sprite) {
         this.sprite = sprite;
@@ -33,7 +35,6 @@ export default class Animation {
     }
     update() {
         this.nextFrameIndex();
-        this.postUpdates.forEach(e => e(this));
     }
 
     draw(context) {
@@ -41,9 +42,11 @@ export default class Animation {
         const d = this.dimension;
         const size = this.size;
         const p = this.position;
+        context.save();
         context.drawImage(this.sprite.getImage(),
             d[0] * framePosition[0], d[1] * framePosition[1],
-            d[0], d[1],0,0, size[0], size[1]);
+            d[0], d[1],p[0]-0.5*size[0],p[1]-0.5*size[1], size[0], size[1]);
+        context.restore();
     }
 }
 

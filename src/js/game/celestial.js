@@ -1,4 +1,5 @@
 import EventSystem from "../engine/eventSystem";
+import Entity from "../engine/entity";
 
 export default class Celestial {
 
@@ -14,14 +15,12 @@ export default class Celestial {
     constructor(sprite, planet) {
         this.#body = planet;
         this.#sprite = sprite;
+        this.entity = new Entity();
+
         this.eventSystem = new EventSystem(this);
         this.eventSystem.registerEvent("onCollided");
         this.eventSystem.addListener("onCollided", (f, e) => {
-            let ptb = e.physicsTargets;
-            let k  = e.effectManager.applyCollision(ptb[0].getBody(), ptb[1].getBody())[1];
-            if (this.#body.m<k.m){
-                this.#body.markForRemoval=true;
-            }
+            this.#body.markForRemoval = this.#body.m < e.getBody().m;
         });
 
 

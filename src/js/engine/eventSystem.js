@@ -11,9 +11,9 @@ export default class EventSystem{
     addListener(event,callback){
         this.eventList[event].push(callback);
     }
-    triggerEvent(event,source){
+    triggerEvent(event,source,params={}){
         this.eventList[event].forEach(element => {
-            element(this.owner,source);
+            element(this.owner,source,params);
         });
     }
     registerEvent(eventName){

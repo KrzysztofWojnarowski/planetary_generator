@@ -11,7 +11,4 @@ export default [
     "assets/8.png",
     "assets/9.png",
     "assets/10.png"
-
-
-
 ];

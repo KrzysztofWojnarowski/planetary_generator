@@ -1,3 +1,5 @@
+import Effects from "./effects";
+
 export default class Physics {
     G = 0.01;
     dt = 5;
@@ -8,8 +10,8 @@ export default class Physics {
     }) {
         this.G = config.G;
         this.dt = config.dt;
+        this.effects = new Effects();
     }
-
     calculateDistance(objectA, objectB) {
         return [
             objectB.x - objectA.x,
@@ -49,10 +51,48 @@ export default class Physics {
         return a.map((i, e) => i + b[e]);
     }
 
-    isCollision(objectA,objectB){
-        const distance = this.calculateDistance(objectA,objectB);
-        let radius = objectA.r+objectB.r;
-        return (distance[0]*distance[0]<radius*radius) && (distance[1]*distance[1]<radius*radius);
+    isCollision(objectA, objectB) {
+        const distance = this.calculateDistance(objectA, objectB);
+        let radius = objectA.r + objectB.r;
+        return (distance[0] * distance[0] < radius * radius) && (distance[1] * distance[1] < radius * radius);
+    }
+
+    getCollisions(target, gameObjects) {
+        const tb = target;
+        let map = new Map();
+        gameObjects.forEach((v,k) => {
+            if (tb!=v && this.isCollision(tb,v)){
+                map.set(k,v);
+            }
+        });
+        return map;
+    }
+
+
+    applyGravity(target, gameObjects) {
+        let f = [0, 0];
+        let tb = target;
+        gameObjects.forEach(cellestial => {
+            if (cellestial != target) {
+                let cb = cellestial;
+                f = this.vectorSum(f, this.calculateForce(tb, cb));
+            }
+        });
+        tb.fx = f[0];
+        tb.fy = f[1];
+        let newPosition = this.calculatePosition(tb);
+        let newVelocity = this.calculateSpeed(tb);
+        tb.x = newPosition[0];
+        tb.y = newPosition[1];
+        tb.vx = newVelocity[0];
+        tb.vy = newVelocity[1];
+    }
+
+    applyNonElasticCollision(target,collider){
+       let a = target;
+       let b = collider;
+       a.m>b.m && this.effects.collisionEffect(a,b);
     }
 
 }
+

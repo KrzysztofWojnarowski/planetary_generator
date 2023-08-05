@@ -1,3 +1,6 @@
+import Entity from "../engine/entity";
+import EventSystem from "../engine/eventSystem";
+
 export default class Background {
     position = [0, 0];
     size = [2000, 2000];
@@ -5,6 +8,11 @@ export default class Background {
     #isLoaded = false;
     #image = {};
 
+    constructor(){
+        this.eventSystem = new EventSystem(this);
+        this.eventSystem.registerEvent("onUpdate",this.onUpdate);
+        this.entity = new Entity();
+    }
 
     load() {
         let url = this.url;
@@ -40,7 +48,8 @@ export default class Background {
         context.fillRect(0, 0, size[0], size[1]);
         context.drawImage(backgroundImage, position[0], position[1], size[0], size[1], 0, 0, 6000, 6000);
     }
-    update(shipBody){
+    onUpdate(ship){
+        const shipBody = ship.getBody();
         this.move([500+0.5*shipBody.x,500+0.5*shipBody.y]);
     }
 }

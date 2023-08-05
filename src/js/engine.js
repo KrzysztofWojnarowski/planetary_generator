@@ -4,15 +4,73 @@ import Planets from "./planets.js";
 export default class Engine {
 
    store = {
-      context: {},
       system: [],
+      physical: new Map(),
+      animation: [],
+      eventQueue: new Map()
    }
    #physics = {};
-   physicsTargets = [];
-   effectManager = {};
-   constructor(physics, effectManager) {
+   constructor(physics) {
       this.#physics = physics;
-      this.effectManager = effectManager;
+   }
+
+   registerPhysical(object) {
+      if (typeof object.getBody === "function") {
+         this.store.physical.set(object.entity.getUUID(), object.getBody());
+      }
+   }
+   queueEvent(entityUUID, event, params) {
+      this.store.eventQueue.set(crypto.randomUUID(), { uuid: entityUUID, event: event, params: params });
+   }
+
+   processEvents() {
+      this.store.eventQueue.forEach((v, k) => {
+         let element = this.store.system.find(e => e.entity.getUUID() === v.uuid);
+         element.eventSystem.triggerEvent(v.event, ...v.params);
+         this.store.eventQueue.delete(k);
+
+      });
+   }
+
+   removePhysical(uuid) {
+      this.store.physical.delete(uuid);
+   }
+
+   removeFromSystem(uuid) {
+      this.store.system = this.store.system.filter(e => {
+         return !(e.entity.getUUID() == uuid);
+      });
+   }
+
+   removeMarked() {
+      this.store.physical.forEach((e, k) => {
+         if (e.markForRemoval == true) {
+            this.removePhysical(k);
+            this.removeFromSystem(k);
+         }
+      });
+   }
+
+   registerAnimation(object) {
+      if (typeof object.animation === "object") {
+         this.store.animation.push(object.animation);
+      }
+   }
+
+   getParentOfPhysical(physical) {
+      return this.store.system.find(e => e.getBody() == physical);
+   }
+
+   getByUUID(uuid) {
+      return this.store.system.find(e => e.entity.getUUID == uuid);
+   }
+
+   updateAnimations() {
+      this.store.animation.forEach(e => e.update());
+   }
+
+   setLoader(loader) {
+      this.loader = loader;
    }
 
    getPhysics() {
@@ -29,43 +87,65 @@ export default class Engine {
       this.store.system = system;
    }
 
+   setStage(stage) {
+      this.stage = stage;
+   }
+   getStage() {
+      return this.stage;
+   }
+
+
    restart() {
 
    }
-
-   applyPhysics() {
-      return this.store.system.map(celestialPrim => {
-         let a = celestialPrim.getBody();
-         let f = [0, 0];
-         let ret = Object.assign({}, a);
-         this.store.system.forEach(celestialSec => {
-            let b = celestialSec.getBody();
-            if (celestialPrim!=celestialSec){
-               this.physicsTargets = [celestialPrim,celestialSec,ret];
-               if(this.#physics.isCollision(a,b)){
-                  celestialPrim.eventSystem.triggerEvent("onCollided",this);
-               }else{
-                 f = this.#physics.vectorSum(f, this.#physics.calculateForce(a, b));
-                 
-               }
-            }
-         });
-         a.fx = f[0];
-         a.fy = f[1];
-         let newPosition = this.#physics.calculatePosition(ret);
-         let newVelocity = this.#physics.calculateSpeed(ret);
-         a.x = newPosition[0];
-         a.y = newPosition[1];
-         a.vx = newVelocity[0];
-         a.vy = newVelocity[1];
-         celestialPrim.eventSystem.triggerEvent("onUpdate", this);
-         return celestialPrim;
-      });
+   bindBackground(background) {
+      this.background = background;
    }
+
+   bindCamera(camera) {
+      this.camera = camera;
+   }
+   bindContext(context) {
+      this.context = context;
+   }
+
+
+
    update() {
-      let system = this.applyPhysics(this.store.system);
-      this.store.system = system.filter(c => !c.getBody().markForRemoval);
-
+      this.store.physical.forEach((e, k) => {
+         this.processPhysical(e);
+         this.queueEvent(k, "onUpdate", [this]);
+      });
+      this.updateAnimations();
+      this.processEvents();
+      this.removeMarked();
+   }
+   processPhysical(e) {
+      const physics = this.#physics;
+      let physical = this.store.physical;
+      physics.applyGravity(e, physical);
+      let colliders = physics.getCollisions(e, physical);
+      colliders.forEach((collider) => {
+         physics.applyNonElasticCollision(e, collider);
+         this.queueEvent(this.getParentOfPhysical(e).entity.getUUID(), "onCollided", [this.getParentOfPhysical(collider), this]);
+      });
 
    }
+   redraw() {
+      let objects = this.store.system;
+      let context = this.context;
+      context.reset();
+      this.background.draw(context);
+      let camera = this.camera;
+      let offset = camera.position;
+      context.translate(offset[0], offset[1]);
+      objects.forEach(e => {
+         e.draw(context);
+      });
+      this.store.animation.forEach(e => e.draw(this.context));
+   }
+
+
+
+
 }

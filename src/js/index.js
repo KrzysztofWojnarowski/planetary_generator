@@ -5,14 +5,13 @@ import Camera from "./camera.js";
 import Planets from "./planets.js";
 import Config from "./config.js";
 import Random from "lm_random/random";
-import EffectManager from "./effectManager.js";
-import Effects from "./effects.js";
+import Effects from "./engine/effects.js";
 import prebuild from "./prebuild.js";
 import Builder from "./builder.js";
 import Background from "./game/background.js";
 import KeyboardHandler from "./keyboardHandler.js";
 import Canvas from "./canvas.js";
-import Hud from "./hud.js";
+import Hud from "./game/hud.js";
 
 function app() {
     const config = new Config();
@@ -22,9 +21,7 @@ function app() {
     let camera = new Camera(config.camera);
     let physics = new Physics(config.physics);
     let planets = new Planets(random);
-    let effects = new Effects();
-    let effectManager = new EffectManager(physics, effects);
-    let engine = new Engine(physics, effectManager);
+    let engine = new Engine(physics);
     let canvas = new Canvas(document.querySelector("#canvas"));
     canvas.setDimension(
         window.innerWidth,
@@ -38,66 +35,48 @@ function app() {
         canvasDimension[1] / 2
     );
 
-    let stage = new Stage(canvas.getContext(), camera);
     let builder = new Builder(planets);
     const imageLoader = builder.buildAssets();
-    imageLoader.eventSystem.addListener("onImagesReady", (e,s) => {
-        console.log("everything loaded");
-        animate();
-    });
-
-
-
-
-
-
     let system = [];
     prebuild.forEach(element => {
         system.push(builder.build(element));
-
+        
     });
     let ship = builder.buildShip();
     system.push(ship);
     const context = canvas.getContext("2d");
     engine.init(context, system);
     let background = new Background();
-    stage.setBackground(builder.buildBackground(background));
+    engine.bindBackground(builder.buildBackground(background));
     let keyboardHandler = new KeyboardHandler();
     keyboardHandler.bindCameraKeys(camera, document);
     keyboardHandler.bindShipKeys(ship, document);
     camera.lockOn(ship.getBody());
+    engine.bindCamera(camera);
+    engine.bindContext(context);
     let hud = new Hud(camera);
     hud.watchSystem(system);
-    let explode = builder.buildExplosion();
-
-
-
-    ship.eventSystem.addListener("onRemove", (e, s) => {
-        e.getBody().markForRemoval = true;
+    system.forEach(e=>{
+        engine.registerPhysical(e);
     });
-    ship.eventSystem.addListener("onUpdate", (e, s) => {
-        e.update(s.getPhysics());
-        background.update(e.getBody());
-    });
-
     function animate() {
         window.requestAnimationFrame(redraw);
-
+        
     }
-    function redraw() {
-        console.log(
-        );
-        if (stage.isLoaded(engine.store.system) && background.isLoaded() && ship.isLoaded() && explode.sprite.isLoaded()) {
-            engine.update();
-            camera.update();
-            hud.update(engine.store.system);
-            stage.redraw(engine.store.system.concat(hud));
-        } else {
-            console.log("loading");
-        }
+    imageLoader.eventSystem.addListener("onImagesReady", (e, s) => {
+        console.log("everything loaded");
         animate();
-
+    });
+    engine.setLoader(imageLoader);
+    
+    function redraw() {
+        engine.update();
+        camera.update();
+        hud.update(engine.store.system);
+        engine.redraw();
+        animate();
+        
     }
-  
+    
 }
 window.addEventListener("DOMContentLoaded", app);

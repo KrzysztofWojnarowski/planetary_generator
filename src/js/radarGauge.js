@@ -1,4 +1,10 @@
+import Entity from "./engine/entity";
+
 export default class RadarGauge{
+
+    constructor(){
+        this.entity= new Entity();
+    }
 
     observed = {};
     obstacles =[];
@@ -6,6 +12,7 @@ export default class RadarGauge{
         this.observed = ship.getBody();
     }
     addObstacle(obstacle){
+        if (typeof obstacle.getBody ==="function")
         this.obstacles.push(obstacle.getBody());
     }
     draw(context){

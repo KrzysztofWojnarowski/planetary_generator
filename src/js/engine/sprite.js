@@ -11,6 +11,7 @@ export default class Sprite {
 
     bindImage(image){
         this.image = image;
+        this.#isLoaded = true;
     }
        
     load(url) {

@@ -1,5 +1,6 @@
-import ThrottleGauge from "./ThrottleGauge";
-import RadarGauge from "./radarGauge";
+import ThrottleGauge from "../ThrottleGauge";
+import RadarGauge from "../radarGauge";
+import Entity from "../engine/entity";
 
 export default class Hud {
 
@@ -9,6 +10,8 @@ export default class Hud {
     constructor(camera) {
         this.camera = camera;
         this.windowSize = camera.getDimension();
+        this.entity = new Entity();
+
     }
     draw(context) {
         let [w, h] = this.windowSize;

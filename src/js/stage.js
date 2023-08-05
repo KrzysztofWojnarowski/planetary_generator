@@ -22,6 +22,10 @@ export default class Stage {
     setBackground(background) {
         this.#background = background;
     }
+
+    getBackground() {
+        return this.#background;
+    }
     redraw(objects) {
         let context = this.#context;
         context.reset();
