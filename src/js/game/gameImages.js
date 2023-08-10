@@ -13,5 +13,7 @@ export default {
     blackHoleSheet: "../assets/7.png",
     sunSheet: "../assets/8.png",
     violetStarSheet: "../assets/9.png",
-    earth: "../assets/10.png"
+    earth: "../assets/10.png",
+    gaugeSheet:"../assets/All.png",
+    iconSheet:"../assets/icons.png"
 }

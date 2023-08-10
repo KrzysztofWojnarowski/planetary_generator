@@ -1,12 +1,10 @@
-import Physics from "./engine/physics.js";
-import Planets from "./planets.js";
-
 export default class Engine {
 
    store = {
       system: [],
       physical: new Map(),
       animation: [],
+      drawable:[],
       eventQueue: new Map()
    }
    #physics = {};
@@ -24,12 +22,18 @@ export default class Engine {
    }
 
    processEvents() {
+
       this.store.eventQueue.forEach((v, k) => {
+         console.log(v,k);
          let element = this.store.system.find(e => e.entity.getUUID() === v.uuid);
          element.eventSystem.triggerEvent(v.event, ...v.params);
          this.store.eventQueue.delete(k);
 
       });
+   }
+
+   getPhysicals(){
+      return this.store.physical;
    }
 
    removePhysical(uuid) {
@@ -57,6 +61,12 @@ export default class Engine {
       }
    }
 
+   registerDrawable(object) {
+      if (typeof object.drawable === "object") {
+         this.store.drawable.push(object.drawable);
+      }
+   }
+
    getParentOfPhysical(physical) {
       return this.store.system.find(e => e.getBody() == physical);
    }
@@ -68,6 +78,9 @@ export default class Engine {
    updateAnimations() {
       this.store.animation.forEach(e => e.update());
    }
+   updateDrawables() {
+      this.store.drawable.forEach(e => e.update());
+   }
 
    setLoader(loader) {
       this.loader = loader;
@@ -77,26 +90,11 @@ export default class Engine {
       return this.#physics;
    }
 
-   init(canvas, system) {
-      this.restart();
-      this.store.context = canvas;
-      this.loadSystem(system);
-   }
-
    loadSystem(system) {
       this.store.system = system;
    }
 
-   setStage(stage) {
-      this.stage = stage;
-   }
-   getStage() {
-      return this.stage;
-   }
-
-
    restart() {
-
    }
    bindBackground(background) {
       this.background = background;
@@ -109,14 +107,13 @@ export default class Engine {
       this.context = context;
    }
 
-
-
    update() {
       this.store.physical.forEach((e, k) => {
          this.processPhysical(e);
          this.queueEvent(k, "onUpdate", [this]);
       });
       this.updateAnimations();
+      this.updateDrawables();
       this.processEvents();
       this.removeMarked();
    }
@@ -143,8 +140,12 @@ export default class Engine {
          e.draw(context);
       });
       this.store.animation.forEach(e => e.draw(this.context));
+      this.store.drawable.forEach(e => e.draw(this.context));
    }
 
+   assemble(assemblingFunction){
+      assemblingFunction(this);
+   }
 
 
 

@@ -1,7 +1,7 @@
-import EventSystem from "../engine/eventSystem";
-import Sprite from "../engine/sprite";
-import Animation from "../engine/animation";
-import Entity from "../engine/entity";
+import EventSystem from "../../engine/eventSystem";
+import Sprite from "../../engine/sprite";
+import Animation from "../../engine/animation";
+import Entity from "../../engine/entity";
 export default class Explode {
 
     frameRows = 6;
@@ -33,7 +33,6 @@ export default class Explode {
         ]
     }
     nextFrameIndex() {
-        console.log("updating");
         this.currentFrame++;
     }
 
@@ -44,7 +43,6 @@ export default class Explode {
 
     draw(context) {
         const framePosition = this.getFramePosition();
-        console.log(framePosition);
         const d  = this.dimension;
         context.drawImage(this.animation.sprite.getImage(),
         d[0]*framePosition[0],d[1]*framePosition[1],

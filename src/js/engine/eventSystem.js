@@ -12,6 +12,7 @@ export default class EventSystem{
         this.eventList[event].push(callback);
     }
     triggerEvent(event,source,params={}){
+        console.log(event,params);
         this.eventList[event].forEach(element => {
             element(this.owner,source,params);
         });

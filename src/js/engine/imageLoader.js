@@ -23,7 +23,6 @@ export default class ImageLoader {
                 gameImage.setLoaded();
                 console.log(`Loaded: ${element}`);
                 if (this.isReady()){
-                    console.log(this);
                     this.eventSystem.triggerEvent("onImagesReady",this);
                 }
             });
@@ -32,7 +31,7 @@ export default class ImageLoader {
     }
     isReady(){
        let k =  Object.keys(this.images).filter(element=>{
-            return !this.images[element].isLoaded()
+            return !this.images[element].isLoaded();
         })
         return k.length==0;
     }

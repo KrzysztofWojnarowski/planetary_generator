@@ -14,7 +14,7 @@ export default class Background {
         this.entity = new Entity();
     }
 
-    load() {
+    load() {    
         let url = this.url;
         return new Promise(resolve => {
             const image = new Image();
@@ -40,16 +40,23 @@ export default class Background {
     move(vector) {
         this.position = vector;
     }
-//@TODO: figure out more generic rules, and put magic numbers to config
     draw(context) {
         const backgroundImage = this.getImage();
         const position = this.position;
-        const size = this.size
+        const size = this.size;
+        context.save();
         context.fillRect(0, 0, size[0], size[1]);
-        context.drawImage(backgroundImage, position[0], position[1], size[0], size[1], 0, 0, 6000, 6000);
+        context.translate(-position[0]%6000,-position[1]%6000);
+        for(let k=-1;k<2;k++){
+            for(let j=-1;j<2;j++){
+                context.drawImage(backgroundImage,0,0,size[0],size[1],j*6000,k*6000,6000,6000);
+            }
+        }
+        context.restore();
     }
     onUpdate(ship){
         const shipBody = ship.getBody();
-        this.move([500+0.5*shipBody.x,500+0.5*shipBody.y]);
+        this.move([5+0.7*shipBody.x,5+0.7*shipBody.y]);
+
     }
 }

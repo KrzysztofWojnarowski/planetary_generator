@@ -68,6 +68,25 @@ export default class Physics {
         return map;
     }
 
+    getInRange(target,gameObjects,range){
+        const tb = target;
+        let map = new Map();
+        gameObjects.forEach((v,k) => {
+            if (tb!=v && this.inRange(tb,v,range)){
+                map.set(k,v);
+            }
+        });
+        return map;
+    }
+
+
+    inRange(objectA, objectB,range) {
+        let totalRange = range+objectA.r+objectB.r;
+        const rS = totalRange*totalRange;
+        const distance = this.calculateDistance(objectA, objectB);
+        return (distance[0] * distance[0] < rS) && (distance[1] * distance[1] < rS);
+    }
+
 
     applyGravity(target, gameObjects) {
         let f = [0, 0];

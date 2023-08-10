@@ -29,32 +29,22 @@ export default class KeyboardHandler {
             }
         });
     }
-
-
-    bindCameraKeys(camera, document) {
-        document.addEventListener("keypress", e => {
-            e.preventDefault();
+    bindContextSwitchKeys(gameContextHandler, document) {
+        document.addEventListener("keydown", e => {
+            e.preventDefault(e);
+            console.log(e.key);
             switch (e.key) {
-                case "w": camera.move([0, 10]);
-                    break;
-                case "s": camera.move([0, -10]);
-                    break;
-                case "a": camera.move([-10, 0]);
-                    break;
-                case "d": camera.move([10, 0]);
-                    break;
-                case "q": camera.zoomIn();
-                    break;
-                case "e": camera.zoomOut();
-                    break;
-                case "r": engine.restart();
-                    break;
-                case "z": camera.rotate([0, 0.1]);
-                    break;
-                case "x": camera.rotate([0.1, 0]);
+                case "Escape":
+                    const currentContextObject = gameContextHandler.extractContext();
+                    const currentContextUUID = gameContextHandler.getCurrentUUID();
+                    let nextContext = currentContextUUID=="gameplay"?"menuContext":"gameplay";
+                    gameContextHandler.registerContext(gameContextHandler.getCurrentUUID(), currentContextObject);
+                    gameContextHandler.applyContext(nextContext);
                     break;
             }
-        }
-        );
+        });
     }
+
+
+
 }
