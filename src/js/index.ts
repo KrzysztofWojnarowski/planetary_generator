@@ -3,6 +3,7 @@ import Physics from "./engine/physics.js";
 import Camera from "./engine/camera.js";
 import Planets from "./game/ingameObjects/planets.js";
 import Config from "./game/config.js";
+// @ts-ignore
 import Random from "lm_random/random";
 import Builder from "./game/builder.js";
 import Canvas from "./engine/canvas.js";
@@ -32,9 +33,9 @@ function app() {
     engine.bindCamera(camera);
     const imageLoader = builder.buildAssets();
     engine.setLoader(imageLoader);
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext();
     engine.bindContext(context);
-    imageLoader.eventSystem.addListener("onImagesReady", (e, s) => {
+    imageLoader.eventSystem.addListener("onImagesReady", () => {
         console.log("everything loaded");
         engine.assemble(assemblingFunction);
         animate();
