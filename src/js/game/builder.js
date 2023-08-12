@@ -7,7 +7,6 @@ import gameImages from "./gameImages";
 
 
 export default class Builder {
-
     #planets = {};
     constructor(planets) {
         this.#planets = planets;
