@@ -1,4 +1,5 @@
 export default class Engine {
+   builder = null;
 
    store = {
       system: [],
