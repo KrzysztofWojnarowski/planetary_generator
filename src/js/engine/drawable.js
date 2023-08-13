@@ -1,5 +1,4 @@
 export default class Drawable {
-
     position = [0, 0];
     size = [0, 0];
     dimension = [0,0];
