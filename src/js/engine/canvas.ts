@@ -1,15 +1,11 @@
 export class Canvas {
     context: CanvasRenderingContext2D = null;
     dimension: [number, number] = [0,0];
-    htmlElement: HTMLCanvasElement = null;
+    canvas: HTMLCanvasElement = null;
 
-    constructor(htmlElement: HTMLCanvasElement) {
-          this.context = htmlElement.getContext("2d");
-    }
-
-    setDimension(w: number, h: number): void {
-        this.context.canvas.width = w;
-        this.context.canvas.height = h;
+    constructor(htmlCanvasElement: HTMLCanvasElement) {
+        this.canvas = htmlCanvasElement;
+        this.context = htmlCanvasElement.getContext("2d");
     }
 
     getDimension(): [number, number] {
@@ -23,11 +19,8 @@ export class Canvas {
         return this.context;
     }
 
-    resizeCanvas(): void {
+    resize([screenWidth,  screenHeight]: [ number,  number ]): void {
         const canvas = this.context.canvas;
-          // Get the current device's screen dimensions
-        const [ screenWidth,  screenHeight ] = this.getScreenSize();
-
         // Set the canvas size to match the screen dimensions
         canvas.width = screenWidth;
         canvas.height = screenHeight;
@@ -37,13 +30,6 @@ export class Canvas {
 
         // Apply the scaling transformation
         this.context.scale(scale, scale);
-    }
-
-    private getScreenSize(): [number, number] {
-        return [
-            window.innerWidth,
-            window.innerHeight
-        ]
     }
 
     private getScale(screenWidth: number, canvasWidth: number, screenHeight: number, canvasHeight: number): number {
