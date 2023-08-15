@@ -6,7 +6,7 @@ import Accelerometer from "./gauges/accelerometer";
 import EnergyMeter from "./gauges/energyMeter";
 import RadarGauge from "./gauges/radarGauge";
 import GameContextHandler from "../engine/gameContextHandler";
-import MenuFrame from "./menuItems/menuFrame";
+import { MenuFrame } from "./menuItems/menu-frame";
 import MenuContent from "./menuItems/menuContent";
 
 export default function assemblingFunction(engine) {
@@ -26,8 +26,9 @@ export default function assemblingFunction(engine) {
     
 }
 
-function buildMenuContext(engine,keyboardHandler){
-    let menuFrame = new MenuFrame(engine);
+function buildMenuContext(engine, keyboardHandler){
+    const screenSize = [window.innerWidth, window.innerHeight];
+    let menuFrame = new MenuFrame(engine, screenSize);
     engine.registerDrawable(menuFrame);
     let menuContent = new MenuContent(engine);
     engine.registerDrawable(menuContent);
