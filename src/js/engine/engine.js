@@ -64,7 +64,7 @@ export default class Engine {
 
    registerDrawable(object) {
       if (typeof object.drawable === "object") {
-         this.store.drawable.push(object.drawable);
+         this.store.drawable.push(object);
       }
    }
 
@@ -80,7 +80,7 @@ export default class Engine {
       this.store.animation.forEach(e => e.update());
    }
    updateDrawables() {
-      this.store.drawable.forEach(e => e.update());
+      this.store.drawable.forEach(e => e.update.apply(e));
    }
 
    setLoader(loader) {
@@ -141,7 +141,11 @@ export default class Engine {
          e.draw(context);
       });
       this.store.animation.forEach(e => e.draw(this.context));
-      this.store.drawable.forEach(e => e.draw(this.context));
+      this.store.drawable.forEach(e => {
+         if(typeof e.draw == 'function') {
+            e.draw.apply(e)
+         }
+      });
    }
 
    assemble(assemblingFunction){

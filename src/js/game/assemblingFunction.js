@@ -1,11 +1,13 @@
-import ThrottleMeter from "./gauges/throttleMeter";
 import prebuild from "../prebuild";
 import Background from "./background";
 import KeyboardHandler from "./keyboardHandler";
-import Accelerometer from "./gauges/accelerometer";
-import EnergyMeter from "./gauges/energyMeter";
-import RadarGauge from "./gauges/radarGauge";
-import GameContextHandler from "../engine/gameContextHandler";
+
+import GameContextHandler  from "../engine/gameContextHandler";
+
+import { ThrottleMeter } from "./gauges/throttle-meter";
+import { Accelerometer } from "./gauges/accelerometer";
+import { EnergyMeter } from "./gauges/energy-meter";
+import { RadarGauge } from "./gauges/radar-gauge";
 import { MenuFrame } from "./menuItems/menu-frame";
 import { MenuContent } from "./menuItems/menu-content";
 
@@ -31,8 +33,6 @@ function buildMenuContext(engine, keyboardHandler){
     const menuFrame = new MenuFrame(engine, screenSize);
     engine.registerDrawable(menuFrame);
     const menuContent = new MenuContent(engine);
-
-    console.log('menu', menuContent);
     engine.registerDrawable(menuContent);
 }
 
@@ -42,7 +42,6 @@ function buildGameplayContext(engine,keyboardHandler){
     let system = [];
     prebuild.forEach(element => {
         system.push(builder.build(element));
-
     });
     engine.loadSystem(system);
     engine.bindBackground(builder.buildBackground(background));    

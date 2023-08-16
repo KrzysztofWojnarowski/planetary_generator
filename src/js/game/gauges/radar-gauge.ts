@@ -3,8 +3,23 @@ import Sprite from "../../engine/sprite";
 import Drawable from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
-export default class RadarGauge {
-    constructor(engine) {
+import Engine from "../../engine/engine";
+import Camera from "../../engine/camera";
+import Physics from "../../engine/physics";
+
+export class RadarGauge {
+    engine: Engine = null;
+    entity: Entity = null;
+    drawable: Drawable = null;
+    camera: Camera = null;
+    position: Position = null;
+    eventSystem: EventSystem = null;
+    radarMap: Map<any, any> = new Map();
+    radarStart = 0;
+    owner: any; // is ship
+
+    constructor(engine: Engine) {
+        this.engine = engine;
         let sprite = new Sprite();
         this.entity = new Entity();
         this.drawable = new Drawable();
@@ -18,53 +33,51 @@ export default class RadarGauge {
         this.drawable.bindUpdate(this.update, [this, engine]);
         this.drawable.bindDraw(this.draw, [this, engine]);
         this.eventSystem = new EventSystem();
-        this.radarMap = new Map();
-        this.radarStart = 0;
     }
 
-    bindOwner(owner) {
+    bindOwner(owner: any) {
         this.owner = owner;
     }
 
-    update(self, engine) {
-        const cp = self.camera.getPosition();
+    update() {
+        const cp = this.camera.getPosition();
         let newPosition = [
             Math.round(-cp[0] + 1100),
             Math.round(-cp[1] + 310)
-        ]
-        self.drawable.setPosition(newPosition);
-        let physics = engine.getPhysics();
-        self.radarMap = physics.getInRange(self.owner.getBody(), engine.getPhysicals(), 5000);
-        if (Math.round(self.radarStart / (4 * Math.PI)) == 1) {
-            self.radarStart = 0;
+        ];
+        this.drawable.setPosition(newPosition);
+        let physics = this.engine.getPhysics() as Physics;
+        this.radarMap = physics.getInRange(this.owner.getBody(), this.engine.getPhysicals(), 5000);
+        if (Math.round(this.radarStart / (4 * Math.PI)) == 1) {
+            this.radarStart = 0;
         } else {
-            self.radarStart += 0.1;
+            this.radarStart += 0.1;
         }
     }
 
-    draw(self, engine) {
-        const context = engine.context;
-        const ownerBody = self.owner.getBody();
-        const d = this.topLeft;
-        const size = this.size;
-        const p = this.position;
-        const dm = this.dimension;
+    draw() {
+        const context = this.engine.context;
+        const ownerBody = this.owner.getBody();
+        const d = this.drawable.topLeft;
+        const size = this.drawable.size;
+        const p = this.drawable.position;
+        const dm = this.drawable.dimension;
         context.save();
         context.translate(p[0] + size[0], p[1] + size[1]);
-        context.drawImage(this.sprite.getImage(),
+        context.drawImage((this.drawable.sprite as Sprite).getImage(),
             d[0], d[1],
             dm[0], dm[1],
             0, 0,
             size[0], size[1]);
         context.beginPath();
         context.fillStyle = "rgba(100,200,100,0.5)";
-        context.arc(size[0] * 0.5, size[1] * 0.5, 90, self.radarStart, 0.12 * Math.PI + self.radarStart);
+        context.arc(size[0] * 0.5, size[1] * 0.5, 90, this.radarStart, 0.12 * Math.PI + this.radarStart);
         context.lineTo(size[0] * 0.5, size[1] * 0.5);
         context.fill();
-        context.arc(size[0] * 0.5, size[1] * 0.5, 90, self.radarStart - Math.PI, 0.12 * Math.PI + self.radarStart);
+        context.arc(size[0] * 0.5, size[1] * 0.5, 90, this.radarStart - Math.PI, 0.12 * Math.PI + this.radarStart);
         context.lineTo(size[0] * 0.5, size[1] * 0.5);
         context.clip();
-        self.radarMap.forEach(e => {
+        this.radarMap.forEach(e => {
             context.beginPath();
             context.fillStyle = "rgba(200,250,200,0.5)";
             context.arc(-(-e.x + ownerBody.x) * 0.01 + size[0] * 0.5, -(-e.y + ownerBody.y) * 0.01 + 0.5 * size[1], 2, 0, Math.PI * 2);
