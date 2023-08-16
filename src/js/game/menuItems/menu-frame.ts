@@ -13,6 +13,7 @@ export interface MenuSettings {
 }
 
 export class MenuFrame {
+    engine: Engine = null;
     entity: Entity = null;
     drawable: Drawable = null;
     eventSystem: EventSystem = null;
@@ -37,6 +38,9 @@ export class MenuFrame {
     }
 
     constructor(engine: Engine, screenSize?: [number, number]) {
+        this.engine = engine;
+        this.camera = engine.camera;
+
         const sprite = new Sprite();
         sprite.setImage(engine.loader.images.gaugeSheet.getImage());
 
@@ -45,22 +49,22 @@ export class MenuFrame {
         this.position = new Position();
 
         this.eventSystem = new EventSystem();
-        this.camera = engine.camera;
     }
 
-    update(self: MenuFrame) {
-        self.tick++;
-        if (self.tick % 5 == 0) {
-            self.frame++;
-            self.frame = self.frame > 3 ? 0 : self.frame;
+    update(): void {
+        this.tick++;
+
+        if (this.tick % 5 == 0) {
+            this.frame++;
+            this.frame = this.frame > 3 ? 0 : this.frame;
         }
-        self.drawable.topLeft = [448 + self.frame * 32, 48];
-        const cp = self.camera.getPosition();
+        this.drawable.topLeft = [448 + this.frame * 32, 48];
+        const cp = this.camera.getPosition();
         let newPosition = [
             Math.round(-cp[0] + 750),
             Math.round(-cp[1] + 395)
         ];
-        self.drawable.setPosition(newPosition);
+        this.drawable.setPosition(newPosition);
     }
 
 
@@ -72,7 +76,6 @@ export class MenuFrame {
         drawable.topLeft = this.defaultMenuSettings.topLeft;
 
         drawable.bindSprite(sprite);
-        drawable.bindUpdate(this.update, [this]);
 
         return drawable;
     }
