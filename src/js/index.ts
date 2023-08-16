@@ -6,25 +6,26 @@ import Config from "./game/config.js";
 // @ts-ignore
 import Random from "lm_random/random";
 import Builder from "./game/builder.js";
-import Canvas from "./engine/canvas.js";
+import { Canvas } from "./engine/canvas";
 import assemblingFunction from "./game/assemblingFunction.js";
+
 function app() {
     const config = new Config();
     let random = new Random();
     random.seed(0.5);
     random.warmUp();
+
     let camera = new Camera(config.camera);
     let physics = new Physics(config.physics);
     let planets = new Planets(random);
     let engine = new Engine(physics);
-    let canvas = new Canvas(document.querySelector("#canvas"));
-    let builder = new Builder(planets);
+    const canvas = new Canvas(document.querySelector("#canvas"));
+    const builder = new Builder(planets);
+    
     engine.builder = builder;
-    canvas.setDimension(
-        window.innerWidth,
-        window.innerHeight
-    );
+    canvas.resize(getScreenSize());
     const canvasDimension = canvas.getDimension();
+
     camera.setVisibleWindow(canvasDimension[0], canvasDimension[1]);
     camera.moveTo(
         canvasDimension[0] / 2,
@@ -48,6 +49,13 @@ function app() {
         camera.update();
         engine.redraw();
         animate();
+    }
+
+    function getScreenSize(): [number, number] {
+        return [
+            window.innerWidth,
+            window.innerHeight
+        ]
     }
 }
 window.addEventListener("DOMContentLoaded", app);
