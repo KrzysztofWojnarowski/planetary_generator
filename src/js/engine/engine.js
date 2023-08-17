@@ -148,10 +148,7 @@ export default class Engine {
       });
    }
 
-   assemble(assemblingFunction){
-      assemblingFunction(this);
+   async assemble(assemblingFunction) {
+      await assemblingFunction(this)
    }
-
-
-
 }

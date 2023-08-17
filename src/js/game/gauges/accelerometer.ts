@@ -32,7 +32,6 @@ export class Accelerometer {
         this.drawable.dimension = [48, 7];
         this.drawable.size = [120, 30];
         this.drawable.topLeft=[869,68];
-        this.drawable.bindUpdate(this.update,[this]);
         this.eventSystem = new EventSystem();
         this.step=1/4;
         this.camera = engine.camera;

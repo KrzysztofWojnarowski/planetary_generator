@@ -29,8 +29,6 @@ export class EnergyMeter {
         this.drawable.dimension = [10, 8];
         this.drawable.size = [20,28];
         this.drawable.topLeft=[255,102];
-        this.drawable.bindUpdate(this.update,[this]);
-        this.drawable.bindDraw(this.draw,[this,engine]);
         this.eventSystem = new EventSystem();
     }
     
