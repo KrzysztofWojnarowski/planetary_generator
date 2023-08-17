@@ -11,11 +11,11 @@ import { RadarGauge } from "./gauges/radar-gauge";
 import { MenuFrame } from "./menuItems/menu-frame";
 import { MenuContent } from "./menuItems/menu-content";
 
-export default function assemblingFunction(engine) {
+export default async function assemblingFunction(engine) {
     console.log("assembling things");
     const gameContextHandler = new GameContextHandler(engine);
     const keyboardHandler = new KeyboardHandler();
-    buildGameplayContext(engine,keyboardHandler);
+    await buildGameplayContext(engine,keyboardHandler);
     const gameContext =  gameContextHandler.extractContext();
     gameContextHandler.registerContext("gameplay",gameContext);
     gameContextHandler.applyContext("gameplay");
@@ -36,15 +36,18 @@ function buildMenuContext(engine, keyboardHandler){
     engine.registerDrawable(menuContent);
 }
 
-function buildGameplayContext(engine,keyboardHandler){
-    let background = new Background();
+async function buildGameplayContext(engine,keyboardHandler) {
     const builder = engine.builder;
     let system = [];
     prebuild.forEach(element => {
         system.push(builder.build(element));
     });
     engine.loadSystem(system);
-    engine.bindBackground(builder.buildBackground(background));    
+
+    let background = new Background();
+    const builderBackground = await builder.buildBackground(background)
+    engine.bindBackground(builderBackground);
+
     let ship = builder.buildShip();
     engine.store.system.push(ship);
     engine.camera.lockOn(ship.getBody());
@@ -58,7 +61,12 @@ function buildGameplayContext(engine,keyboardHandler){
     throttleMeter.bindOwner(ship);
     accelerometer.bindOwner(ship);
     engine.registerDrawable(radarGauge);
+
+    // Not working
     engine.registerDrawable(throttleMeter);
+    console.log('throttleMeter', throttleMeter);
+
+    // Not working
     engine.registerDrawable(accelerometer);
     engine.registerDrawable(energyMeter);
     engine.store.system.forEach(e => {

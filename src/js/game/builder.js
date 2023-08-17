@@ -42,11 +42,10 @@ export default class Builder {
 
     }
 
-    buildBackground(background){
-        background.load().then(image=>{
-            background.setImage(image);
-            background.setLoaded(true);
-        });
+    async buildBackground(background){
+        const backgroundImage = await background.load()
+        background.setImage(backgroundImage);
+        background.setLoaded(true);
         return background;
     }
     

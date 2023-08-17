@@ -1,5 +1,6 @@
 import Entity from "../engine/entity";
 import EventSystem from "../engine/eventSystem";
+import { ImageLoader } from "../engine/image-loader";
 
 export default class Background {
     position = [0, 0];
@@ -16,14 +17,7 @@ export default class Background {
 
     load() {    
         let url = this.url;
-        return new Promise(resolve => {
-            const image = new Image();
-            image.addEventListener("load", (e) => {
-                resolve(image);
-            });
-            image.src = url;
-        });
-
+        return ImageLoader.load(url);
     }
     isLoaded() {
         return this.#isLoaded;

@@ -6,17 +6,9 @@ export default class Drawable {
     topLeft=[0,0];
     updateArgs=[];
     drawArgs=[];
-    updateFunction=()=>{};
+
     bindSprite(sprite) {
         this.sprite = sprite;
-    }
-    bindUpdate(updateFunction,args){
-        this.updateFunction = updateFunction;
-        this.updateArgs = args;
-    }
-    bindDraw(drawFunction,args){
-        this.drawFunction = drawFunction;
-        this.drawArgs = args;
     }
 
     getSize() {
@@ -45,7 +37,7 @@ export default class Drawable {
     }
 
     draw(context) {
-        typeof this.drawFunction==="function"? this.drawFunction(...this.drawArgs):this.defaultDraw(context);
+        typeof this.drawFunction==="function"? this.drawFunction(...this.drawArgs) : this.defaultDraw(context);
     }
 }
 

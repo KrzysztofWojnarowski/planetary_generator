@@ -30,8 +30,6 @@ export class RadarGauge {
         this.drawable.dimension = [40, 40];
         this.drawable.size = [200, 200];
         this.drawable.topLeft = [484, 772];
-        this.drawable.bindUpdate(this.update, [this, engine]);
-        this.drawable.bindDraw(this.draw, [this, engine]);
         this.eventSystem = new EventSystem();
     }
 

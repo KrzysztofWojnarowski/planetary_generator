@@ -38,8 +38,9 @@ function app() {
     engine.bindContext(context);
     imageLoader.eventSystem.addListener("onImagesReady", () => {
         console.log("everything loaded");
-        engine.assemble(assemblingFunction);
-        animate();
+        engine.assemble(assemblingFunction).then(() => {
+            animate();
+        });
     });
     function animate() {
         window.requestAnimationFrame(redraw);
