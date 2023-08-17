@@ -19,16 +19,10 @@ export class EnergyMeter {
 
     constructor(engine: Engine) {
         this.engine = engine;
-        let sprite = new Sprite();
         this.entity = new Entity();
-        this.drawable = new Drawable();
+        this.drawable = this.getDrawable();
         this.position = new Position();
         this.camera = engine.camera;
-        sprite.setImage(engine.loader.images.gaugeSheet.getImage());
-        this.drawable.bindSprite(sprite);
-        this.drawable.dimension = [10, 8];
-        this.drawable.size = [20,28];
-        this.drawable.topLeft=[255,102];
         this.eventSystem = new EventSystem();
     }
     
@@ -54,6 +48,9 @@ export class EnergyMeter {
         const size = this.drawable.size;
         const p = this.drawable.position;
         const dm = this.drawable.dimension;
+        console.log('this.drawable', this.drawable, this)
+console.log('(this.drawable.sprite as Sprite).getImage()', (this.drawable.sprite as Sprite).getImage())
+
         for ( let i=0; i < this.energyBars; i++){
             context.drawImage((this.drawable.sprite as Sprite).getImage(),
             d[0],d[1],
@@ -64,4 +61,16 @@ export class EnergyMeter {
         }
     }
 
+    private getDrawable(): Drawable {
+        const drawable = new Drawable();
+        const gaugeImage = this.engine.loader.images.gaugeSheet.getImage();
+        let sprite = new Sprite();
+        sprite.setImage(gaugeImage, this);
+        drawable.bindSprite(sprite);
+        drawable.dimension = [10, 8];
+        drawable.size = [20,28];
+        drawable.topLeft=[255,102];
+
+        return drawable;
+    }
 }

@@ -5,6 +5,7 @@ import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
 import Camera from "../../engine/camera";
 import Engine from "../../engine/engine";
+import SpaceShip from "../ingameObjects/spaceship";
 
 export class Accelerometer {
     engine: Engine = null;
@@ -14,7 +15,7 @@ export class Accelerometer {
     position: Position = null;
     eventSystem: EventSystem = null;
     step = 1/4;
-    owner: any; // is ship
+    owner: SpaceShip; // is ship
     energyBars = 0;
     rels: {
         step: number,
@@ -23,6 +24,7 @@ export class Accelerometer {
     };
 
     constructor(engine: Engine) {
+        this.engine = engine;
         let sprite = new Sprite();
         this.entity = new Entity();
         this.drawable = new Drawable();
@@ -35,7 +37,7 @@ export class Accelerometer {
         this.eventSystem = new EventSystem();
         this.step=1/4;
         this.camera = engine.camera;
-        this.owner = {};
+        this.owner = null;
         this.rels = {
             step: this.step,
             camera: this.camera,
@@ -45,12 +47,12 @@ export class Accelerometer {
     
     bindOwner(owner: any) {
         this.owner = owner;
-        this.step = (4/this.owner.getMesh().maxSpeed);
+        this.step = (4 / this.owner.getMesh().maxSpeed);
     }
 
     update() {
         let ob = this.owner.getBody();
-        let v= Math.sqrt(ob.vx*ob.vx + ob.vy*ob.vy);
+        let v = Math.sqrt(ob.vx*ob.vx + ob.vy*ob.vy);
         let frameIndex = Math.floor(v*this.step);
         this.drawable.topLeft = [869 - frameIndex * 48,68];
         const cp = this.camera.getPosition();
@@ -62,5 +64,4 @@ export class Accelerometer {
 
        this.drawable.setPosition(newPosition);
     }
-
 }

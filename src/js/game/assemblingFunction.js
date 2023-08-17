@@ -61,7 +61,12 @@ async function buildGameplayContext(engine,keyboardHandler) {
     throttleMeter.bindOwner(ship);
     accelerometer.bindOwner(ship);
     engine.registerDrawable(radarGauge);
+
+    // Not working
     engine.registerDrawable(throttleMeter);
+    console.log('throttleMeter', throttleMeter);
+
+    // Not working
     engine.registerDrawable(accelerometer);
     engine.registerDrawable(energyMeter);
     engine.store.system.forEach(e => {

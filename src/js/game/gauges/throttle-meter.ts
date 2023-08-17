@@ -5,6 +5,7 @@ import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
 import Engine from "../../engine/engine";
 import Camera from "../../engine/camera";
+import SpaceShip from "../ingameObjects/spaceship";
 
 export class ThrottleMeter {
     engine: Engine = null;
@@ -14,9 +15,10 @@ export class ThrottleMeter {
     position: Position = null;
     eventSystem: EventSystem = null;
     step = 1/4;
-    owner: any; // is ship
+    owner: SpaceShip; // is ship
 
     constructor(engine: Engine) {
+        this.engine = engine;
         let sprite = new Sprite();
         this.entity = new Entity();
         this.drawable = new Drawable();
@@ -25,7 +27,7 @@ export class ThrottleMeter {
         this.drawable.bindSprite(sprite);
         this.drawable.dimension = [44, 44];
         this.drawable.size = [120, 120];
-        this.drawable.topLeft=[290,210];
+        this.drawable.topLeft = [290,210];
         this.eventSystem = new EventSystem();
         this.camera = engine.camera;
     }
@@ -36,8 +38,10 @@ export class ThrottleMeter {
     }
 
     update() {
+        console.log('throttle', this)
         let frameIndex = Math.floor(this.owner.throttle * this.step);
-        this.drawable.topLeft = [290+frameIndex*48,210];
+        this.drawable.topLeft = [290 + frameIndex * 48,210];
+
         const cp = this.camera.getPosition();
         let newPosition = [
             Math.round(-cp[0]+1350),

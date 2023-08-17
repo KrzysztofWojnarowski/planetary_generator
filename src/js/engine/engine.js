@@ -144,6 +144,8 @@ export default class Engine {
       this.store.drawable.forEach(e => {
          if(typeof e.draw == 'function') {
             e.draw.apply(e)
+         } else {
+            e.drawable.defaultDraw.apply(e.drawable, [this.context]);
          }
       });
    }
