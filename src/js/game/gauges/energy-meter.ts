@@ -1,12 +1,15 @@
 import Entity from "../../engine/entity";
 import Sprite from "../../engine/sprite";
-import Drawable from "../../engine/drawable";
+import { Drawable } from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
 import { Camera } from "../../engine/camera";
 import Engine from "../../engine/engine";
+import { PositionCordinates } from "../../engine/models/position.model";
+import SpaceShip from "../ingameObjects/spaceship";
+import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 
-export class EnergyMeter {
+export class EnergyMeter implements GetPositionCoordinates {
     engine: Engine = null;
     entity: Entity = null;
     drawable: Drawable = null;
@@ -14,7 +17,7 @@ export class EnergyMeter {
     position: Position = null;
     eventSystem: EventSystem = null;
     step = 1/4;
-    owner: any; // is ship
+    owner: SpaceShip;
     energyBars = 0;
 
     constructor(engine: Engine) {
@@ -32,24 +35,18 @@ export class EnergyMeter {
 
     update() {
         let mesh  = this.owner.getMesh();
-        let energyRatio = 100/mesh.energyCapacity;
-        this.energyBars = Math.round(mesh.energy*energyRatio);
-        const cp = this.camera.getPosition();
-        let newPosition = [
-            Math.round(-cp[0]+30),
-            Math.round(-cp[1]+10)
-        ]
-       this.drawable.setPosition(newPosition);
+        let energyRatio = 100 / mesh.energyCapacity;
+        this.energyBars = Math.round(mesh.energy * energyRatio);
+
+        this.drawable.setPosition(this.getPositionCoordinates());
     }
 
-    draw(){
+    draw(): void {
         const context = this.engine.context;
         const d = this.drawable.topLeft;
         const size = this.drawable.size;
         const p = this.drawable.position;
         const dm = this.drawable.dimension;
-        console.log('this.drawable', this.drawable, this);
-console.log('(this.drawable.sprite as Sprite).getImage()', (this.drawable.sprite as Sprite).getImage())
 
         for ( let i=0; i < this.energyBars; i++){
             context.drawImage((this.drawable.sprite as Sprite).getImage(),
@@ -61,16 +58,25 @@ console.log('(this.drawable.sprite as Sprite).getImage()', (this.drawable.sprite
         }
     }
 
-    private getDrawable(): Drawable {
-        const drawable = new Drawable();
-        const gaugeImage = this.engine.loader.images.gaugeSheet.getImage();
-        let sprite = new Sprite();
-        sprite.setImage(gaugeImage, this);
-        drawable.bindSprite(sprite);
-        drawable.dimension = [10, 8];
-        drawable.size = [20,28];
-        drawable.topLeft=[255,102];
+    getPositionCoordinates(): PositionCordinates {
+        const cp = this.camera.getPosition();
 
-        return drawable;
+        let newPosition: PositionCordinates = [
+            Math.round(-cp[0]+30),
+            Math.round(-cp[1]+10)
+        ];
+
+        return newPosition;
+    }
+
+    private getDrawable(): Drawable {
+        return new Drawable()
+            .setDemention([10, 8])
+            .setSize([20,28])
+            .setTopLeft([255,102])
+            .bindSprite(
+                new Sprite()
+                    .setImage(this.engine.loader.images.gaugeSheet.getImage())
+            );
     }
 }

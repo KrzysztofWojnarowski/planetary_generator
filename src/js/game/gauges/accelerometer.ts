@@ -1,13 +1,16 @@
+import { GetDrawable } from './../../engine/models/get-drawable.mode';
 import Entity from "../../engine/entity";
 import Sprite from "../../engine/sprite";
-import Drawable from "../../engine/drawable";
+import { Drawable } from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
 import { Camera } from "../../engine/camera";
 import Engine from "../../engine/engine";
 import SpaceShip from "../ingameObjects/spaceship";
+import { PositionCordinates } from "../../engine/models/position.model";
+import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 
-export class Accelerometer {
+export class Accelerometer implements GetDrawable, GetPositionCoordinates {
     engine: Engine = null;
     entity: Entity = null;
     drawable: Drawable = null;
@@ -25,16 +28,11 @@ export class Accelerometer {
 
     constructor(engine: Engine) {
         this.engine = engine;
-        let sprite = new Sprite();
         this.entity = new Entity();
-        this.drawable = new Drawable();
+        this.drawable = this.getDrawable();
         this.position = new Position();
-        sprite.setImage(engine.loader.images.gaugeSheet.getImage());
-        this.drawable.bindSprite(sprite);
-        this.drawable.dimension = [48, 7];
-        this.drawable.size = [120, 30];
-        this.drawable.topLeft=[869,68];
         this.eventSystem = new EventSystem();
+
         this.step=1/4;
         this.camera = engine.camera;
         this.owner = null;
@@ -55,13 +53,27 @@ export class Accelerometer {
         let v = Math.sqrt(ob.vx*ob.vx + ob.vy*ob.vy);
         let frameIndex = Math.floor(v*this.step);
         this.drawable.topLeft = [869 - frameIndex * 48,68];
+        this.drawable.setPosition(this.getPositionCoordinates());
+    }
+
+    getPositionCoordinates(): PositionCordinates {
         const cp = this.camera.getPosition();
 
-        let newPosition = [
+        let newPosition: PositionCordinates = [
             Math.round(-cp[0]+90),
             Math.round(-cp[1]+700)
         ]
+        return newPosition;
+    }
 
-       this.drawable.setPosition(newPosition);
+    getDrawable(): Drawable { 
+        return new Drawable()
+            .setDemention([48, 7])
+            .setSize([120, 30])
+            .setTopLeft([869, 68])
+            .bindSprite(
+                new Sprite()
+                    .setImage(this.engine.loader.images.gaugeSheet.getImage())
+            );
     }
 }

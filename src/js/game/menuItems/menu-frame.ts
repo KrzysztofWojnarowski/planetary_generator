@@ -1,10 +1,13 @@
+import { GetDrawable } from './../../engine/models/get-drawable.mode';
 import Entity from "../../engine/entity";
 import Sprite from "../../engine/sprite";
-import Drawable from "../../engine/drawable";
+import { Drawable } from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
 import Engine from "../../engine/engine";
 import { Camera } from "../../engine/camera";
+import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
+import { PositionCordinates } from "../../engine/models/position.model";
 
 export interface MenuSettings {
     dimension: [number, number];
@@ -12,7 +15,7 @@ export interface MenuSettings {
     topLeft: [number, number];
 }
 
-export class MenuFrame {
+export class MenuFrame implements GetDrawable, GetPositionCoordinates {
     engine: Engine = null;
     entity: Entity = null;
     drawable: Drawable = null;
@@ -41,11 +44,8 @@ export class MenuFrame {
         this.engine = engine;
         this.camera = engine.camera;
 
-        const sprite = new Sprite();
-        sprite.setImage(engine.loader.images.gaugeSheet.getImage());
-
         this.entity = new Entity();
-        this.drawable = this.getDrawable(screenSize, sprite);
+        this.drawable = this.getDrawable();
         this.position = new Position();
 
         this.eventSystem = new EventSystem();
@@ -59,24 +59,28 @@ export class MenuFrame {
             this.frame = this.frame > 3 ? 0 : this.frame;
         }
         this.drawable.topLeft = [448 + this.frame * 32, 48];
+
+        this.drawable.setPosition(this.getPositionCoordinates());
+    }
+
+    getPositionCoordinates(): PositionCordinates {
         const cp = this.camera.getPosition();
         let newPosition = [
             Math.round(-cp[0] + 750),
             Math.round(-cp[1] + 395)
         ];
-        this.drawable.setPosition(newPosition);
+
+        return newPosition as PositionCordinates;
     }
-
-
-    private getDrawable([screenWidth, screenHeight]: [number, number], sprite: Sprite): Drawable {
-        const drawable = new Drawable();
-
-        drawable.dimension = this.defaultMenuSettings.dimension;
-        drawable.size = this.defaultMenuSettings.size;
-        drawable.topLeft = this.defaultMenuSettings.topLeft;
-
-        drawable.bindSprite(sprite);
-
-        return drawable;
+    
+    getDrawable(): Drawable { 
+        return new Drawable()
+            .setDemention(this.defaultMenuSettings.dimension)
+            .setSize(this.defaultMenuSettings.size)
+            .setTopLeft(this.defaultMenuSettings.topLeft)
+            .bindSprite(
+                new Sprite()
+                    .setImage(this.engine.loader.images.gaugeSheet.getImage())
+            );
     }
 }
