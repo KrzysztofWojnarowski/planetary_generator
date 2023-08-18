@@ -1,6 +1,6 @@
 import EventSystem from "../../engine/eventSystem";
 import Sprite from "../../engine/sprite";
-import Animation from "../../engine/animation";
+import { Animation } from "../../engine/animation";
 import Entity from "../../engine/entity";
 export default class Explode {
 

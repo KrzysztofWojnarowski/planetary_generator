@@ -1,20 +1,23 @@
-export default class Animation {
+import { Size } from "./models/size.model";
+import Sprite from "./sprite";
 
+export class Animation {
     position = [0, 0];
-    size = [0, 0];
+    size: Size = [0, 0];
     dimension = [0,0];
-    sprite = {};
-    postUpdates = [];
+    sprite: Sprite = null;
+    postUpdates: Function[] = [];
     framesInRow = 0;
     currentFrame = 0;
 
-    bindSprite(sprite) {
+    bindSprite(sprite: Sprite) {
         this.sprite = sprite;
     }
 
-    bindUpdateDecorator(decorator) {
+    bindUpdateDecorator(decorator: Function) {
         this.postUpdates.push(decorator);
     }
+
     nextFrameIndex() {
         this.currentFrame++;
     }
@@ -30,14 +33,14 @@ export default class Animation {
     getSize() {
         return this.size;
     }
-    setSize(size) {
+    setSize(size: Size) {
         this.size = size;
     }
     update() {
         this.nextFrameIndex();
     }
 
-    draw(context) {
+    draw(context: CanvasRenderingContext2D) {
         const framePosition = this.getFramePosition();
         const d = this.dimension;
         const size = this.size;
