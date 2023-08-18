@@ -3,7 +3,7 @@ import Sprite from "../../engine/sprite";
 import Drawable from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
-import Camera from "../../engine/camera";
+import { Camera } from "../../engine/camera";
 import Engine from "../../engine/engine";
 import SpaceShip from "../ingameObjects/spaceship";
 

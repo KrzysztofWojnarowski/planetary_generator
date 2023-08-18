@@ -1,25 +1,28 @@
-export default class Camera {
+import { PositionCordinates } from "./models/position.model";
+import { Vector } from "./models/vector.model";
 
-    position = [5000, 5000];
+export type CameraTarget = any;
+
+export class Camera {
+    position: PositionCordinates = [5000, 5000];
     zoom = 0.1;
     angle = [0, Math.PI / 2];
-    target = {};
+    target: CameraTarget = null;
     width = 0;
     height = 0;
     velocity = [0, 0];
     allowedRange = [this.width*0.2,this.height*0.2];
-
 
     constructor(config = {
         position: [0, 0],
         zoom: 1,
         angle: [0, Math.PI / 2]
     }) {
-        this.position = config.position;
+        this.position = config.position as PositionCordinates;
         this.zoom = config.zoom;
         this.angle = config.angle;
     }
-    setVisibleWindow(w, h) {
+    setVisibleWindow(w: number, h: number) {
         this.width = w;
         this.height = h;
         this.setAllowedRange();
@@ -29,8 +32,7 @@ export default class Camera {
        this.allowedRange = [this.width*0.2,this.height*0.2];
     }
 
-
-    move(vector) {
+    move(vector: Vector) {
         this.position[0] += vector[0];
         this.position[1] += vector[1];
     }
@@ -42,15 +44,15 @@ export default class Camera {
         this.zoom *= 0.5
     }
 
-    rotate(angle) {
+    rotate(angle: [number, number]) {
         this.angle = [this.angle[0] + angle[0], this.angle[1] + angle[1]];
     }
 
-    moveTo(x, y) {
+    moveTo(x: number, y: number) {
         this.position = [x, y];
     }
 
-    lockOn(target) {
+    lockOn(target: CameraTarget) {
         this.target = target;
     }
 
@@ -102,7 +104,4 @@ export default class Camera {
             this.height
         ]
     }
-
-
-
 }
