@@ -1,6 +1,6 @@
 import Engine from "./engine/engine.js";
 import Physics from "./engine/physics.js";
-import Camera from "./engine/camera.js";
+import { Camera } from "./engine/camera";
 import Planets from "./game/ingameObjects/planets.js";
 import Config from "./game/config.js";
 // @ts-ignore
@@ -36,12 +36,14 @@ function app() {
     engine.setLoader(imageLoader);
     const context = canvas.getContext();
     engine.bindContext(context);
+    
     imageLoader.eventSystem.addListener("onImagesReady", () => {
         console.log("everything loaded");
         engine.assemble(assemblingFunction).then(() => {
             animate();
         });
     });
+
     function animate() {
         window.requestAnimationFrame(redraw);
     }

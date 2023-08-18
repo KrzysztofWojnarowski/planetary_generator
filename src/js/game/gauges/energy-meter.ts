@@ -3,7 +3,7 @@ import Sprite from "../../engine/sprite";
 import Drawable from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
-import Camera from "../../engine/camera";
+import { Camera } from "../../engine/camera";
 import Engine from "../../engine/engine";
 
 export class EnergyMeter {
@@ -48,7 +48,7 @@ export class EnergyMeter {
         const size = this.drawable.size;
         const p = this.drawable.position;
         const dm = this.drawable.dimension;
-        console.log('this.drawable', this.drawable, this)
+        console.log('this.drawable', this.drawable, this);
 console.log('(this.drawable.sprite as Sprite).getImage()', (this.drawable.sprite as Sprite).getImage())
 
         for ( let i=0; i < this.energyBars; i++){

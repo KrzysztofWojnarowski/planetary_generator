@@ -4,7 +4,7 @@ import Drawable from "../../engine/drawable";
 import EventSystem from "../../engine/eventSystem";
 import Position from "../../engine/position";
 import Engine from "../../engine/engine";
-import Camera from "../../engine/camera";
+import { Camera } from "../../engine/camera";
 import Physics from "../../engine/physics";
 
 export class RadarGauge {
