@@ -6,7 +6,7 @@ import { Position } from "../../engine/position";
 import { Camera } from "../../engine/camera";
 import Engine from "../../engine/engine";
 import { PositionCordinates } from "../../engine/models/position.model";
-import SpaceShip from "../ingameObjects/spaceship";
+import SpaceShip from "../ingame-objects/spaceship";
 import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 
 export class EnergyMeter implements GetPositionCoordinates {

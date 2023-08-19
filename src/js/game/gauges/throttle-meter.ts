@@ -5,7 +5,7 @@ import { EventSystem } from "../../engine/event-system";
 import { Position } from "../../engine/position";
 import Engine from "../../engine/engine";
 import { Camera } from "../../engine/camera";
-import SpaceShip from "../ingameObjects/spaceship";
+import SpaceShip from "../ingame-objects/spaceship";
 import { PositionCordinates } from "../../engine/models/position.model";
 import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 import { GetDrawable } from "../../engine/models/get-drawable.mode";

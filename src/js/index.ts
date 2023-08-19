@@ -1,7 +1,7 @@
 import Engine from "./engine/engine.js";
 import Physics from "./engine/physics.js";
 import { Camera } from "./engine/camera";
-import Planets from "./game/ingameObjects/planets.js";
+import Planets from "./game/ingame-objects/planets.js";
 import Config from "./game/config.js";
 // @ts-ignore
 import Random from "lm_random/random";
