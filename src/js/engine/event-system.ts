@@ -3,7 +3,9 @@
     "onUpdate" |
     "onRemove" | 
     "onImagesReady" | 
-    "onCollided"; 
+    "onCollided" | 
+    "onExplodeStart" | 
+    "onExplodeEnd"; 
 
 export type EventList  = {
     [eventType in SystemEvent]: Array<(...args: any) => void>;
@@ -21,7 +23,9 @@ export class EventSystem {
         "onUpdate":[],
         "onRemove":[],
         "onImagesReady": [],
-        "onCollided": []
+        "onCollided": [],
+        "onExplodeStart": [],
+        "onExplodeEnd": [],
     }
     
     addListener(event: SystemEvent, callback: (...args: any) => void){

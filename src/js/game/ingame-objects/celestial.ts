@@ -2,7 +2,7 @@ import { Entity } from './../../engine/entity';
 import { EventSystem } from "../../engine/event-system";
 import { Sprite } from "../../engine/sprite";
 
-export default class Celestial {
+export class Celestial {
     body: any = {};
     sprite: Sprite = null;
     frame = 1;
