@@ -1,4 +1,4 @@
-import { EventSystem } from "../../engine/eventSystem";
+import { EventSystem } from "../../engine/event-system";
 import { Entity } from "../../engine/entity";
 
 export default class Celestial {

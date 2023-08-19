@@ -1,4 +1,4 @@
-import { EventSystem } from "../../engine/eventSystem";
+import { EventSystem } from "../../engine/event-system";
 import Sprite from "../../engine/sprite";
 import { Animation } from "../../engine/animation";
 import { Entity } from "../../engine/entity";

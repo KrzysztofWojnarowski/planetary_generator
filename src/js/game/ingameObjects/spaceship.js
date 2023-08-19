@@ -1,4 +1,4 @@
-import { EventSystem } from "../../engine/eventSystem";
+import { EventSystem } from "../../engine/event-system";
 import { PhysicalBody } from "../../engine/physicalbody";
 import spaceshiptypes from "./spaceshiptypes.js";
 import Explode from "./explode";

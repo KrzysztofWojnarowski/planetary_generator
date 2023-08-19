@@ -1,5 +1,5 @@
 import { Entity } from "../engine/entity";
-import { EventSystem } from "../engine/eventSystem";
+import { EventSystem } from "../engine/event-system";
 import { ImageLoader } from "../engine/image-loader";
 
 export default class Background {
