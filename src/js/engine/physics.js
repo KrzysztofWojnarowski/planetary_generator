@@ -1,4 +1,4 @@
-import Effects from "./effects";
+import { Effects } from "./effects";
 
 export default class Physics {
     G = 0.01;

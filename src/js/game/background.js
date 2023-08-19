@@ -1,5 +1,5 @@
-import Entity from "../engine/entity";
-import EventSystem from "../engine/eventSystem";
+import { Entity } from "../engine/entity";
+import { EventSystem } from "../engine/eventSystem";
 import { ImageLoader } from "../engine/image-loader";
 
 export default class Background {
@@ -15,7 +15,7 @@ export default class Background {
         this.entity = new Entity();
     }
 
-    load() {    
+    load() {     
         let url = this.url;
         return ImageLoader.load(url);
     }

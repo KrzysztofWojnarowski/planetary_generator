@@ -1,4 +1,4 @@
-import EventSystem from "./eventSystem";
+import { EventSystem } from "./eventSystem";
 import PngImage from "./pngImage";
 
 export default class ImageLoader {

@@ -1,5 +1,5 @@
 import { GetDrawable } from './../../engine/models/get-drawable.mode';
-import Entity from "../../engine/entity";
+import { Entity } from "../../engine/entity";
 import { Drawable } from "../../engine/drawable";
 import Sprite from "../../engine/sprite";
 import Engine from "../../engine/engine";

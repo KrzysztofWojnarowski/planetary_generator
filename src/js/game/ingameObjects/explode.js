@@ -1,9 +1,9 @@
-import EventSystem from "../../engine/eventSystem";
+import { EventSystem } from "../../engine/eventSystem";
 import Sprite from "../../engine/sprite";
 import { Animation } from "../../engine/animation";
-import Entity from "../../engine/entity";
-export default class Explode {
+import { Entity } from "../../engine/entity";
 
+export default class Explode {
     frameRows = 6;
     framesInRow = 8;
     currentFrame = 0;

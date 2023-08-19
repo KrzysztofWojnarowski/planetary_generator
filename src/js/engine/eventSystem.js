@@ -1,4 +1,4 @@
-export default class EventSystem{
+export class EventSystem{
 
     constructor(owner){
         this.owner = owner;

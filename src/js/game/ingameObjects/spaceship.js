@@ -1,8 +1,8 @@
-import EventSystem from "../../engine/eventSystem";
-import PhysicalBody from "../../engine/physicalbody";
+import { EventSystem } from "../../engine/eventSystem";
+import { PhysicalBody } from "../../engine/physicalbody";
 import spaceshiptypes from "./spaceshiptypes.js";
 import Explode from "./explode";
-import Entity from "../../engine/entity";
+import { Entity } from "../../engine/entity";
 
 export default class SpaceShip {
     keyboardState = {
