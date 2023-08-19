@@ -2,7 +2,7 @@ import prebuild from "../prebuild";
 import Background from "./background";
 import KeyboardHandler from "./keyboardHandler";
 
-import GameContextHandler  from "../engine/gameContextHandler";
+import { GameContextHandler }  from "../engine/game-contex-handler";
 
 import { ThrottleMeter } from "./gauges/throttle-meter";
 import { Accelerometer } from "./gauges/accelerometer";
