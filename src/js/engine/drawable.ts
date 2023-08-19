@@ -1,6 +1,6 @@
 import { PositionCordinates } from "./models/position.model";
 import { Size } from "./models/size.model";
-import Sprite from "./sprite";
+import { Sprite } from "./sprite";
 
 export class Drawable {
     position = [0, 0];

@@ -1,8 +1,8 @@
 import { Entity } from "../../engine/entity";
-import Sprite from "../../engine/sprite";
+import { Sprite } from "../../engine/sprite";
 import { Drawable } from "../../engine/drawable";
 import { EventSystem } from "../../engine/event-system";
-import Position from "../../engine/position";
+import { Position } from "../../engine/position";
 import Engine from "../../engine/engine";
 import { Camera } from "../../engine/camera";
 import SpaceShip from "../ingameObjects/spaceship";

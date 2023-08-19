@@ -1,10 +1,10 @@
 import { EventSystem } from "./event-system";
-import PngImage from "./pngImage";
+import { Image } from "./image";
 import { ImageLoader } from "./image-loader";
 
 export class ImageLoaderManager {
     eventSystem: EventSystem = null;
-    images: { [key: string]: PngImage } = {}
+    images: { [key: string]: Image } = {}
     imageList: { [key: string]: string } = null
 
     constructor() {
@@ -21,7 +21,7 @@ export class ImageLoaderManager {
             const url: string = this.imageList[imageName];
             try {
                 const image = await ImageLoader.load(url);
-                const gameImage = new PngImage();
+                const gameImage = new Image();
                 gameImage.setImage(image);
                 gameImage.setLoaded();
                 console.log(`Loaded: ${imageName}`);

@@ -1,5 +1,5 @@
 import { Size } from "./models/size.model";
-import Sprite from "./sprite";
+import { Sprite } from "./sprite";
 
 export class Animation {
     position = [0, 0];

@@ -1,9 +1,9 @@
 import { GetDrawable } from './../../engine/models/get-drawable.mode';
 import { Entity } from "../../engine/entity";
-import Sprite from "../../engine/sprite";
+import { Sprite } from "../../engine/sprite";
 import { Drawable } from "../../engine/drawable";
 import { EventSystem } from "../../engine/event-system";
-import Position from "../../engine/position";
+import { Position } from "../../engine/position";
 import { Camera } from "../../engine/camera";
 import Engine from "../../engine/engine";
 import SpaceShip from "../ingameObjects/spaceship";

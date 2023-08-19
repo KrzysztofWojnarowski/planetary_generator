@@ -1,6 +1,6 @@
 import { ImageLoader } from "./image-loader";
 
-export default class Sprite {
+export class Sprite {
     image: HTMLImageElement = null;
 
     _spriteImage: HTMLImageElement = null;

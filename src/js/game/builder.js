@@ -1,5 +1,5 @@
 import Celestial from "./ingameObjects/celestial";
-import Sprite from "../engine/sprite";
+import { Sprite } from "../engine/sprite";
 import SpaceShip from "./ingameObjects/spaceship";
 import { ImageLoaderManager } from "../engine/image-loader-manager";
 import gameImages from "./gameImages";

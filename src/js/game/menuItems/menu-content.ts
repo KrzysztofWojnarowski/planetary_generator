@@ -1,7 +1,7 @@
 import { GetDrawable } from './../../engine/models/get-drawable.mode';
 import { Entity } from "../../engine/entity";
 import { Drawable } from "../../engine/drawable";
-import Sprite from "../../engine/sprite";
+import { Sprite } from "../../engine/sprite";
 import Engine from "../../engine/engine";
 import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 import { PositionCordinates } from "../../engine/models/position.model";
