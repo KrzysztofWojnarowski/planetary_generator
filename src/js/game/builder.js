@@ -1,10 +1,8 @@
 import Celestial from "./ingameObjects/celestial";
 import Sprite from "../engine/sprite";
 import SpaceShip from "./ingameObjects/spaceship";
-import Explode from "./ingameObjects/explode";
-import ImageLoader from "../engine/imageLoader";
+import { ImageLoaderManager } from "../engine/image-loader-manager";
 import gameImages from "./gameImages";
-
 
 export default class Builder {
     #planets = {};
@@ -13,13 +11,11 @@ export default class Builder {
     }
 
     buildAssets(){
-        const loader = new ImageLoader();
+        const loader = new ImageLoaderManager();
         loader.setAssetList(gameImages);
         loader.loadImages();
         return loader;
     }
-
-
 
     build(presets) {
         let planet = this.#planets.spawnEmpty(presets.type);
