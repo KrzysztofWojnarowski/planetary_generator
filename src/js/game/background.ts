@@ -1,17 +1,20 @@
 import { Entity } from "../engine/entity";
 import { EventSystem } from "../engine/event-system";
 import { ImageLoader } from "../engine/image-loader";
+import SpaceShip from "./ingame-objects/spaceship";
 
 export default class Background {
     position = [0, 0];
     size = [2000, 2000];
     url = "assets/background.png";
-    #isLoaded = false;
-    #image = {};
+    _isLoaded = false;
+    image: HTMLImageElement;
+    eventSystem: EventSystem;
+    entity: Entity;
 
     constructor(){
         this.eventSystem = new EventSystem(this);
-        this.eventSystem.registerEvent("onUpdate",this.onUpdate);
+        this.eventSystem.registerEvent("onUpdate");
         this.entity = new Entity();
     }
 
@@ -19,22 +22,28 @@ export default class Background {
         let url = this.url;
         return ImageLoader.load(url);
     }
+
     isLoaded() {
-        return this.#isLoaded;
+        return this._isLoaded;
     }
-    getImage() {
-        return this.#image;
+    
+    getImage(): HTMLImageElement {
+        return this.image;
     }
-    setImage(image) {
-        this.#image = image;
+    
+    setImage(image: HTMLImageElement) {
+        this.image = image;
     }
-    setLoaded(loaded) {
-        this.#isLoaded = loaded;
+    
+    setLoaded(loaded: boolean) {
+        this._isLoaded = loaded;
     }
-    move(vector) {
+    
+    move(vector: [number, number]) {
         this.position = vector;
     }
-    draw(context) {
+    
+    draw(context: CanvasRenderingContext2D) {
         const backgroundImage = this.getImage();
         const position = this.position;
         const size = this.size;
@@ -48,7 +57,8 @@ export default class Background {
         }
         context.restore();
     }
-    onUpdate(ship){
+    
+    onUpdate(ship: SpaceShip){
         const shipBody = ship.getBody();
         this.move([5+0.7*shipBody.x,5+0.7*shipBody.y]);
 

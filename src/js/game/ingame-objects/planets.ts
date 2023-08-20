@@ -29,7 +29,7 @@ export class Planets {
         this.rand = randomizer;
     }
 
-    private spawnEmpty(type: string): Body {
+    public spawnEmpty(type: string): Body {
         return {
             type: type,
             x: 0,

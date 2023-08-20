@@ -12,7 +12,7 @@ export class ImageLoaderManager {
         this.eventSystem.registerEvent("onImagesReady");
     }
 
-    setAssetList(imageList: { key: string }) {
+    setAssetList(imageList: { [key: string]: string }) {
         this.imageList = imageList;
     }
 

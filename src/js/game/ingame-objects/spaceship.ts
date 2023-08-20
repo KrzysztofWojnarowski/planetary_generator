@@ -4,7 +4,7 @@ import { PhysicalBody } from "../../engine/physicalbody";
 import { spaceshiptypes } from "./spaceshiptypes";
 import Explode from "./explode";
 import Engine from '../../engine/engine';
-import Physics from '../../engine/physics';
+import { Physics } from '../../engine/physics';
 
 export default class SpaceShip {
     private keyboardState:  { [key: string]: boolean } = {
@@ -22,7 +22,7 @@ export default class SpaceShip {
     private rotation = Math.PI / 2;
     private force = 0;
     private body = new PhysicalBody();
-    private throttle = 0;
+    public throttle = 0;
     private powerQuantum = 1e-18;
     private throttleFactor = 0;
     private physics: any = {};

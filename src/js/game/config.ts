@@ -1,5 +1,4 @@
-export default class Config {
-
+export class Config {
     camera = {
         position: [0, 0],
         zoom: 1,

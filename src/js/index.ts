@@ -1,13 +1,13 @@
-import Engine from "./engine/engine.js";
-import Physics from "./engine/physics.js";
+import Engine from "./engine/engine";
+import { Physics } from "./engine/physics";
 import { Camera } from "./engine/camera";
 import { Planets } from "./game/ingame-objects/planets";
-import Config from "./game/config.js";
+import { Config } from "./game/config";
 // @ts-ignore
 import Random from "lm_random/random";
-import Builder from "./game/builder.js";
+import { Builder } from "./game/builder";
 import { Canvas } from "./engine/canvas";
-import assemblingFunction from "./game/assemblingFunction.js";
+import { assemblingFunction } from "./game/assembling-function";
 
 function app() {
     const config = new Config();

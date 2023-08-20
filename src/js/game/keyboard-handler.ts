@@ -1,9 +1,10 @@
-export default class KeyboardHandler {
+import { GameContextHandler } from "../engine/game-contex-handler";
+import SpaceShip from "./ingame-objects/spaceship";
 
-
-    bindShipKeys(ship, document) {
+export class KeyboardHandler {
+    bindShipKeys(ship: SpaceShip, document: Document) {
         document.addEventListener("keydown", e => {
-            e.preventDefault(e);
+            e.preventDefault();
             switch (e.key) {
                 case "ArrowLeft": ship.handleArrowLeftPress();
                     break;
@@ -16,7 +17,7 @@ export default class KeyboardHandler {
             }
         });
         document.addEventListener("keyup", e => {
-            e.preventDefault(e);
+            e.preventDefault();
             switch (e.key) {
                 case "ArrowLeft": ship.handleArrowLeftRelease();
                     break;
@@ -29,9 +30,9 @@ export default class KeyboardHandler {
             }
         });
     }
-    bindContextSwitchKeys(gameContextHandler, document) {
+    bindContextSwitchKeys(gameContextHandler: GameContextHandler, document: Document) {
         document.addEventListener("keydown", e => {
-            e.preventDefault(e);
+            e.preventDefault();
             console.log(e.key);
             switch (e.key) {
                 case "Escape":
@@ -44,7 +45,4 @@ export default class KeyboardHandler {
             }
         });
     }
-
-
-
 }
