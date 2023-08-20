@@ -1,7 +1,6 @@
 import Engine from "./engine/engine.js";
 import Physics from "./engine/physics.js";
 import { Camera } from "./engine/camera";
-import Planets from "./game/ingameObjects/planets.js";
 import Config from "./game/config.js";
 // @ts-ignore
 import Random from "lm_random/random";
@@ -17,10 +16,9 @@ function app() {
 
     let camera = new Camera(config.camera);
     let physics = new Physics(config.physics);
-    let planets = new Planets(random);
     let engine = new Engine(physics);
     const canvas = new Canvas(document.querySelector("#canvas"));
-    const builder = new Builder(planets);
+    const builder = new Builder();
     
     engine.builder = builder;
     canvas.resize(getScreenSize());

@@ -48,9 +48,6 @@ export class EnergyMeter {
         const size = this.drawable.size;
         const p = this.drawable.position;
         const dm = this.drawable.dimension;
-        console.log('this.drawable', this.drawable, this);
-console.log('(this.drawable.sprite as Sprite).getImage()', (this.drawable.sprite as Sprite).getImage())
-
         for ( let i=0; i < this.energyBars; i++){
             context.drawImage((this.drawable.sprite as Sprite).getImage(),
             d[0],d[1],

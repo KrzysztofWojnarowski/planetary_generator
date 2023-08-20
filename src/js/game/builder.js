@@ -1,18 +1,18 @@
 import Celestial from "./ingameObjects/celestial";
 import Sprite from "../engine/sprite";
 import SpaceShip from "./ingameObjects/spaceship";
-import Explode from "./ingameObjects/explode";
 import ImageLoader from "../engine/imageLoader";
 import gameImages from "./gameImages";
+import PhysicalBody from "../engine/physicalbody";
+import CellestialImplementation from "../engine/implementation/cellestial.implementation";
+import EntityImplementation from "../engine/implementation/entity.implementation";
+import PhysicalBodyImplementation from "../engine/implementation/physicalBody.implementation";
+import SpriteImplementation from "../engine/implementation/sprite.implementation";
 
 
 export default class Builder {
-    #planets = {};
-    constructor(planets) {
-        this.#planets = planets;
-    }
 
-    buildAssets(){
+    buildAssets() {
         const loader = new ImageLoader();
         loader.setAssetList(gameImages);
         loader.loadImages();
@@ -20,39 +20,33 @@ export default class Builder {
     }
 
 
-
-    build(presets) {
-        let planet = this.#planets.spawnEmpty(presets.type);
-        planet.x = presets.x;
-        planet.y = presets.y;
-        planet.m = presets.m;
-        planet.vx = presets.vx;
-        planet.vy = presets.vy;
-        planet.m = presets.m;
-        planet.r = presets.r;
-        let sprite = new Sprite();
-        sprite.load(presets.image).then(image => {
-            sprite.setImage(image);
-            sprite.setLoaded();
-        });
-        let celestial = new Celestial(sprite,planet);
-        celestial.setFrameCount(presets.frameCount);
-        celestial.setFrameSize(presets.frameSize);
-        return celestial;
-
+    build(presets, engine) {
+        const buildData = presets.cellestial;
+        const cellestialInstance = new CellestialImplementation(
+            new EntityImplementation(
+                {
+                    label: buildData.entity.label,
+                    UUID: crypto.randomUUID()
+                }),
+            new PhysicalBodyImplementation(buildData.physicalBody),
+            new SpriteImplementation(buildData.sprite)
+        );
+        engine.eventHandlingSystem.addListener("onCollided", () => celestial.markForRemoval = true);
+        return cellestialInstance;
     }
 
-    async buildBackground(background){
-        const backgroundImage = await background.load()
-        background.setImage(backgroundImage);
-        background.setLoaded(true);
+    buildBackground(background) {
+        background.load().then(image => {
+            background.setImage(image);
+            background.setLoaded(true);
+        });
         return background;
     }
-    
 
-    buildShip(){
+
+    buildShip() {
         let ship = new SpaceShip();
-        ship.load().then(image=>{
+        ship.load().then(image => {
             ship.setImage(image);
             ship.setLoaded(true);
         });

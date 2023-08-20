@@ -32,7 +32,6 @@ export default class KeyboardHandler {
     bindContextSwitchKeys(gameContextHandler, document) {
         document.addEventListener("keydown", e => {
             e.preventDefault(e);
-            console.log(e.key);
             switch (e.key) {
                 case "Escape":
                     const currentContextObject = gameContextHandler.extractContext();

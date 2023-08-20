@@ -14,8 +14,8 @@ export default class Physics {
     }
     calculateDistance(objectA, objectB) {
         return [
-            objectB.x - objectA.x,
-            objectB.y - objectA.y
+            objectB.position[0] - objectA.position[0],
+            objectB.position[1] - objectA.position[1]
         ];
 
     }
@@ -31,14 +31,14 @@ export default class Physics {
     }
     calculateSpeed(objectA) {
         return [
-            objectA.vx + (objectA.fx / objectA.m) * this.dt,
-            objectA.vy + (objectA.fy / objectA.m) * this.dt,
+            objectA.velocity[0] + (objectA.force[0] / objectA.m) * this.dt,
+            objectA.velocity[1] + (objectA.force[1] / objectA.m) * this.dt,
         ];
     }
     calculatePosition(objectA) {
         return [
-            this.#calculatePosition(objectA.x, objectA.vx, objectA.fx),
-            this.#calculatePosition(objectA.y, objectA.vy, objectA.fy)
+            this.#calculatePosition(objectA.position[0], objectA.velocity[0], objectA.force[0]),
+            this.#calculatePosition(objectA.position[1], objectA.velocity[1], objectA.force[1])
         ];
     }
 
@@ -97,14 +97,11 @@ export default class Physics {
                 f = this.vectorSum(f, this.calculateForce(tb, cb));
             }
         });
-        tb.fx = f[0];
-        tb.fy = f[1];
+        tb.force = f;
         let newPosition = this.calculatePosition(tb);
         let newVelocity = this.calculateSpeed(tb);
-        tb.x = newPosition[0];
-        tb.y = newPosition[1];
-        tb.vx = newVelocity[0];
-        tb.vy = newVelocity[1];
+        tb.position = newPosition;
+        tb.velocity = newVelocity;
     }
 
     applyNonElasticCollision(target,collider){

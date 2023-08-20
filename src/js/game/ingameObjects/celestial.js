@@ -12,8 +12,8 @@ export default class Celestial {
     #tick = 0;
     #frameSize = [200, 200];
 
-    constructor(sprite, planet) {
-        this.#body = planet;
+    constructor(sprite, physicalBody) {
+        this.#body = physicalBody;
         this.#sprite = sprite;
         this.entity = new Entity();
 

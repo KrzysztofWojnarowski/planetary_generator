@@ -38,7 +38,6 @@ export class ThrottleMeter {
     }
 
     update() {
-        console.log('throttle', this)
         let frameIndex = Math.floor(this.owner.throttle * this.step);
         this.drawable.topLeft = [290 + frameIndex * 48,210];
 

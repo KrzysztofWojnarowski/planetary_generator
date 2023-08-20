@@ -1,4 +1,4 @@
-import prebuild from "../prebuild";
+import prebuild from "./dataObjects/prebuild.js";
 import Background from "./background";
 import KeyboardHandler from "./keyboardHandler";
 
@@ -40,7 +40,9 @@ async function buildGameplayContext(engine,keyboardHandler) {
     const builder = engine.builder;
     let system = [];
     prebuild.forEach(element => {
-        system.push(builder.build(element));
+        console.log("building system");
+        system.push(builder.build(element,engine));
+
     });
     engine.loadSystem(system);
 
@@ -50,7 +52,7 @@ async function buildGameplayContext(engine,keyboardHandler) {
 
     let ship = builder.buildShip();
     engine.store.system.push(ship);
-    engine.camera.lockOn(ship.getBody());
+    engine.camera.lockOn(ship);
     keyboardHandler.bindShipKeys(ship, document);
     let throttleMeter = new ThrottleMeter(engine);
     let accelerometer = new Accelerometer(engine);

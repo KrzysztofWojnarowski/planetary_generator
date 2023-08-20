@@ -39,5 +39,8 @@ export default class ImageLoader {
     getGameImages(){
         return this.images;
     }
+    getImage(imagePointer){
+        return this.images[imagePointer].getImage();
+    }
 
 }
