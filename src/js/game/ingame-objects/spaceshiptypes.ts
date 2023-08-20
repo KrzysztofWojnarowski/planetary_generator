@@ -1,10 +1,9 @@
-export default {
-
+export const spaceshiptypes = {
     bascicCrousier:{
         sprite:{
-            position:[237,647],
-            sizeSource:[55,55],
-            sizeDestination:[30,30]
+            position: [237,647],
+            sizeSource: [55,55],
+            sizeDestination: [30,30]
         },
         energy:4000,
         energyCapacity:10000,
@@ -17,7 +16,4 @@ export default {
         powerQuantum:1e-9
 
     }
-
-
-
 }
