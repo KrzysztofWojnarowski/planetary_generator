@@ -8,6 +8,7 @@ export default class Engine {
       drawable:[],
       eventQueue: new Map()
    }
+   
    #physics = {};
    constructor(physics) {
       this.#physics = physics;

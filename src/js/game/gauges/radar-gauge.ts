@@ -1,13 +1,17 @@
-import Entity from "../../engine/entity";
-import Sprite from "../../engine/sprite";
-import Drawable from "../../engine/drawable";
-import EventSystem from "../../engine/eventSystem";
-import Position from "../../engine/position";
+import { GetDrawable } from './../../engine/models/get-drawable.mode';
+import { Entity } from "../../engine/entity";
+import { Sprite } from "../../engine/sprite";
+import { Drawable } from "../../engine/drawable";
+import { EventSystem } from "../../engine/event-system";
+import { Position } from "../../engine/position";
 import Engine from "../../engine/engine";
 import { Camera } from "../../engine/camera";
-import Physics from "../../engine/physics";
+import { Physics } from "../../engine/physics";
+import { PositionCordinates } from "../../engine/models/position.model";
+import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
+import SpaceShip from '../ingame-objects/spaceship';
 
-export class RadarGauge {
+export class RadarGauge implements GetDrawable, GetPositionCoordinates {
     engine: Engine = null;
     entity: Entity = null;
     drawable: Drawable = null;
@@ -16,20 +20,14 @@ export class RadarGauge {
     eventSystem: EventSystem = null;
     radarMap: Map<any, any> = new Map();
     radarStart = 0;
-    owner: any; // is ship
+    owner: SpaceShip;
 
     constructor(engine: Engine) {
         this.engine = engine;
-        let sprite = new Sprite();
         this.entity = new Entity();
-        this.drawable = new Drawable();
+        this.drawable = this.getDrawable();
         this.position = new Position();
         this.camera = engine.camera;
-        sprite.setImage(engine.loader.images.iconSheet.getImage());
-        this.drawable.bindSprite(sprite);
-        this.drawable.dimension = [40, 40];
-        this.drawable.size = [200, 200];
-        this.drawable.topLeft = [484, 772];
         this.eventSystem = new EventSystem();
     }
 
@@ -38,12 +36,7 @@ export class RadarGauge {
     }
 
     update() {
-        const cp = this.camera.getPosition();
-        let newPosition = [
-            Math.round(-cp[0] + 1100),
-            Math.round(-cp[1] + 310)
-        ];
-        this.drawable.setPosition(newPosition);
+        this.drawable.setPosition(this.getPositionCoordinates());
         let physics = this.engine.getPhysics() as Physics;
         this.radarMap = physics.getInRange(this.owner.getBody(), this.engine.getPhysicals(), 5000);
         if (Math.round(this.radarStart / (4 * Math.PI)) == 1) {
@@ -82,7 +75,27 @@ export class RadarGauge {
             context.fill();
         });
         context.restore();
-
     }
 
+    getPositionCoordinates(): PositionCordinates {
+        const cp = this.camera.getPosition();
+
+        let newPosition: PositionCordinates = [
+            Math.round(-cp[0] + 1100),
+            Math.round(-cp[1] + 310)
+        ];
+
+        return newPosition;
+    }
+
+    getDrawable(): Drawable { 
+        return new Drawable()
+            .setDemention([40, 40])
+            .setSize([200, 200])
+            .setTopLeft([484, 772])
+            .bindSprite(
+                new Sprite()
+                    .setImage(this.engine.loader.images.iconSheet.getImage())
+            );
+    }
 }

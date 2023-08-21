@@ -1,5 +1,7 @@
-export default class Effects {
-    collisionEffect(objectA, objectB) {
+import { PhysicalBody } from "./physicalbody";
+
+export class Effects {
+    collisionEffect(objectA: PhysicalBody, objectB: PhysicalBody) {
         let m1 = objectA.m;
         let m2 = objectB.m;
         let v1 = [objectA.vx, objectA.vy];

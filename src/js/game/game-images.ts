@@ -1,5 +1,4 @@
-export default {
-
+export const gameImages =  {
     spaceshipSheet: "../assets/pngegg.png",
     background: "../assets/background.png",
     explosionSheet: "../assets/explode.png",

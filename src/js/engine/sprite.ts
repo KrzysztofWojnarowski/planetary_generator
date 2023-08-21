@@ -1,6 +1,6 @@
 import { ImageLoader } from "./image-loader";
 
-export default class Sprite {
+export class Sprite {
     image: HTMLImageElement = null;
 
     _spriteImage: HTMLImageElement = null;
@@ -18,9 +18,9 @@ export default class Sprite {
     async load(url: string) {
         return await ImageLoader.load(url);
     }
-    setImage(image: HTMLImageElement, context?: any){
-        console.log('image', image, context)
+    setImage(image: HTMLImageElement){
         this._spriteImage = image;
+        return this;
     }
     setLoaded(){
         this._isLoaded = true;

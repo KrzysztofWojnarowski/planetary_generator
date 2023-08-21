@@ -1,8 +1,8 @@
-import prebuild from "../prebuild";
+import { prebuild } from "../prebuild";
 import Background from "./background";
-import KeyboardHandler from "./keyboardHandler";
+import { KeyboardHandler } from "./keyboard-handler";
 
-import GameContextHandler  from "../engine/gameContextHandler";
+import { GameContextHandler }  from "../engine/game-contex-handler";
 
 import { ThrottleMeter } from "./gauges/throttle-meter";
 import { Accelerometer } from "./gauges/accelerometer";
@@ -10,8 +10,9 @@ import { EnergyMeter } from "./gauges/energy-meter";
 import { RadarGauge } from "./gauges/radar-gauge";
 import { MenuFrame } from "./menuItems/menu-frame";
 import { MenuContent } from "./menuItems/menu-content";
+import Engine from "../engine/engine";
 
-export default async function assemblingFunction(engine) {
+export async function assemblingFunction(engine: Engine) {
     console.log("assembling things");
     const gameContextHandler = new GameContextHandler(engine);
     const keyboardHandler = new KeyboardHandler();
@@ -28,17 +29,17 @@ export default async function assemblingFunction(engine) {
     
 }
 
-function buildMenuContext(engine, keyboardHandler){
-    const screenSize = [window.innerWidth, window.innerHeight];
+function buildMenuContext(engine: Engine){
+    const screenSize: [number, number] = [window.innerWidth, window.innerHeight];
     const menuFrame = new MenuFrame(engine, screenSize);
     engine.registerDrawable(menuFrame);
     const menuContent = new MenuContent(engine);
     engine.registerDrawable(menuContent);
 }
 
-async function buildGameplayContext(engine,keyboardHandler) {
+async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHandler) {
     const builder = engine.builder;
-    let system = [];
+    let system: any = [];
     prebuild.forEach(element => {
         system.push(builder.build(element));
     });
@@ -69,7 +70,7 @@ async function buildGameplayContext(engine,keyboardHandler) {
     // Not working
     engine.registerDrawable(accelerometer);
     engine.registerDrawable(energyMeter);
-    engine.store.system.forEach(e => {
+    engine.store.system.forEach((e: any) => {
         engine.registerPhysical(e);
     });
 }   

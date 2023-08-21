@@ -1,9 +1,9 @@
-import EventSystem from "../../engine/eventSystem";
-import Sprite from "../../engine/sprite";
+import { EventSystem } from "../../engine/event-system";
+import { Sprite } from "../../engine/sprite";
 import { Animation } from "../../engine/animation";
-import Entity from "../../engine/entity";
-export default class Explode {
+import { Entity } from "../../engine/entity";
 
+export default class Explode {
     frameRows = 6;
     framesInRow = 8;
     currentFrame = 0;
@@ -11,6 +11,11 @@ export default class Explode {
     size = 100;
     url = "assets/explode.png";
     position = [400,400];
+    sprite: Sprite = null;
+    entity: Entity = null;
+    eventSystem: EventSystem = null;
+    animation: Animation = null;
+
     constructor() {
         this.sprite = new Sprite();
         this.entity = new Entity();
@@ -25,7 +30,6 @@ export default class Explode {
         this.animation.bindSprite(this.sprite);
     }
     
-   
     getFramePosition() {
         return [
             this.currentFrame%this.framesInRow,
@@ -41,18 +45,11 @@ export default class Explode {
 
     }
 
-    draw(context) {
+    draw(context: CanvasRenderingContext2D) {
         const framePosition = this.getFramePosition();
         const d  = this.dimension;
         context.drawImage(this.animation.sprite.getImage(),
         d[0]*framePosition[0],d[1]*framePosition[1],
         d[0],d[1],0,0,this.size,this.size);
     }
-
-
-
-
-
-
-
 }

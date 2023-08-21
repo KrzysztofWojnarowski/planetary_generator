@@ -1,7 +1,10 @@
-import Entity from "../../engine/entity";
-import Drawable from "../../engine/drawable";
-import Sprite from "../../engine/sprite";
+import { GetDrawable } from './../../engine/models/get-drawable.mode';
+import { Entity } from "../../engine/entity";
+import { Drawable } from "../../engine/drawable";
+import { Sprite } from "../../engine/sprite";
 import Engine from "../../engine/engine";
+import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
+import { PositionCordinates } from "../../engine/models/position.model";
 
 export interface CoordinatesSizeDimension {
     dimension: [number, number];
@@ -9,7 +12,7 @@ export interface CoordinatesSizeDimension {
     topLeft: [number, number];
 }
 
-export class MenuContent {
+export class MenuContent implements GetDrawable, GetPositionCoordinates {
     drawable: Drawable = null;
     entity: Entity = null;
     context: CanvasRenderingContext2D = null; 
@@ -40,23 +43,12 @@ export class MenuContent {
         this.engine = engine;
 
         this.entity = new Entity();
-        this.drawable = new Drawable();
+        this.drawable = this.getDrawable();
         this.context = engine.context;
-
-        this.drawable.position = [10, 10];
-
-        let sprite = new Sprite();
-        sprite.setImage(engine.loader.images.gaugeSheet.getImage());
-        this.drawable.bindSprite(sprite);
     }
 
     update() {
-        const cameraPosition = this.engine.camera.getPosition();
-        let newPosition = [
-            Math.round(-cameraPosition[0] + 750),
-            Math.round(-cameraPosition[1] + 400)
-        ];
-        this.drawable.setPosition(newPosition);
+        this.drawable.setPosition(this.getPositionCoordinates());
     }
 
     draw() {
@@ -107,5 +99,23 @@ export class MenuContent {
         context.font = "bold 30px Courier";
         context.fillStyle = "rgba(50,90,30,1)";
         context.fillText(text, x, y);
+    }
+
+    getPositionCoordinates(): PositionCordinates {
+        const cameraPosition = this.engine.camera.getPosition();
+        let newPosition = [
+            Math.round(-cameraPosition[0] + 750),
+            Math.round(-cameraPosition[1] + 400)
+        ];
+        return newPosition as PositionCordinates;
+    }
+
+    getDrawable(): Drawable { 
+        return new Drawable()
+            .setPosition([10, 10])
+            .bindSprite(
+                new Sprite()
+                    .setImage(this.engine.loader.images.gaugeSheet.getImage())
+            );
     }
 }

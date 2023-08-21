@@ -1,39 +1,48 @@
-import EventSystem from "../../engine/eventSystem";
-import PhysicalBody from "../../engine/physicalbody";
-import spaceshiptypes from "./spaceshiptypes.js";
+import { Entity } from './../../engine/entity';
+import { EventSystem } from "../../engine/event-system";
+import { PhysicalBody } from "../../engine/physicalbody";
+import { spaceshiptypes } from "./spaceshiptypes";
 import Explode from "./explode";
-import Entity from "../../engine/entity";
+import Engine from '../../engine/engine';
+import { Physics } from '../../engine/physics';
 
 export default class SpaceShip {
-    keyboardState = {
+    private keyboardState:  { [key: string]: boolean } = {
         arrowUp: false,
         arrowDown: false,
         arrowLeft: false,
         arrowRight: false
-    }
-    url = "assets/pngegg.png";
-    #isLoaded = false;
-    #image = {};
-    #mesh = spaceshiptypes.bascicCrousier;
-    position = [100, 1900];
-    velocity = [0, 0];
-    rotation = Math.PI / 2;
-    force = 0;
-    body = new PhysicalBody();
-    throttle = 0;
-    powerQuantum = 1e-18;
-    throttleFactor = 0;
-    physics = {};
+    };
+    private url = "assets/pngegg.png";
+    private _isLoaded = false;
+    private image: HTMLImageElement | {} = {};
+    private mesh = spaceshiptypes.bascicCrousier;
+    private position: number[] = [100, 1900];
+    private velocity: number[] = [0, 0];
+    private rotation = Math.PI / 2;
+    private force = 0;
+    private body = new PhysicalBody();
+    public throttle = 0;
+    private powerQuantum = 1e-18;
+    private throttleFactor = 0;
+    private physics: any = {};
+    private eventSystem: EventSystem;
+    entity: Entity = null;
+    vx;
+    vy;
+    maxSpeed;
+    isCharging: boolean;
+
     constructor() {
         this.entity = new Entity();
-        this.body.m = this.#mesh.m;
+        this.body.m = this.mesh.m;
         this.body.x = this.position[0];
         this.body.y = this.position[1];
-        this.body.r = this.#mesh.r;
+        this.body.r = this.mesh.r;
         this.vx = 0;
         this.vy = 0;
-        this.maxSpeed = this.#mesh.maxSpeed;
-        this.powerQuantum = this.#mesh.powerQuantum;
+        this.maxSpeed = this.mesh.maxSpeed;
+        this.powerQuantum = this.mesh.powerQuantum;
         this.eventSystem = new EventSystem(this);
         this.eventSystem.registerEvent("onCollided");
         this.eventSystem.addListener("onCollided", this.onCollision);
@@ -45,10 +54,10 @@ export default class SpaceShip {
         });
     }
 
-    onRemove(e, s) {
+    onRemove(e: any, s: any) {
         e.getBody().markForRemoval = true;
     }
-    onUpdate(e, s) {
+    onUpdate(e: any, s: any) {
         e.update(s.getPhysics());
     }
 
@@ -56,7 +65,7 @@ export default class SpaceShip {
         return this.body;
     }
 
-    setBody(body) {
+    setBody(body: any) {
         this.body.fromObject(body);
     }
 
@@ -71,29 +80,30 @@ export default class SpaceShip {
         });
 
     }
+
     isLoaded() {
-        return this.#isLoaded;
+        return this.isLoaded;
     }
     getImage() {
-        return this.#image;
+        return this.image;
     }
-    setImage(image) {
-        this.#image = image;
+    setImage(image: HTMLImageElement) {
+        this.image = image;
     }
-    setLoaded(loaded) {
-        this.#isLoaded = loaded;
+    setLoaded(loaded: boolean) {
+        this._isLoaded = loaded;
     }
 
-    drawChargingCircle(context) {
+    drawChargingCircle(context: CanvasRenderingContext2D) {
         this.isCharging ? context.fill() : context.stroke();
     }
 
-    draw(context) {
+    draw(context: CanvasRenderingContext2D) {
         context.save();
         const body = this.getBody();
         context.translate(body.x, body.y);
         context.rotate(this.rotation);
-        let sprite = this.#mesh.sprite;
+        let sprite = this.mesh.sprite;
         let [x, y] = sprite.position;
         let [w, h] = sprite.sizeSource;
         let [dw, dh] = sprite.sizeDestination;
@@ -102,7 +112,7 @@ export default class SpaceShip {
         context.fillStyle = "rgba(0,200,150,0.1)";
         context.arc(-0.5 * dw + 10, -0.5 * dh + 20, this.getMesh().effectiveRange + 35, 0, 2 * Math.PI);
         this.drawChargingCircle(context);
-        context.drawImage(this.#image, x, y, w, h, -0.5 * dw, -0.5 * dh, dw, dh);
+        context.drawImage(this.image as HTMLImageElement, x, y, w, h, -0.5 * dw, -0.5 * dh, dw, dh);
         context.restore();
     }
     //TODO - use sprite instead of this nasty hack
@@ -127,10 +137,10 @@ export default class SpaceShip {
     throttleUp() {
         
         if (!this.hasEnergy()) return;
-        if (this.#mesh.power > this.throttle)
+        if (this.mesh.power > this.throttle)
             this.throttle += 0.5;
         else
-            this.throttle = this.#mesh.power;
+            this.throttle = this.mesh.power;
     }
 
     throttleDown() {
@@ -154,20 +164,20 @@ export default class SpaceShip {
     }
 
     getMesh() {
-        return this.#mesh;
+        return this.mesh;
     }
 
-    chargeMap(ship, engine) {
+    chargeMap(ship: SpaceShip, engine: Engine) {
         let system = engine.store.physical;
-        let physics = engine.getPhysics();
+        let physics = engine.getPhysics() as Physics;
         return physics.getInRange(ship.getBody(), system, ship.getMesh().effectiveRange);
     }
 
-    chargeFromObject(object) {
+    chargeFromObject(object: any) {
         return object.m * this.getMesh().chargingSpeed;
     }
 
-    updateChargeEnergy(ship, engine) {
+    updateChargeEnergy(ship: SpaceShip, engine: Engine) {
         let chargeMap = this.chargeMap(ship, engine);
         let mesh = ship.getMesh();
         chargeMap.forEach(e => {
@@ -180,7 +190,7 @@ export default class SpaceShip {
     }
 
     //TODO: Come up with something more reasonable
-    update(physics) {
+    update(physics: Physics) {
         this.handleKeyboardState();
         this.updatheThrottelEnergy();
         let throttleFactor = this.throttle * this.powerQuantum;
@@ -194,7 +204,7 @@ export default class SpaceShip {
         this.body.y = p[1];
 
     }
-    onCollision(e, f, g) {
+    onCollision(e: any, f: any, g: Engine) {
         e.body.markForRemoval = true;
         let explosion = new Explode();
         const body = e.getBody();
@@ -219,11 +229,11 @@ export default class SpaceShip {
         this.keyboardState.arrowRight && this.turnRight();
     }
 
-    keyPressed(key) {
+    keyPressed(key: string) {
         !this.keyboardState[key] && (this.keyboardState[key] = true);
     }
 
-    keyReleased(key) {
+    keyReleased(key: string) {
         this.keyboardState[key] && (this.keyboardState[key] = false);
     }
 

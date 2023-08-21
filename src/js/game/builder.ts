@@ -1,28 +1,26 @@
-import Celestial from "./ingameObjects/celestial";
-import Sprite from "../engine/sprite";
-import SpaceShip from "./ingameObjects/spaceship";
-import Explode from "./ingameObjects/explode";
-import ImageLoader from "../engine/imageLoader";
-import gameImages from "./gameImages";
+import { Celestial } from "./ingame-objects/celestial";
+import { Sprite } from "../engine/sprite";
+import SpaceShip from "./ingame-objects/spaceship";
+import { ImageLoaderManager } from "../engine/image-loader-manager";
+import { gameImages } from "./game-images";
+import { Planets } from "./ingame-objects/planets";
+import Background from "./background";
 
-
-export default class Builder {
-    #planets = {};
-    constructor(planets) {
-        this.#planets = planets;
+export class Builder {
+    planets: Planets = null;;
+    constructor(planets: Planets) {
+        this.planets = planets;
     }
 
     buildAssets(){
-        const loader = new ImageLoader();
+        const loader = new ImageLoaderManager();
         loader.setAssetList(gameImages);
         loader.loadImages();
         return loader;
     }
 
-
-
-    build(presets) {
-        let planet = this.#planets.spawnEmpty(presets.type);
+    build(presets: any) {
+        let planet = this.planets.spawnEmpty(presets.type);
         planet.x = presets.x;
         planet.y = presets.y;
         planet.m = presets.m;
@@ -42,7 +40,7 @@ export default class Builder {
 
     }
 
-    async buildBackground(background){
+    async buildBackground(background: Background){
         const backgroundImage = await background.load()
         background.setImage(backgroundImage);
         background.setLoaded(true);
@@ -52,11 +50,10 @@ export default class Builder {
 
     buildShip(){
         let ship = new SpaceShip();
-        ship.load().then(image=>{
+        ship.load().then((image: HTMLImageElement)=>{
             ship.setImage(image);
             ship.setLoaded(true);
         });
         return ship;
-
     }
 }

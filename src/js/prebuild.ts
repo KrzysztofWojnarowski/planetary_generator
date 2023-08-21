@@ -1,4 +1,4 @@
-export default [
+export const prebuild =  [
     {
         label:"Sun",
         type:"star",

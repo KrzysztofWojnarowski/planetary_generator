@@ -1,14 +1,17 @@
-import Entity from "./entity";
+import Engine from "./engine";
+import { Entity } from "./entity";
 
+export class GameContextHandler {
+    engine: Engine = null;
+    entity: Entity = null;
+    contextMap: Map<any, any> = new Map();
+    currentContext: string = '';
 
-export default class GameContextHandler {
-    constructor(engine) {
+    constructor(engine: Engine) {
         this.entity = new Entity();
-        this.contextMap = new Map();
         this.engine = engine;
-        this.currentContext = "";
-
     }
+
     createNewContext() {
         return {
             system: [],
@@ -16,9 +19,10 @@ export default class GameContextHandler {
             animation: [],
             drawable: [],
             eventQueue: new Map()
-        }
+        } as any;
     }
-    applyContext(uuid) {
+    
+    applyContext(uuid: string) {
         this.currentContext = uuid;
         this.engine.store = this.contextMap.get(uuid);
     }
@@ -31,11 +35,13 @@ export default class GameContextHandler {
     extractContext() {
         return this.engine.store;
     }
-    registerContext(uuid, context) {
+
+    // context is store from engine
+    registerContext(uuid: string, context: any) {
         this.contextMap.set(uuid, context);
     }
 
-    buildContextFromFunction(fn,keyboardHandler,UUID){
+    buildContextFromFunction(fn: any, keyboardHandler: any, UUID: string){
         fn(this.engine,keyboardHandler,UUID);
         return this.engine.store;
     }

@@ -1,8 +1,11 @@
-import Effects from "./effects";
+import { Effects } from "./effects";
+import { PhysicalBody } from "./physicalbody";
 
-export default class Physics {
+// TODO: Mage proper TS!!
+export class Physics {
     G = 0.01;
     dt = 5;
+    effects: Effects;
 
     constructor(config = {
         G: 0.01,
@@ -12,14 +15,14 @@ export default class Physics {
         this.dt = config.dt;
         this.effects = new Effects();
     }
-    calculateDistance(objectA, objectB) {
+    calculateDistance(objectA: PhysicalBody, objectB: PhysicalBody) {
         return [
             objectB.x - objectA.x,
             objectB.y - objectA.y
         ];
 
     }
-    calculateForce(objectA, objectB) {
+    calculateForce(objectA: PhysicalBody, objectB: PhysicalBody) {
         let distance = this.calculateDistance(objectA, objectB);
         let d = distance;
         let r = Math.sqrt(d[0] * d[0] + d[1] * d[1]);
@@ -29,38 +32,38 @@ export default class Physics {
             forceFactor * d[1] / (r * r)
         ];
     }
-    calculateSpeed(objectA) {
+    calculateSpeed(objectA: PhysicalBody) {
         return [
             objectA.vx + (objectA.fx / objectA.m) * this.dt,
             objectA.vy + (objectA.fy / objectA.m) * this.dt,
         ];
     }
-    calculatePosition(objectA) {
+    calculatePosition(objectA: PhysicalBody) {
         return [
-            this.#calculatePosition(objectA.x, objectA.vx, objectA.fx),
-            this.#calculatePosition(objectA.y, objectA.vy, objectA.fy)
+            this._calculatePosition(objectA.x, objectA.vx, objectA.fx),
+            this._calculatePosition(objectA.y, objectA.vy, objectA.fy)
         ];
     }
 
-    #calculatePosition(x, v, f) {
+    _calculatePosition(x: number, v: number, f: number) {
         return x + v * this.dt + f * Math.pow(this.dt, 2) / 2;
     }
 
-    vectorSum(a, b) {
-        let sum = a.map((i, e) => i + b[e]);
-        return a.map((i, e) => i + b[e]);
+    vectorSum(a:any, b: any) {
+        let sum = a.map((i: number, e:number) => i + b[e]);
+        return sum;
     }
 
-    isCollision(objectA, objectB) {
+    isCollision(objectA: PhysicalBody, objectB: PhysicalBody) {
         const distance = this.calculateDistance(objectA, objectB);
         let radius = objectA.r + objectB.r;
         return (distance[0] * distance[0] < radius * radius) && (distance[1] * distance[1] < radius * radius);
     }
 
-    getCollisions(target, gameObjects) {
+    getCollisions(target: any, gameObjects: any) {
         const tb = target;
         let map = new Map();
-        gameObjects.forEach((v,k) => {
+        gameObjects.forEach((v: any,k: any) => {
             if (tb!=v && this.isCollision(tb,v)){
                 map.set(k,v);
             }
@@ -68,10 +71,10 @@ export default class Physics {
         return map;
     }
 
-    getInRange(target,gameObjects,range){
+    getInRange(target: any,gameObjects: any,range: any){
         const tb = target;
         let map = new Map();
-        gameObjects.forEach((v,k) => {
+        gameObjects.forEach((v: PhysicalBody,k: number) => {
             if (tb!=v && this.inRange(tb,v,range)){
                 map.set(k,v);
             }
@@ -80,7 +83,7 @@ export default class Physics {
     }
 
 
-    inRange(objectA, objectB,range) {
+    inRange(objectA: PhysicalBody, objectB: PhysicalBody, range: number) {
         let totalRange = range+objectA.r+objectB.r;
         const rS = totalRange*totalRange;
         const distance = this.calculateDistance(objectA, objectB);
@@ -88,10 +91,10 @@ export default class Physics {
     }
 
 
-    applyGravity(target, gameObjects) {
+    applyGravity(target: any, gameObjects: any) {
         let f = [0, 0];
         let tb = target;
-        gameObjects.forEach(cellestial => {
+        gameObjects.forEach((cellestial: any) => {
             if (cellestial != target) {
                 let cb = cellestial;
                 f = this.vectorSum(f, this.calculateForce(tb, cb));
@@ -107,7 +110,7 @@ export default class Physics {
         tb.vy = newVelocity[1];
     }
 
-    applyNonElasticCollision(target,collider){
+    applyNonElasticCollision(target: any, collider: any){
        let a = target;
        let b = collider;
        a.m>b.m && this.effects.collisionEffect(a,b);
