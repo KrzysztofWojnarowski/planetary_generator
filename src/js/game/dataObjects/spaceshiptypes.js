@@ -1,4 +1,5 @@
-export const spaceshiptypes = {
+export default {
+
     bascicCrousier:{
         sprite:{
             position:[237,647],

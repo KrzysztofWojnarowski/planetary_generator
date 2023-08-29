@@ -71,7 +71,7 @@ export class RadarGauge implements GetDrawable, GetPositionCoordinates {
         this.radarMap.forEach(e => {
             context.beginPath();
             context.fillStyle = "rgba(200,250,200,0.5)";
-            context.arc(-(-e.x + ownerBody.x) * 0.01 + size[0] * 0.5, -(-e.y + ownerBody.y) * 0.01 + 0.5 * size[1], 2, 0, Math.PI * 2);
+            context.arc(-(-e.x + ownerBody.position[0]) * 0.01 + size[0] * 0.5, -(-e.y + ownerBody.position[1]) * 0.01 + 0.5 * size[1], 2, 0, Math.PI * 2);
             context.fill();
         });
         context.restore();

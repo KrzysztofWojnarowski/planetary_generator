@@ -1,6 +1,6 @@
 import { Effects } from "./effects";
-import { PhysicalBody } from "./models/physicalBody.model";
-import { Vector } from "./models/vector.model";
+import { PhysicalBody } from "./physicalbody";
+
 // TODO: Mage proper TS!!
 export class Physics {
     G = 0.01;
@@ -17,8 +17,8 @@ export class Physics {
     }
     calculateDistance(objectA: PhysicalBody, objectB: PhysicalBody) {
         return [
-            objectB.position[0] - objectA.position[0],
-            objectB.position[1] - objectA.position[1]
+            objectB.x - objectA.x,
+            objectB.y - objectA.y
         ];
 
     }
@@ -34,14 +34,14 @@ export class Physics {
     }
     calculateSpeed(objectA: PhysicalBody) {
         return [
-            objectA.velocity[0] + (objectA.force[0] / objectA.m) * this.dt,
-            objectA.velocity[1] + (objectA.force[1] / objectA.m) * this.dt,
+            objectA.vx + (objectA.fx / objectA.m) * this.dt,
+            objectA.vy + (objectA.fy / objectA.m) * this.dt,
         ];
     }
     calculatePosition(objectA: PhysicalBody) {
         return [
-            this._calculatePosition(objectA.position[0], objectA.velocity[0], objectA.force[0]),
-            this._calculatePosition(objectA.position[1], objectA.velocity[1], objectA.force[1])
+            this._calculatePosition(objectA.x, objectA.vx, objectA.fx),
+            this._calculatePosition(objectA.y, objectA.vy, objectA.fy)
         ];
     }
 
@@ -49,9 +49,9 @@ export class Physics {
         return x + v * this.dt + f * Math.pow(this.dt, 2) / 2;
     }
 
-    vectorSum(a:Vector, b:Vector) {
-        let sum = a.map((i, e) => i + b[e]);
-        return a.map((i, e) => i + b[e]);
+    vectorSum(a:any, b: any) {
+        let sum = a.map((i: number, e:number) => i + b[e]);
+        return sum;
     }
 
     isCollision(objectA: PhysicalBody, objectB: PhysicalBody) {
@@ -100,11 +100,14 @@ export class Physics {
                 f = this.vectorSum(f, this.calculateForce(tb, cb));
             }
         });
-        tb.force = f;
+        tb.fx = f[0];
+        tb.fy = f[1];
         let newPosition = this.calculatePosition(tb);
         let newVelocity = this.calculateSpeed(tb);
-        tb.position = newPosition;
-        tb.velocity = newVelocity;
+        tb.x = newPosition[0];
+        tb.y = newPosition[1];
+        tb.vx = newVelocity[0];
+        tb.vy = newVelocity[1];
     }
 
     applyNonElasticCollision(target: any, collider: any){

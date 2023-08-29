@@ -1,0 +1,1 @@
+export type PositionCordinates = [number, number];

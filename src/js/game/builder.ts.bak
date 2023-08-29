@@ -1,12 +1,15 @@
+import { Celestial } from "./ingame-objects/celestial";
+import { Sprite } from "../engine/sprite";
 import SpaceShip from "./ingame-objects/spaceship";
 import { ImageLoaderManager } from "../engine/image-loader-manager";
 import { gameImages } from "./game-images";
+import { Planets } from "./ingame-objects/planets";
 import Background from "./background";
+import PhysicalBody from "../engine/physicalbody";
 import CellestialImplementation from "../engine/implementation/cellestial.implementation";
 import EntityImplementation from "../engine/implementation/entity.implementation";
 import PhysicalBodyImplementation from "../engine/implementation/physicalBody.implementation";
 import SpriteImplementation from "../engine/implementation/sprite.implementation";
-import Engine from "../engine/engine";
 
 
 export class Builder {
@@ -21,19 +24,6 @@ export class Builder {
 
     
 
-    build(presets:any, engine:any) {
-        const buildData = presets.cellestial;
-        const cellestialInstance = new CellestialImplementation(
-            new EntityImplementation(
-                {
-                    label: buildData.entity.label,
-                    UUID: crypto.randomUUID()
-                }),
-            new PhysicalBodyImplementation(buildData.physicalBody),
-            new SpriteImplementation(buildData.sprite)
-        );
-        engine.eventHandlingSystem.addListener("onCollided", () => cellestialInstance.markForRemoval = true);
-        return cellestialInstance;
     }
 
     async buildBackground(background: Background){

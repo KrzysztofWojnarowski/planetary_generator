@@ -60,7 +60,7 @@ export default class Background {
     
     onUpdate(ship: SpaceShip){
         const shipBody = ship.getBody();
-        this.move([5+0.7*shipBody.x,5+0.7*shipBody.y]);
+        this.move([5+0.7*shipBody.position[0],5+0.7*shipBody.position[1]]);
 
     }
 }
