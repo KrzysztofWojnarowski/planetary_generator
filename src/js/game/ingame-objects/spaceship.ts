@@ -17,10 +17,7 @@ export default class SpaceShip {
     private _isLoaded = false;
     private image: HTMLImageElement | {} = {};
     private mesh = spaceshiptypes.bascicCrousier;
-    private position: number[] = [100, 1900];
-    private velocity: number[] = [0, 0];
     private rotation = Math.PI / 2;
-    private force = 0;
     private body:PhysicalBodyImplementation = null;
     public throttle = 0;
     private powerQuantum = 1e-18;

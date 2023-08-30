@@ -90,11 +90,10 @@ export class Camera {
     }
 
     getRange() {
-        console.log(this.target);
         const target = this.target;
         return [
-            this.position[0] + target[0]-this.width/2,
-            this.position[1] + target[1]-this.height/2
+            this.position[0] + target.position[0]-this.width/2,
+            this.position[1] + target.position[1]-this.height/2
         ];
     }
     getPosition(){
