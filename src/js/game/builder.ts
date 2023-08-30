@@ -10,16 +10,12 @@ import Engine from "../engine/engine";
 
 
 export class Builder {
-    
-
     buildAssets(){
         const loader = new ImageLoaderManager();
         loader.setAssetList(gameImages);
         loader.loadImages();
         return loader;
     }
-
-    
 
     build(presets:any, engine:any) {
         const buildData = presets.cellestial;
@@ -43,7 +39,6 @@ export class Builder {
         return background;
     }
     
-
     buildShip(){
         let ship = new SpaceShip();
         ship.load().then((image: HTMLImageElement)=>{

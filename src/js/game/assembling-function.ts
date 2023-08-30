@@ -1,4 +1,4 @@
-import { prebuild } from "../prebuild";
+import prebuild from "./dataObjects/prebuild";
 import Background from "./background";
 import { KeyboardHandler } from "./keyboard-handler";
 
@@ -41,7 +41,8 @@ async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHan
     const builder = engine.builder;
     let system: any = [];
     prebuild.forEach(element => {
-        system.push(builder.build(element));
+        console.log(element);
+        system.push(builder.build(element,engine));
     });
     engine.loadSystem(system);
 
