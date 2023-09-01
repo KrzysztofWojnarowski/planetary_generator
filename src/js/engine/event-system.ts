@@ -33,7 +33,6 @@ export class EventSystem {
     }
     
     triggerEvent(event: SystemEvent, source: any, params={}){
-        console.log(event,params);
         this.eventList[event].forEach(elementCallback => {
             elementCallback(this.owner, source, params);
         });

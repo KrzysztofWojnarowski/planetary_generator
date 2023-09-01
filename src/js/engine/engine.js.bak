@@ -1,6 +1,3 @@
-import CellestialSystem from "./systems/cellestial.system";
-import EventHandlingSystem from "./systems/eventHandling.system";
-
 export default class Engine {
    builder = null;
 
@@ -8,57 +5,36 @@ export default class Engine {
       system: [],
       physical: new Map(),
       animation: [],
-      drawable: [],
+      drawable:[],
       eventQueue: new Map()
    }
+   
    #physics = {};
    constructor(physics) {
       this.#physics = physics;
-      this.eventHandlingSystem = new EventHandlingSystem();
-
    }
+
    registerPhysical(object) {
-      if (object.constructor.name == "CellestialImplementation") {
-         this.registerPhysicalTS(object);
-         return;
-      }
       if (typeof object.getBody === "function") {
          this.store.physical.set(object.entity.getUUID(), object.getBody());
       }
    }
-   /**This function will take over the registerPhysucal responsibility after TS refactor */
-   registerPhysicalTS(object) {
-      if (typeof object.getBody == "function") {
-         this.store.physical.set(object.getEntity().getUUID(), object.getBody().getBody());
-         
-      }
-
-   }
-
    queueEvent(entityUUID, event, params) {
       this.store.eventQueue.set(crypto.randomUUID(), { uuid: entityUUID, event: event, params: params });
    }
 
    processEvents() {
-      this.store.eventQueue.forEach((v, k) => {
 
-         let element = this.store.system.find(e => {
-            if (typeof e.entity === "object")
-               return e.entity.getUUID() === v.uuid;
-            else
-               return e.getEntity().getUUID() === v.uuid
-         });
-         if(typeof element.eventSystem =="object")
-            element.eventSystem.triggerEvent(v.event, ...v.params);
-         else{
-            
-            this.eventHandlingSystem.triggerEvent(v.event,element,v.params);
-         }
+      this.store.eventQueue.forEach((v, k) => {
+         console.log(v,k);
+         let element = this.store.system.find(e => e.entity.getUUID() === v.uuid);
+         element.eventSystem.triggerEvent(v.event, ...v.params);
          this.store.eventQueue.delete(k);
+
       });
    }
 
-   getPhysicals() {
+   getPhysicals(){
       return this.store.physical;
    }
 
@@ -138,10 +114,6 @@ export default class Engine {
          this.processPhysical(e);
          this.queueEvent(k, "onUpdate", [this]);
       });
-      //Mid step in TS ECS implementation
-      this.store.system.forEach(e=>{
-         e.constructor.name==="CellestialImplementation" && CellestialSystem.update(e);
-      })
       this.updateAnimations();
       this.updateDrawables();
       this.processEvents();
@@ -167,18 +139,11 @@ export default class Engine {
       let offset = camera.position;
       context.translate(offset[0], offset[1]);
       objects.forEach(e => {
-         if(typeof e.draw =="function"){
          e.draw(context);
-         }
-      else{
-        if (e.constructor.name =="CellestialImplementation"){
-         CellestialSystem.draw(e,this.loader,context);
-        }
-      }
       });
       this.store.animation.forEach(e => e.draw(this.context));
       this.store.drawable.forEach(e => {
-         if (typeof e.draw == 'function') {
+         if(typeof e.draw == 'function') {
             e.draw.apply(e)
          } else {
             e.drawable.defaultDraw.apply(e.drawable, [this.context]);
@@ -189,5 +154,4 @@ export default class Engine {
    async assemble(assemblingFunction) {
       await assemblingFunction(this)
    }
-
 }

@@ -5,7 +5,9 @@ import { spaceshiptypes } from "./spaceshiptypes";
 import Explode from "./explode";
 import Engine from '../../engine/engine';
 import { Physics } from '../../engine/physics';
+import Entity from "../../engine/entity";
 import PhysicalBodyImplementation from "../../engine/implementation/physicalBody.implementation";
+
 export default class SpaceShip {
     private keyboardState:  { [key: string]: boolean } = {
         arrowUp: false,
@@ -17,20 +19,30 @@ export default class SpaceShip {
     private _isLoaded = false;
     private image: HTMLImageElement | {} = {};
     private mesh = spaceshiptypes.bascicCrousier;
+    private position: number[] = [100, 1900];
+    private velocity: number[] = [0, 0];
     private rotation = Math.PI / 2;
-    private body:PhysicalBodyImplementation = null;
+    private force = 0;
+    private body = new PhysicalBody();
     public throttle = 0;
     private powerQuantum = 1e-18;
+    private throttleFactor = 0;
+    private physics: any = {};
     private eventSystem: EventSystem;
     entity: Entity = null;
-    
-    maxSpeed:number;
+    vx;
+    vy;
+    maxSpeed;
     isCharging: boolean;
 
     constructor() {
-        this.body = new PhysicalBodyImplementation(this.mesh.physicalBody);
         this.entity = new Entity();
-
+        this.body.m = this.mesh.m;
+        this.body.x = this.position[0];
+        this.body.y = this.position[1];
+        this.body.r = this.mesh.r;
+        this.vx = 0;
+        this.vy = 0;
         this.maxSpeed = this.mesh.maxSpeed;
         this.powerQuantum = this.mesh.powerQuantum;
         this.eventSystem = new EventSystem(this);
@@ -52,7 +64,11 @@ export default class SpaceShip {
     }
 
     getBody() {
-        return this.body.getBody();
+        return this.body;
+    }
+
+    setBody(body: any) {
+        this.body.fromObject(body);
     }
 
     load() {
@@ -87,7 +103,7 @@ export default class SpaceShip {
     draw(context: CanvasRenderingContext2D) {
         context.save();
         const body = this.getBody();
-        context.translate(body.position[0], body.position[1]);
+        context.translate(body.x, body.y);
         context.rotate(this.rotation);
         let sprite = this.mesh.sprite;
         let [x, y] = sprite.position;
@@ -180,15 +196,14 @@ export default class SpaceShip {
         this.handleKeyboardState();
         this.updatheThrottelEnergy();
         let throttleFactor = this.throttle * this.powerQuantum;
-        let body = this.getBody();
-        body.force[0] += throttleFactor * Math.cos(this.rotation);
-        body.force[1] += throttleFactor * Math.sin(this.rotation);
+        this.body.fx += throttleFactor * Math.cos(this.rotation);
+        this.body.fy += throttleFactor * Math.sin(this.rotation);
         let v = physics.calculateSpeed(this.getBody());
-        body.velocity[0] = Math.abs(v[0]) > this.maxSpeed ? this.maxSpeed * (v[0] / Math.abs(v[0])) : v[0];
-        body.velocity[1] = Math.abs(v[1]) > this.maxSpeed ? this.maxSpeed * (v[1] / Math.abs(v[1])) : v[1];
+        this.body.vx = Math.abs(v[0]) > this.maxSpeed ? this.maxSpeed * (v[0] / Math.abs(v[0])) : v[0];
+        this.body.vy = Math.abs(v[1]) > this.maxSpeed ? this.maxSpeed * (v[1] / Math.abs(v[1])) : v[1];
         let p = physics.calculatePosition(this.getBody());
-        body.position = p;
-
+        this.body.x = p[0];
+        this.body.y = p[1];
 
     }
     onCollision(e: any, f: any, g: Engine) {

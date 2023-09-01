@@ -39,4 +39,8 @@ export class ImageLoaderManager {
     getGameImages() {
         return this.images;
     }
+    getImage(imagePointer:string){
+        return this.images[imagePointer].getImage();
+    }
+
 }
