@@ -7,7 +7,7 @@ export default {
             sizeDestination:[30,30]
         },
         physicalBody:{
-            position: [100, 1900],
+            position: [200, 1900],
             velocity:[0,0],
             force:[0,0],
             r:3,
@@ -19,10 +19,10 @@ export default {
         effectiveRange:100,
         chargingSpeed:5,
         power:5,
-        m:1e-4,
+        m:1e-14,
         r:3,
-        maxSpeed:0.1,
-        powerQuantum:1e-9
+        maxSpeed:5,
+        powerQuantum:1e-8
 
     }
 
