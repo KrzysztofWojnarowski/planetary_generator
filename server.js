@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+
 let app = express();
 let distPath = path.join(__dirname,"dist");
 let assetsPath = path.join(distPath,"assets");
