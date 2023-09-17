@@ -3,14 +3,11 @@ import { PhysicalBody } from "./models/physicalBody.model";
 import { Vector } from "./models/vector.model";
 // TODO: Mage proper TS!!
 export class Physics {
-    G = 0.01;
-    dt = 5;
+    G:number = null;
+    dt:number = null;
     effects: Effects;
 
-    constructor(config = {
-        G: 0.01,
-        dt: 5
-    }) {
+    constructor(config:{G:number,dt:number}) {
         this.G = config.G;
         this.dt = config.dt;
         this.effects = new Effects();

@@ -1,11 +1,14 @@
 import SpaceShip from "./ingame-objects/spaceship";
 import { ImageLoaderManager } from "../engine/image-loader-manager";
-import { gameImages } from "./game-images";
+import { gameImages } from "./dataObjects/game-images";
 import Background from "./background";
 import CellestialImplementation from "../engine/implementation/cellestial.implementation";
 import EntityImplementation from "../engine/implementation/entity.implementation";
 import PhysicalBodyImplementation from "../engine/implementation/physicalBody.implementation";
 import SpriteImplementation from "../engine/implementation/sprite.implementation";
+import { RadarGauge } from "./gauges/radar-gauge";
+import { radar } from "./dataObjects/radar";
+import { SpaceMap } from "./gauges/space-map";
 import Engine from "../engine/engine";
 
 
@@ -32,6 +35,14 @@ export class Builder {
         return cellestialInstance;
     }
 
+    buildRadar(engine:any):RadarGauge{
+        const radarInstance = new RadarGauge(radar,engine);
+        radarInstance.setDrawable(radarInstance.getDrawable());
+        radarInstance.useCamera(engine.camera);
+        return radarInstance;
+            
+    }
+
     async buildBackground(background: Background){
         const backgroundImage = await background.load()
         background.setImage(backgroundImage);
@@ -46,5 +57,14 @@ export class Builder {
             ship.setLoaded(true);
         });
         return ship;
+    }
+
+    buildSpaceMap(spaceMap:SpaceMap,engine:Engine){
+        engine.store.system.forEach(element=>{
+            if (typeof element.getBody == "function"){
+                spaceMap.addToMap(element);
+            }
+        }
+        )
     }
 }

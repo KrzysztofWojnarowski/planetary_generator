@@ -11,7 +11,7 @@ export class Config {
     }
     physics={
         G:1e-4,
-        dt:30
+        dt:3
     }
     windowSize=[1200,800]
 

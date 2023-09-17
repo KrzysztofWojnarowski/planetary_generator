@@ -1,5 +1,4 @@
-export default {
-
+export const spaceshiptypes = {
     bascicCrousier:{
         sprite:{
             position:[237,647],
@@ -7,22 +6,22 @@ export default {
             sizeDestination:[30,30]
         },
         physicalBody:{
-            position: [200, 1900],
-            velocity:[0,0],
+            position: [47000,700],
+            velocity:[0,-0.1],
             force:[0,0],
             r:3,
-            m:1e-4
+            m:1e-17
 
         },
-        energy:4000,
-        energyCapacity:10000,
+        energy:6000,
+        energyCapacity:30000,
         effectiveRange:100,
-        chargingSpeed:5,
+        chargingSpeed:1e4,
         power:5,
-        m:1e-14,
+        m:1e-4,
         r:3,
-        maxSpeed:5,
-        powerQuantum:1e-8
+        maxSpeed:1.8,
+        powerQuantum:4e-21
 
     }
 

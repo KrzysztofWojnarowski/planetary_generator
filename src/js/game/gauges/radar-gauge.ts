@@ -10,25 +10,33 @@ import { Physics } from "../../engine/physics";
 import { PositionCordinates } from "../../engine/models/position.model";
 import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 import SpaceShip from '../ingame-objects/spaceship';
+import SpriteImplementation from '../../engine/implementation/sprite.implementation';
 
 export class RadarGauge implements GetDrawable, GetPositionCoordinates {
     engine: Engine = null;
     entity: Entity = null;
     drawable: Drawable = null;
+    sprite: SpriteImplementation = null;
     camera: Camera = null;
     position: Position = null;
     eventSystem: EventSystem = null;
     radarMap: Map<any, any> = new Map();
     radarStart = 0;
     owner: SpaceShip;
+    scale: number;
+    range: number;
 
-    constructor(engine: Engine) {
+    constructor(presets: any, engine: Engine) {
         this.engine = engine;
         this.entity = new Entity();
-        this.drawable = this.getDrawable();
+        this.sprite = new SpriteImplementation(presets.sprite);
         this.position = new Position();
-        this.camera = engine.camera;
         this.eventSystem = new EventSystem();
+        this.scale = presets.params.scale;
+        this.range = presets.params.range;
+    }
+    useCamera(camera: Camera) {
+        this.camera = camera;
     }
 
     bindOwner(owner: any) {
@@ -38,7 +46,7 @@ export class RadarGauge implements GetDrawable, GetPositionCoordinates {
     update() {
         this.drawable.setPosition(this.getPositionCoordinates());
         let physics = this.engine.getPhysics() as Physics;
-        this.radarMap = physics.getInRange(this.owner.getBody(), this.engine.getPhysicals(), 5000);
+        this.radarMap = physics.getInRange(this.owner.getBody().getBody(), this.engine.getPhysicals(), 500000000);
         if (Math.round(this.radarStart / (4 * Math.PI)) == 1) {
             this.radarStart = 0;
         } else {
@@ -48,14 +56,15 @@ export class RadarGauge implements GetDrawable, GetPositionCoordinates {
 
     draw() {
         const context = this.engine.context;
-        const ownerBody = this.owner.getBody();
+        const position = this.owner.getBody().getPosition();
         const d = this.drawable.topLeft;
         const size = this.drawable.size;
         const p = this.drawable.position;
         const dm = this.drawable.dimension;
+        const scale = this.scale;
         context.save();
         context.translate(p[0] + size[0], p[1] + size[1]);
-        context.drawImage((this.drawable.sprite as Sprite).getImage(),
+        context.drawImage(this.drawable.sprite.getImage(),
             d[0], d[1],
             dm[0], dm[1],
             0, 0,
@@ -71,7 +80,7 @@ export class RadarGauge implements GetDrawable, GetPositionCoordinates {
         this.radarMap.forEach(e => {
             context.beginPath();
             context.fillStyle = "rgba(200,250,200,0.5)";
-            context.arc(-(-e.x + ownerBody.position[0]) * 0.01 + size[0] * 0.5, -(-e.y + ownerBody.position[1]) * 0.01 + 0.5 * size[1], 2, 0, Math.PI * 2);
+            context.arc(-(-e.position[0] + position[0]) * scale + size[0] * 0.5, -(-e.position[1] + position[1]) * scale + 0.5 * size[1], 2, 0, Math.PI * 2);
             context.fill();
         });
         context.restore();
@@ -88,14 +97,20 @@ export class RadarGauge implements GetDrawable, GetPositionCoordinates {
         return newPosition;
     }
 
-    getDrawable(): Drawable { 
-        return new Drawable()
-            .setDemention([40, 40])
-            .setSize([200, 200])
-            .setTopLeft([484, 772])
+    setDrawable(drawable: Drawable) {
+        this.drawable = drawable;
+    }
+
+    getDrawable(): Drawable {
+        const image = this.engine.loader.getImage(this.sprite.getImagePointer());
+        const drawable = new Drawable()
+            .setDemention(this.sprite.getDimension())
+            .setSize(this.sprite.getSize())
+            .setTopLeft(this.sprite.getPosition())
             .bindSprite(
                 new Sprite()
-                    .setImage(this.engine.loader.images.iconSheet.getImage())
+                    .setImage(image)
             );
+        return drawable;
     }
 }

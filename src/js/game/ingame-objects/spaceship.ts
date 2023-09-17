@@ -1,7 +1,6 @@
 import { Entity } from './../../engine/entity';
 import { EventSystem } from "../../engine/event-system";
-import { PhysicalBody } from "../../engine/physicalbody";
-import { spaceshiptypes } from "./spaceshiptypes";
+import { spaceshiptypes } from "../dataObjects/spaceshiptypes";
 import Explode from "./explode";
 import Engine from '../../engine/engine';
 import { Physics } from '../../engine/physics';
@@ -22,6 +21,7 @@ export default class SpaceShip {
     public throttle = 0;
     private powerQuantum = 1e-18;
     private eventSystem: EventSystem;
+    private _body : PhysicalBodyImplementation;
     entity: Entity = null;
     
     maxSpeed:number;
@@ -30,7 +30,6 @@ export default class SpaceShip {
     constructor() {
         this.body = new PhysicalBodyImplementation(this.mesh.physicalBody);
         this.entity = new Entity();
-
         this.maxSpeed = this.mesh.maxSpeed;
         this.powerQuantum = this.mesh.powerQuantum;
         this.eventSystem = new EventSystem(this);
@@ -52,7 +51,7 @@ export default class SpaceShip {
     }
 
     getBody() {
-        return this.body.getBody();
+        return this.body;
     }
 
     load() {
@@ -86,8 +85,8 @@ export default class SpaceShip {
 
     draw(context: CanvasRenderingContext2D) {
         context.save();
-        const body = this.getBody();
-        context.translate(body.position[0], body.position[1]);
+        const position = this.getBody().getPosition();
+        context.translate(position[0], position[1]);
         context.rotate(this.rotation);
         let sprite = this.mesh.sprite;
         let [x, y] = sprite.position;
@@ -156,11 +155,11 @@ export default class SpaceShip {
     chargeMap(ship: SpaceShip, engine: Engine) {
         let system = engine.store.physical;
         let physics = engine.getPhysics() as Physics;
-        return physics.getInRange(ship.getBody(), system, ship.getMesh().effectiveRange);
+        return physics.getInRange(ship.getBody().getBody(), system, ship.getMesh().effectiveRange);
     }
 
     chargeFromObject(object: any) {
-        return object.m * this.getMesh().chargingSpeed;
+        return 8*Math.exp(object.m/this.getMesh().chargingSpeed);
     }
 
     updateChargeEnergy(ship: SpaceShip, engine: Engine) {
@@ -168,6 +167,7 @@ export default class SpaceShip {
         let mesh = ship.getMesh();
         chargeMap.forEach(e => {
             let energyAdditon = this.chargeFromObject(e);
+            console.log(energyAdditon);
             if (energyAdditon + mesh.energy < mesh.energyCapacity) {
                 mesh.energy += energyAdditon;
             }
@@ -180,13 +180,13 @@ export default class SpaceShip {
         this.handleKeyboardState();
         this.updatheThrottelEnergy();
         let throttleFactor = this.throttle * this.powerQuantum;
-        let body = this.getBody();
+        let body = this.getBody().getBody();
         body.force[0] += throttleFactor * Math.cos(this.rotation);
         body.force[1] += throttleFactor * Math.sin(this.rotation);
-        let v = physics.calculateSpeed(this.getBody());
+        let v = physics.calculateSpeed(this.getBody().getBody());
         body.velocity[0] = Math.abs(v[0]) > this.maxSpeed ? this.maxSpeed * (v[0] / Math.abs(v[0])) : v[0];
         body.velocity[1] = Math.abs(v[1]) > this.maxSpeed ? this.maxSpeed * (v[1] / Math.abs(v[1])) : v[1];
-        let p = physics.calculatePosition(this.getBody());
+        let p = physics.calculatePosition(this.getBody().getBody());
         body.position = p;
 
 
@@ -206,6 +206,9 @@ export default class SpaceShip {
 
     getThrottle() {
         return this.throttle;
+    }
+    getEntity(){
+        return this.entity;
     }
 
     handleKeyboardState() {

@@ -49,8 +49,8 @@ export class Accelerometer implements GetDrawable, GetPositionCoordinates {
     }
 
     update() {
-        let ob = this.owner.getBody();
-        let v = Math.sqrt(Math.pow(ob.velocity[0],2) + Math.pow(ob.velocity[1],2));
+        let velocity = this.owner.getBody().getVelocity();
+        let v = Math.sqrt(Math.pow(velocity[0],2) + Math.pow(velocity[1],2));
         let frameIndex = Math.floor(v*this.step);
         this.drawable.topLeft = [869 - frameIndex * 48,68];
         this.drawable.setPosition(this.getPositionCoordinates());

@@ -7,6 +7,6 @@ export type Sprite={
     size:Vector,
     position:Vector,
     frame:number,
-    frameCount:number
-
+    frameCount:|number,
+    framesInRow:|number,
 }

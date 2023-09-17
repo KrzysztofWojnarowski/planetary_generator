@@ -1,16 +1,15 @@
 import prebuild from "./dataObjects/prebuild";
 import Background from "./background";
 import { KeyboardHandler } from "./keyboard-handler";
-
 import { GameContextHandler }  from "../engine/game-contex-handler";
-
 import { ThrottleMeter } from "./gauges/throttle-meter";
 import { Accelerometer } from "./gauges/accelerometer";
 import { EnergyMeter } from "./gauges/energy-meter";
-import { RadarGauge } from "./gauges/radar-gauge";
 import { MenuFrame } from "./menuItems/menu-frame";
 import { MenuContent } from "./menuItems/menu-content";
 import Engine from "../engine/engine";
+import { SpaceMap } from "./gauges/space-map";
+import { gameMap } from "./dataObjects/map";
 
 export async function assemblingFunction(engine: Engine) {
     console.log("assembling things");
@@ -41,7 +40,6 @@ async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHan
     const builder = engine.builder;
     let system: any = [];
     prebuild.forEach(element => {
-        console.log(element);
         system.push(builder.build(element,engine));
     });
     engine.loadSystem(system);
@@ -53,16 +51,21 @@ async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHan
     let ship = builder.buildShip();
     engine.store.system.push(ship);
     engine.camera.lockOn(ship.getBody());
+    const spaceMap = new SpaceMap(gameMap);
+    builder.buildSpaceMap(spaceMap,engine);
+    engine.spaceMap = spaceMap;
+    keyboardHandler.bindMiscControls(spaceMap,document);
     keyboardHandler.bindShipKeys(ship, document);
     let throttleMeter = new ThrottleMeter(engine);
     let accelerometer = new Accelerometer(engine);
     let energyMeter = new EnergyMeter(engine);
-    let radarGauge = new RadarGauge(engine);
+    let radarGauge = builder.buildRadar(engine);
+    engine.registerDrawable(radarGauge);
+
     radarGauge.bindOwner(ship);
     energyMeter.bindOwner(ship);
     throttleMeter.bindOwner(ship);
     accelerometer.bindOwner(ship);
-    engine.registerDrawable(radarGauge);
 
     // Not working
     engine.registerDrawable(throttleMeter);

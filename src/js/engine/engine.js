@@ -12,6 +12,7 @@ export default class Engine {
       eventQueue: new Map()
    }
    #physics = {};
+   spaceMap = null;
    constructor(physics) {
       this.#physics = physics;
       this.eventHandlingSystem = new EventHandlingSystem();
@@ -23,7 +24,7 @@ export default class Engine {
          return;
       }
       if (typeof object.getBody === "function") {
-         this.store.physical.set(object.entity.getUUID(), object.getBody());
+         this.store.physical.set(object.entity.getUUID(), object.getBody().getBody());
       }
    }
    /**This function will take over the registerPhysucal responsibility after TS refactor */
@@ -145,6 +146,7 @@ export default class Engine {
       this.updateAnimations();
       this.updateDrawables();
       this.processEvents();
+      this.spaceMap.update(this.store.system);
       this.removeMarked();
    }
    processPhysical(e) {
@@ -184,6 +186,9 @@ export default class Engine {
             e.drawable.defaultDraw.apply(e.drawable, [this.context]);
          }
       });
+      //@TODO This is a hack remove from here as real map object will be created in proper place
+      this.spaceMap && this.spaceMap.draw(this.context);
+      
    }
 
    async assemble(assemblingFunction) {

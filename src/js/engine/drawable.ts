@@ -1,5 +1,6 @@
 import { PositionCordinates } from "./models/position.model";
 import { Size } from "./models/size.model";
+import { Vector } from "./models/vector.model";
 import { Sprite } from "./sprite";
 
 export class Drawable {
@@ -20,7 +21,7 @@ export class Drawable {
         return this.size;
     }
     
-    setSize(size: Size) {
+    setSize(size: Vector) {
         this.size = size;
         return this;
     }
@@ -30,12 +31,12 @@ export class Drawable {
         return this;
     }
 
-    setDemention(dimension: [number, number]): Drawable {
+    setDemention(dimension: Vector): Drawable {
         this.dimension = dimension;
         return this;
     }
 
-    setTopLeft(topLeft: [number, number]): Drawable {
+    setTopLeft(topLeft:Vector): Drawable {
         this.topLeft = topLeft;
         return this;
     }

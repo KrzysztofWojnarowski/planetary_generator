@@ -1,4 +1,5 @@
 import { GameContextHandler } from "../engine/game-contex-handler";
+import { SpaceMap } from "./gauges/space-map";
 import SpaceShip from "./ingame-objects/spaceship";
 
 export class KeyboardHandler {
@@ -33,7 +34,6 @@ export class KeyboardHandler {
     bindContextSwitchKeys(gameContextHandler: GameContextHandler, document: Document) {
         document.addEventListener("keydown", e => {
             e.preventDefault();
-            console.log(e.key);
             switch (e.key) {
                 case "Escape":
                     const currentContextObject = gameContextHandler.extractContext();
@@ -45,4 +45,17 @@ export class KeyboardHandler {
             }
         });
     }
+
+    bindMiscControls(spaceMap:SpaceMap,document:Document){
+        document.addEventListener("keydown",e=>{
+            e.preventDefault();
+            if (e.key=="m") spaceMap.shallDraw = true;
+        });
+        document.addEventListener("keyup",e=>{
+            e.preventDefault();
+            console.log(spaceMap.shallDraw);
+            if (e.key =="m") spaceMap.shallDraw = false;
+        });
+    }
+        
 }
