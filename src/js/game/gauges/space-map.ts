@@ -15,7 +15,6 @@ export class SpaceMap{
     }
     draw(context:CanvasRenderingContext2D){
         if (!this.shallDraw) return;
-        console.log();
         context.save();
         context.beginPath();
         context.resetTransform();
@@ -43,7 +42,6 @@ export class SpaceMap{
         {
             this.clearMap();
             system.forEach(e=>this.addToMap(e));
-            console.log('upda');
         }
     }
 

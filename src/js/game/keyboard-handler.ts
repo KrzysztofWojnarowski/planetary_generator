@@ -53,7 +53,6 @@ export class KeyboardHandler {
         });
         document.addEventListener("keyup",e=>{
             e.preventDefault();
-            console.log(spaceMap.shallDraw);
             if (e.key =="m") spaceMap.shallDraw = false;
         });
     }

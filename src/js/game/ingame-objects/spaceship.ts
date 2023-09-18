@@ -167,7 +167,6 @@ export default class SpaceShip {
         let mesh = ship.getMesh();
         chargeMap.forEach(e => {
             let energyAdditon = this.chargeFromObject(e);
-            console.log(energyAdditon);
             if (energyAdditon + mesh.energy < mesh.energyCapacity) {
                 mesh.energy += energyAdditon;
             }

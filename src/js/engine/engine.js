@@ -156,6 +156,7 @@ export default class Engine {
       let colliders = physics.getCollisions(e, physical);
       colliders.forEach((collider) => {
          physics.applyNonElasticCollision(e, collider);
+         console.log(e);
          this.queueEvent(this.getParentOfPhysical(e).entity.getUUID(), "onCollided", [this.getParentOfPhysical(collider), this]);
       });
 
