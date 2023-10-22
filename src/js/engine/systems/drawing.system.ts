@@ -1,5 +1,5 @@
 import { ImageLoaderManager } from "../image-loader-manager";
-import SpriteImplementation from "../implementation/sprite.implementation";
+import {SpriteImplementation} from "../implementation/sprite.implementation";
 import { Sprite } from "../models/sprite.model";
 import { Vector } from "../models/vector.model";
 

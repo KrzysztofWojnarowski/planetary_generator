@@ -10,7 +10,7 @@ import { Physics } from "../../engine/physics";
 import { PositionCordinates } from "../../engine/models/position.model";
 import { GetPositionCoordinates } from "../../engine/models/get-position-coordinates.model";
 import SpaceShip from '../ingame-objects/spaceship';
-import SpriteImplementation from '../../engine/implementation/sprite.implementation';
+import {SpriteImplementation} from '../../engine/implementation/sprite.implementation';
 
 export class RadarGauge implements GetDrawable, GetPositionCoordinates {
     engine: Engine = null;

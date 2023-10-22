@@ -5,22 +5,25 @@ import Background from "./background";
 import CellestialImplementation from "../engine/implementation/cellestial.implementation";
 import EntityImplementation from "../engine/implementation/entity.implementation";
 import PhysicalBodyImplementation from "../engine/implementation/physicalBody.implementation";
-import SpriteImplementation from "../engine/implementation/sprite.implementation";
+import {SpriteImplementation} from "../engine/implementation/sprite.implementation";
 import { RadarGauge } from "./gauges/radar-gauge";
 import { radar } from "./dataObjects/radar";
 import { SpaceMap } from "./gauges/space-map";
 import Engine from "../engine/engine";
+import { spaceshiptypes } from "./dataObjects/spaceshiptypes";
+import { ImplementationRegistry } from "../engine/implementation/implementationRegistry";
+import { GameObject } from "../engine/interfaces/gameObject.interface";
 
 
 export class Builder {
-    buildAssets(){
+    buildAssets() {
         const loader = new ImageLoaderManager();
         loader.setAssetList(gameImages);
         loader.loadImages();
         return loader;
     }
 
-    build(presets:any, engine:any) {
+    build(presets: any, engine: any) {
         const buildData = presets.cellestial;
         const cellestialInstance = new CellestialImplementation(
             new EntityImplementation(
@@ -35,33 +38,35 @@ export class Builder {
         return cellestialInstance;
     }
 
-    buildRadar(engine:any):RadarGauge{
-        const radarInstance = new RadarGauge(radar,engine);
+    buildRadar(engine: any): RadarGauge {
+        const radarInstance = new RadarGauge(radar, engine);
         radarInstance.setDrawable(radarInstance.getDrawable());
         radarInstance.useCamera(engine.camera);
         return radarInstance;
-            
+
     }
 
-    async buildBackground(background: Background){
+    async buildBackground(background: Background) {
         const backgroundImage = await background.load()
         background.setImage(backgroundImage);
         background.setLoaded(true);
         return background;
     }
-    
-    buildShip(){
+
+    buildShip() {
         let ship = new SpaceShip();
-        ship.load().then((image: HTMLImageElement)=>{
+        ship.load().then((image: HTMLImageElement) => {
             ship.setImage(image);
             ship.setLoaded(true);
         });
         return ship;
     }
 
-    buildSpaceMap(spaceMap:SpaceMap,engine:Engine){
-        engine.store.system.forEach(element=>{
-            if (typeof element.getBody == "function"){
+    
+
+    buildSpaceMap(spaceMap: SpaceMap, engine: Engine) {
+        engine.store.system.forEach(element => {
+            if (typeof element.getBody == "function") {
                 spaceMap.addToMap(element);
             }
         }

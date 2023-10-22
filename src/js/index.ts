@@ -7,6 +7,7 @@ import Random from "lm_random/random";
 import { Builder } from "./game/builder";
 import { Canvas } from "./engine/canvas";
 import { assemblingFunction } from "./game/assembling-function";
+import { EngineNew } from "./engine/Engine.new";
 
 function app() {
     const config = new Config();
@@ -41,6 +42,8 @@ function app() {
             animate();
         });
     });
+    //Refactor abstraction layer - new Engine class in ts to replace old engine
+   
 
     function animate() {
         window.requestAnimationFrame(redraw);

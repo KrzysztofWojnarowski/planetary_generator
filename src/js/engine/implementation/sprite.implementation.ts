@@ -1,7 +1,8 @@
+import { GameObject } from "../interfaces/gameObject.interface";
 import { Sprite } from "../models/sprite.model";
 import { Vector } from "../models/vector.model";
 
-export default class SpriteImplementation{
+export  class SpriteImplementation implements GameObject{
     _sprite:Sprite;
     constructor(sprite:Sprite){
         this._sprite = sprite;

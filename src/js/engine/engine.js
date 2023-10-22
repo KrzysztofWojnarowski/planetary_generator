@@ -1,8 +1,11 @@
-import CellestialSystem from "./systems/cellestial.system";
+import { EngineNew } from "./Engine.new";
+import { CellestialSystem } from "./systems/cellestial.system";
 import EventHandlingSystem from "./systems/eventHandling.system";
+import { SpriteSystem } from "./systems/sprite.system";
 
 export default class Engine {
    builder = null;
+   newEngine = null;
 
    store = {
       system: [],
@@ -11,11 +14,25 @@ export default class Engine {
       drawable: [],
       eventQueue: new Map()
    }
+   registeredImplementationSystemUpdateHandlers = {
+      SpriteImplementation(spriteImplementation) {
+         SpriteSystem.update(spriteImplementation);
+      },
+   };
+   registeredImplementationSystemDrawHandlers = {
+      SpriteImplementation(mainComponent, spriteImplementation) {
+         SpriteSystem.draw(spriteImplementation,
+            mainComponent.getBody().getPosition(),
+            this.loader,this.context);
+      }
+   }
+
    #physics = {};
    spaceMap = null;
    constructor(physics) {
       this.#physics = physics;
       this.eventHandlingSystem = new EventHandlingSystem();
+      this.engineNew = new EngineNew(physics);
 
    }
    registerPhysical(object) {
@@ -31,7 +48,7 @@ export default class Engine {
    registerPhysicalTS(object) {
       if (typeof object.getBody == "function") {
          this.store.physical.set(object.getEntity().getUUID(), object.getBody().getBody());
-         
+
       }
 
    }
@@ -42,18 +59,17 @@ export default class Engine {
 
    processEvents() {
       this.store.eventQueue.forEach((v, k) => {
-
          let element = this.store.system.find(e => {
             if (typeof e.entity === "object")
                return e.entity.getUUID() === v.uuid;
             else
                return e.getEntity().getUUID() === v.uuid
          });
-         if(typeof element.eventSystem =="object")
+         if (typeof element.eventSystem == "object")
             element.eventSystem.triggerEvent(v.event, ...v.params);
-         else{
-            
-            this.eventHandlingSystem.triggerEvent(v.event,element,v.params);
+         else {
+
+            this.eventHandlingSystem.triggerEvent(v.event, element, v.params);
          }
          this.store.eventQueue.delete(k);
       });
@@ -140,9 +156,7 @@ export default class Engine {
          this.queueEvent(k, "onUpdate", [this]);
       });
       //Mid step in TS ECS implementation
-      this.store.system.forEach(e=>{
-         e.constructor.name==="CellestialImplementation" && CellestialSystem.update(e);
-      })
+      this.useNewUpdate(this.store.system);
       this.updateAnimations();
       this.updateDrawables();
       this.processEvents();
@@ -156,7 +170,6 @@ export default class Engine {
       let colliders = physics.getCollisions(e, physical);
       colliders.forEach((collider) => {
          physics.applyNonElasticCollision(e, collider);
-         console.log(e);
          this.queueEvent(this.getParentOfPhysical(e).entity.getUUID(), "onCollided", [this.getParentOfPhysical(collider), this]);
       });
 
@@ -170,14 +183,14 @@ export default class Engine {
       let offset = camera.position;
       context.translate(offset[0], offset[1]);
       objects.forEach(e => {
-         if(typeof e.draw =="function"){
-         e.draw(context);
+         if (typeof e.draw == "function") {
+            e.draw(context);
          }
-      else{
-        if (e.constructor.name =="CellestialImplementation"){
-         CellestialSystem.draw(e,this.loader,context);
-        }
-      }
+         else {
+            if (e.constructor.name == "CellestialImplementation") {
+               CellestialSystem.draw(e, this.loader, context);
+            }
+         }
       });
       this.store.animation.forEach(e => e.draw(this.context));
       this.store.drawable.forEach(e => {
@@ -189,11 +202,13 @@ export default class Engine {
       });
       //@TODO This is a hack remove from here as real map object will be created in proper place
       this.spaceMap && this.spaceMap.draw(this.context);
-      
+
    }
 
    async assemble(assemblingFunction) {
       await assemblingFunction(this)
    }
-
+   useNewUpdate(gameObjects){
+      this.engineNew.update(gameObjects,this.loader,this.context);
+   }
 }

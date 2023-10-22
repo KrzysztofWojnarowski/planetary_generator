@@ -1,6 +1,6 @@
 import EntityImplementation from "./entity.implementation";
 import PhysicalBodyImplementation from "./physicalBody.implementation";
-import SpriteImplementation from "./sprite.implementation";
+import {SpriteImplementation} from "./sprite.implementation";
 
 
 export default class CellestialImplementation {
