@@ -5,14 +5,17 @@ import Background from "./background";
 import CellestialImplementation from "../engine/implementation/cellestial.implementation";
 import EntityImplementation from "../engine/implementation/entity.implementation";
 import PhysicalBodyImplementation from "../engine/implementation/physicalBody.implementation";
-import {SpriteImplementation} from "../engine/implementation/sprite.implementation";
+import { SpriteImplementation } from "../engine/implementation/sprite.implementation";
 import { RadarGauge } from "./gauges/radar-gauge";
 import { radar } from "./dataObjects/radar";
 import { SpaceMap } from "./gauges/space-map";
 import Engine from "../engine/engine";
-import { spaceshiptypes } from "./dataObjects/spaceshiptypes";
 import { ImplementationRegistry } from "../engine/implementation/implementationRegistry";
-import { GameObject } from "../engine/interfaces/gameObject.interface";
+import { stringIndexed } from "../engine/interfaces/stringIndexed.interface";
+import { GameElement } from "../engine/baseClasses/gameElement.class";
+import prebuild from "./dataObjects/prebuild";
+import { spaceshiptypes } from "./dataObjects/spaceshiptypes";
+import { gameElements } from "./dataObjects/game.elements";
 
 
 export class Builder {
@@ -61,9 +64,6 @@ export class Builder {
         });
         return ship;
     }
-
-    
-
     buildSpaceMap(spaceMap: SpaceMap, engine: Engine) {
         engine.store.system.forEach(element => {
             if (typeof element.getBody == "function") {
@@ -71,5 +71,21 @@ export class Builder {
             }
         }
         )
+    }
+
+    buildGameElement(entityName:string,preset: stringIndexed) {
+        let implementationProps: stringIndexed = []; 
+            Object.keys(preset).forEach(propName => {
+                implementationProps[propName] = new ImplementationRegistry[propName](preset[propName])
+            }
+            );
+        return new GameElement(entityName, implementationProps);
+    }
+    buildExperimental(gameObjects:stringIndexed) {
+        let gameState: Array<GameElement> = [];
+        for (let i in gameObjects) {
+            gameState.push(this.buildGameElement(i,gameObjects[i]));
+        }        
+        return gameState;
     }
 }

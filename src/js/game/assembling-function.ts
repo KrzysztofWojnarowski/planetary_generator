@@ -10,6 +10,9 @@ import { MenuContent } from "./menuItems/menu-content";
 import Engine from "../engine/engine";
 import { SpaceMap } from "./gauges/space-map";
 import { gameMap } from "./dataObjects/map";
+import { spaceshiptypes } from "./dataObjects/spaceshiptypes";
+import { gameElements } from "./dataObjects/game.elements";
+import { EngineNew } from "../engine/Engine.new";
 
 export async function assemblingFunction(engine: Engine) {
     console.log("assembling things");
@@ -39,6 +42,7 @@ function buildMenuContext(engine: Engine){
 async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHandler) {
     const builder = engine.builder;
     let system: any = [];
+    EngineNew.importState( builder.buildExperimental(gameElements));
     prebuild.forEach(element => {
         system.push(builder.build(element,engine));
     });
@@ -50,6 +54,8 @@ async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHan
 
     let ship = builder.buildShip();
     engine.store.system.push(ship);
+
+    
     engine.camera.lockOn(ship.getBody());
     const spaceMap = new SpaceMap(gameMap);
     builder.buildSpaceMap(spaceMap,engine);

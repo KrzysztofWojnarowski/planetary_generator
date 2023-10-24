@@ -1,6 +1,5 @@
 import { ImageLoaderManager } from "../image-loader-manager";
 import CellestialImplementation from "../implementation/cellestial.implementation";
-import {SpriteImplementation} from "../implementation/sprite.implementation";
 
 export const CellestialSystem= {
 

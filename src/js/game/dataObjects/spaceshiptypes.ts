@@ -1,10 +1,13 @@
-export const spaceshiptypes = {
+import { stringIndexed } from "../../engine/interfaces/stringIndexed.interface";
+
+export const spaceshiptypes:stringIndexed = {
     bascicCrousier: {
         sprite: {
             position: [237, 647],
             sizeSource: [55, 55],
             sizeDestination: [30, 30]
         },
+
         physicalBody: {
             position: [47000, 700],
             velocity: [0, -0.1],
@@ -14,6 +17,7 @@ export const spaceshiptypes = {
 
         },
         staticCharacteristics: {
+            title:"Ship Description",
             description: "This is basic crouiser ship type. Used for exploration of the space.",
 
         },
@@ -37,7 +41,6 @@ export const spaceshiptypes = {
             }
         ],
         engine: {
-            fuelTank: "fuelTank",
             power: 5,
             maxSpeed: 1.8,
             powerQuantum: 4e-21

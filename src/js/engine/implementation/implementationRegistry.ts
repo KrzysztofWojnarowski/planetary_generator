@@ -1,17 +1,20 @@
-import { Sprite } from "../models/sprite.model";
 import { EngineImplementation } from "./Engine.implementation";
 import PhysicalBodyImplementation from "./physicalBody.implementation";
 import ResourceExtractorImplementation from "./resourceExtractor.implementation";
-import {SpriteImplementation} from "./sprite.implementation";
+import { SpriteImplementation } from "./sprite.implementation";
 import { TankImplementation } from "./tank.implementation";
-import { PhysicalBody } from "../models/physicalBody.model";
-import { Tank } from "../models/tank.model";
-import { Engine } from "../models/engine.model";
-import { ResourceExtractor } from "../models/resourceExtractor.model";
-export const ImplementationRegistry = {
-    sprite:(sprite:Sprite)=>new SpriteImplementation(sprite),
-    physicalBody:(physicalBody:PhysicalBody)=>new PhysicalBodyImplementation(physicalBody),
-    fuelTank:(tank:Tank)=>new TankImplementation(tank),
-    engine:(engine:Engine)=>new EngineImplementation(engine),
-    resourceExtractor:(resourceExtractor:ResourceExtractor)=> new ResourceExtractorImplementation(resourceExtractor)
-};
+import { stringIndexed } from "../interfaces/stringIndexed.interface";
+import EntityImplementation from "./entity.implementation";
+import { staticCharacteristicsImplementation } from "./staticCharacteristics.implementation";
+import { ExtraTankImplementation } from "./extraTank.implementation";
+export const ImplementationRegistry: stringIndexed = {
+    "entity": EntityImplementation,
+    "sprite": SpriteImplementation,
+    "physicalBody": PhysicalBodyImplementation,
+    "fuelTank": TankImplementation,
+    "engine": EngineImplementation,
+    "resourceExtractor": ResourceExtractorImplementation,
+    "staticCharacteristics": staticCharacteristicsImplementation,
+    "extraTankArray":ExtraTankImplementation
+
+}

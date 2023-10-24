@@ -27,7 +27,15 @@ export default class ResourceExtractorImplementation {
     }
     setCurrentResource(resourceName:string){
         this._resourceExtractor.acceptedResources.includes(resourceName) 
-        && 
-        (this._resourceExtractor.currentResource=resourceName);
+        ?
+        (this._resourceExtractor.currentResource=resourceName)
+        :
+        console.log("This resource Extractor can't harvest: "+resourceName);
+    }
+    getResourceTank():string{
+        return this._resourceExtractor.resourceTank;
+    }
+    setResourceTank(resourceTankName:string){
+        this._resourceExtractor.resourceTank = resourceTankName;
     }
 }
