@@ -1,10 +1,12 @@
+import { Implementation } from "../baseClasses/Implementation.class";
 import { ResourceExtractor } from "../models/resourceExtractor.model";
 
-export default class ResourceExtractorImplementation {
+export default class ResourceExtractorImplementation extends Implementation{
 
     _resourceExtractor:ResourceExtractor = null;
 
     constructor(resourceExtractor:ResourceExtractor){
+        super();
         this._resourceExtractor = resourceExtractor;
     }
     getEffectiveRange():number{

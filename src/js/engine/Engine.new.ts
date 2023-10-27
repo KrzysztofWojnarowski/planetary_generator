@@ -1,21 +1,27 @@
+import { Implementation } from "./baseClasses/Implementation.class";
+import { BaseSystem } from "./baseClasses/System.class";
 import { GameElement } from "./baseClasses/gameElement.class";
-import { ImageLoader } from "./image-loader"
 import { ImageLoaderManager } from "./image-loader-manager";
-import { GameObject } from "./interfaces/gameObject.interface";
-import { PhysicalBody } from "./physicalbody";
 import { Physics } from "./physics";
+import { SystemRegistry } from "./registry/system.registry";
 import { PhysicalBodySystem } from "./systems/physicalBody.system";
 import { SpriteSystem } from "./systems/sprite.system";
+import { Config } from "../game/config";
 
 export class EngineNew {
     spriteSystem: SpriteSystem = null;
     physicalBodySystem: PhysicalBodySystem = null;
     static state: Array<GameElement> = [];
 
-    constructor(physics: Physics) {
-        this.spriteSystem = new SpriteSystem();
-        this.physicalBodySystem = new PhysicalBodySystem(physics);
-
+    constructor() {
+        const config = new Config;
+        Object.keys(SystemRegistry).forEach(systemName => {
+            try {
+                SystemRegistry[systemName].init(config[systemName as keyof Config]);
+            } catch {
+                console.warn(`${systemName} is not a valid system - init method missing`);
+            }
+        });
     }
 
     static importState(state: Array<GameElement>) {
@@ -24,26 +30,20 @@ export class EngineNew {
 
 
 
-    update(gameObjectArray: Array<any>, loader: ImageLoaderManager, context: CanvasRenderingContext2D) {
-        gameObjectArray.forEach(gameObject => {
+    update(loader: ImageLoaderManager, context: CanvasRenderingContext2D) {
+        EngineNew.state.forEach((element: GameElement) => {
+            Object.keys(element.props).forEach(prop => {
+                if (typeof SystemRegistry[element.props[prop].getHandler()] === "function") {
 
-            for (let property in gameObject) {
-                const constructorName: string = gameObject[property].constructor.name;
-                switch (constructorName) {
-                    case "SpriteImplementation": {
-                        const sprite = gameObject.getSprite();
-                        this.spriteSystem.update(sprite);
-                        break;
+                    SystemRegistry[element.props[prop].getHandler()].update(element.props[prop], element, EngineNew.state);
 
-                    }
-                    case "PhysicalBodyImplementation": {
-                        this.physicalBodySystem.update(gameObject, gameObjectArray);
-                        break;
-                    }
+                } else {
+                    console.log(`This component has no system registered ${prop} `)
                 }
-            }
-
+            });
         });
+        console.log(EngineNew.state);
+
     }
 
     draw(gameObjects: Array<any>) {

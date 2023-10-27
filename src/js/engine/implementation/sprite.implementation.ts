@@ -1,10 +1,11 @@
-import { GameObject } from "../interfaces/gameObject.interface";
+import { Implementation } from "../baseClasses/Implementation.class";
 import { Sprite } from "../models/sprite.model";
 import { Vector } from "../models/vector.model";
 
-export  class SpriteImplementation implements GameObject{
+export  class SpriteImplementation extends Implementation{
     _sprite:Sprite;
     constructor(sprite:Sprite){
+        super();
         this._sprite = sprite;
     }
     getSprite():Sprite{

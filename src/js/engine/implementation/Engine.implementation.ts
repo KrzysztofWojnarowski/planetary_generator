@@ -1,7 +1,9 @@
+import { Implementation } from "../baseClasses/Implementation.class";
 import { Engine } from "../models/engine.model";
-export class EngineImplementation {
+export class EngineImplementation extends Implementation {
     _engine: Engine = null;
     constructor(engine: Engine) {
+        super();
         this._engine = engine;
     }
     getEngine(): Engine {

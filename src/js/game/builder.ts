@@ -3,19 +3,19 @@ import { ImageLoaderManager } from "../engine/image-loader-manager";
 import { gameImages } from "./dataObjects/game-images";
 import Background from "./background";
 import CellestialImplementation from "../engine/implementation/cellestial.implementation";
-import EntityImplementation from "../engine/implementation/entity.implementation";
+import { EntityImplementation } from "../engine/implementation/entity.implementation";
 import PhysicalBodyImplementation from "../engine/implementation/physicalBody.implementation";
 import { SpriteImplementation } from "../engine/implementation/sprite.implementation";
 import { RadarGauge } from "./gauges/radar-gauge";
 import { radar } from "./dataObjects/radar";
 import { SpaceMap } from "./gauges/space-map";
 import Engine from "../engine/engine";
-import { ImplementationRegistry } from "../engine/implementation/implementationRegistry";
 import { stringIndexed } from "../engine/interfaces/stringIndexed.interface";
 import { GameElement } from "../engine/baseClasses/gameElement.class";
-import prebuild from "./dataObjects/prebuild";
-import { spaceshiptypes } from "./dataObjects/spaceshiptypes";
-import { gameElements } from "./dataObjects/game.elements";
+import { BaseSystem } from "../engine/baseClasses/System.class";
+import { EventManager } from "../engine/eventManager/eventManager";
+import { EventStoreItem } from "../engine/eventManager/eventStoreItem.interface";
+import { eventHandlerRegistry } from "./eventHandlers/eventHandler.registry";
 
 
 export class Builder {
@@ -73,19 +73,37 @@ export class Builder {
         )
     }
 
-    buildGameElement(entityName:string,preset: stringIndexed) {
-        let implementationProps: stringIndexed = []; 
-            Object.keys(preset).forEach(propName => {
-                implementationProps[propName] = new ImplementationRegistry[propName](preset[propName])
-            }
-            );
-        return new GameElement(entityName, implementationProps);
+    buildGameElement(entityName: string, preset: stringIndexed) {
+        let implementationProps: stringIndexed = [];
+        Object.keys(preset).forEach(propName => {
+            implementationProps[propName] = new GameElement(propName, preset[propName]);
+        });
+        const element = new GameElement(entityName, implementationProps);
+        this.subscribeToEvents(element);
+        return element;
     }
-    buildExperimental(gameObjects:stringIndexed) {
+
+    subscribeToEvents(element: GameElement) {
+        if (BaseSystem.has(element, "eventListener")) {
+            const eventBaseData = element.get("eventListener").exportProps() as Array<stringIndexed>;       
+              eventBaseData.forEach(event=>{
+                    const eventStoreItem:EventStoreItem = {
+                        type:event.event,
+                        emiterID:event.emiterID||"",
+                        emiterGroup:event.emiterGroup||"",
+                        subscriber:element,
+                        handler:eventHandlerRegistry[event.handler]
+                    }   
+                 EventManager.subscribe(eventStoreItem);
+                });
+        }
+    }
+
+    buildExperimental(gameObjects: stringIndexed) {
         let gameState: Array<GameElement> = [];
         for (let i in gameObjects) {
-            gameState.push(this.buildGameElement(i,gameObjects[i]));
-        }        
+            gameState.push(this.buildGameElement(i, gameObjects[i]));
+        }
         return gameState;
     }
 }

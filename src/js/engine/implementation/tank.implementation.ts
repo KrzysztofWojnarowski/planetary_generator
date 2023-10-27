@@ -1,9 +1,11 @@
+import { Implementation } from "../baseClasses/Implementation.class";
 import { Tank } from "../models/tank.model";
 
-export class TankImplementation{
+export class TankImplementation extends Implementation{
 
     _tank:Tank = null;
     constructor(tank:Tank){
+        super();
         this._tank = tank;
     }
     getLevel():number{

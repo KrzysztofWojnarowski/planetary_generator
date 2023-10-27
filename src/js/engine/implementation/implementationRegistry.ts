@@ -4,7 +4,7 @@ import ResourceExtractorImplementation from "./resourceExtractor.implementation"
 import { SpriteImplementation } from "./sprite.implementation";
 import { TankImplementation } from "./tank.implementation";
 import { stringIndexed } from "../interfaces/stringIndexed.interface";
-import EntityImplementation from "./entity.implementation";
+import {EntityImplementation} from "./entity.implementation";
 import { staticCharacteristicsImplementation } from "./staticCharacteristics.implementation";
 import { ExtraTankImplementation } from "./extraTank.implementation";
 export const ImplementationRegistry: stringIndexed = {

@@ -3,7 +3,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 export const SashaBelli: stringIndexed = {
 
     entity: {
-        label: "Sasha Belli"
+        label: "Sasha Belli",
+        id:"Sasha001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [84000, 0],

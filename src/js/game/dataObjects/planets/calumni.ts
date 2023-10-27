@@ -2,7 +2,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 
 export const Calumni:stringIndexed= {
     entity: {
-        label: "Beta Calumni"
+        label: "Beta Calumni",
+        id:"Calumni001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [64000, 0],

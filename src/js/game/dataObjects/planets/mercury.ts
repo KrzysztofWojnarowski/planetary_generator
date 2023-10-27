@@ -2,7 +2,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 
 export const Mercury:stringIndexed = {
     entity: {
-        label: "Mercury"
+        label: "Mercury",
+        id:"Mercury001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [70000, 0],

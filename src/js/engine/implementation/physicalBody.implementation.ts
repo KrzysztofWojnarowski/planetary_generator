@@ -1,10 +1,12 @@
 import { PhysicalBody } from "../models/physicalBody.model";
 import { Vector } from "../models/vector.model";
-
-export default class PhysicalBodyImplementation{
+import { Implementation } from "../baseClasses/Implementation.class";
+export default class PhysicalBodyImplementation extends Implementation{
     _physicalBody:PhysicalBody;
     constructor(physicalBody:PhysicalBody){
+        super();
         this._physicalBody = physicalBody;
+
     }
     getBody():PhysicalBody{
         return this._physicalBody;

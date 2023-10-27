@@ -1,10 +1,11 @@
-import { GameElement } from "../baseClasses/gameElement.class";
+import { Implementation } from "../baseClasses/Implementation.class";
 import { GameObject } from "../interfaces/gameObject.interface";
 import { StaticCharacteristics } from "../models/staticCharacteristics.model";
 
-export class staticCharacteristicsImplementation implements GameObject{
+export class staticCharacteristicsImplementation extends Implementation{
     _staticCharacteristics:StaticCharacteristics;
     constructor(staticCharacteristics:StaticCharacteristics){
+        super();
         this._staticCharacteristics = staticCharacteristics;
     }
     getTitle():string{return this._staticCharacteristics.title}

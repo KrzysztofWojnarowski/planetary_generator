@@ -1,9 +1,12 @@
-import { GameObject } from "../interfaces/gameObject.interface";
+import { Implementation } from "../baseClasses/Implementation.class";
 import { Tank } from "../models/tank.model";
-export class ExtraTankImplementation implements GameObject{
-    _tankArray:Array<Tank>  = null;
-    constructor(tankArray:Array<Tank>){
+export class ExtraTankImplementation extends Implementation {
+    _tankArray: Array<Tank> = null;
+    constructor(tankArray: Array<Tank>) {
+        super();
         this._tankArray = tankArray;
-
+    }
+    getTankArray(): Array<Tank> {
+        return this._tankArray;
     }
 }

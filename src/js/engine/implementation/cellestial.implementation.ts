@@ -1,16 +1,18 @@
-import EntityImplementation from "./entity.implementation";
+import { Implementation } from "../baseClasses/Implementation.class";
+import { EntityImplementation } from "./entity.implementation";
 import PhysicalBodyImplementation from "./physicalBody.implementation";
-import {SpriteImplementation} from "./sprite.implementation";
+import { SpriteImplementation } from "./sprite.implementation";
 
 
-export default class CellestialImplementation {
+export default class CellestialImplementation extends Implementation {
     _entity: EntityImplementation = null;
     _physicalBody: PhysicalBodyImplementation = null;
     _sprite: SpriteImplementation = null;
-    markForRemoval:Boolean = null;
+    markForRemoval: Boolean = null;
     constructor(entity: EntityImplementation,
         physicalBody: PhysicalBodyImplementation,
         sprite: SpriteImplementation) {
+        super();
         this._entity = entity;
         this._physicalBody = physicalBody;
         this._sprite = sprite;
@@ -19,19 +21,19 @@ export default class CellestialImplementation {
     getBody(): PhysicalBodyImplementation {
         return this._physicalBody;
     }
-    getEntity():EntityImplementation{
+    getEntity(): EntityImplementation {
         return this._entity;
     }
-    getSprite():SpriteImplementation{
+    getSprite(): SpriteImplementation {
         return this._sprite;
     }
-    setBody(body:PhysicalBodyImplementation){
+    setBody(body: PhysicalBodyImplementation) {
         this._physicalBody = body;
     }
-    setEntity(entity:EntityImplementation){
+    setEntity(entity: EntityImplementation) {
         this._entity = entity;
     }
-    setSprite(sprite:SpriteImplementation){
+    setSprite(sprite: SpriteImplementation) {
         this._sprite = sprite;
     }
 

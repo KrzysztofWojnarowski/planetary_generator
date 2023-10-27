@@ -2,7 +2,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 
 export const GattoGrandi:stringIndexed = {
     entity: {
-        label: "Gatto Grandi"
+        label: "Gatto Grandi",
+        id:"Gatto001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [25000, 0],

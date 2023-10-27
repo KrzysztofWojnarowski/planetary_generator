@@ -1,8 +1,10 @@
+import { Implementation } from "../baseClasses/Implementation.class";
 import { Entity } from "../models/entity.model";
 
-export default class EntityImplementation{
+export class EntityImplementation extends Implementation{
     _entity:Entity;
     constructor(entity:Entity){
+        super();
         this._entity = entity;
     }
     getEntity():Entity{

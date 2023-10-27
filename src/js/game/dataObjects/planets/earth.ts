@@ -2,7 +2,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 
 export const Earth:stringIndexed = {
     entity: {
-        label: "Earth"
+        label: "Earth",
+        id:"Earthi001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [170000, 0],

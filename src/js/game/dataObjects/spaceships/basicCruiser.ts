@@ -1,10 +1,19 @@
 import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interface";
+import { spaceshiptypes } from "../spaceshiptypes";
 
 export const basicCruiser:stringIndexed={
+
+    entity:{
+        label:"Basic Crousier",
+        id:"Cruiser001",
+        group:"spaceships"
+    },
     sprite: {
         position: [237, 647],
         sizeSource: [55, 55],
-        sizeDestination: [30, 30]
+        sizeDestination: [30, 30],
+        frameCount:0,
+        frame:0
     },
 
     physicalBody: {
@@ -25,7 +34,8 @@ export const basicCruiser:stringIndexed={
         chargingSpeed: 1e4,
         acceptedResources: ["Energy", "QuantumOre"],
         currentResource: "Energy",
-        resourceTank: "fuelTank"
+        resourceTank: "fuelTank",
+        isCharging:false
     },
     fuelTank: {
         fuelType: "Energy",
@@ -42,6 +52,25 @@ export const basicCruiser:stringIndexed={
     engine: {
         power: 5,
         maxSpeed: 1.8,
-        powerQuantum: 4e-21
-    }
+        powerQuantum: 4e-21,
+        throttle:0
+    },
+
+    eventListener:[
+       {
+        event:"colided",
+        emiterGroup:"cellestial",
+        handler:"spaceshipColideHandler"
+       },
+       {
+        event:"keyUp",
+        emiterGroup:"keyboard",
+        handler:"spaceshipControlsKeyUp"
+       },
+       {
+        event:"keyDown",
+        emiterGroup:"keyboard",
+        handler:"spaceshipControlsKeyDown"
+       }
+    ]
 }

@@ -2,7 +2,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 
 export const Venus: stringIndexed = {
     entity: {
-        label: "Venus"
+        label: "Venus",
+        id:"Venus001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [47000, -100],

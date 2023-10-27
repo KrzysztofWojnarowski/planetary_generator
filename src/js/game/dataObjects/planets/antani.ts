@@ -2,7 +2,9 @@ import { stringIndexed } from "../../../engine/interfaces/stringIndexed.interfac
 
 export const Antani:stringIndexed={
     entity: {
-        label: "Antani"
+        label: "Antani",
+        id:"Antani001",
+        group:"cellestials"
     },
     physicalBody: {
         position: [100000, 0],

@@ -33,6 +33,7 @@ export default class Engine {
       this.#physics = physics;
       this.eventHandlingSystem = new EventHandlingSystem();
       this.engineNew = new EngineNew(physics);
+      
 
    }
    registerPhysical(object) {
@@ -208,7 +209,7 @@ export default class Engine {
    async assemble(assemblingFunction) {
       await assemblingFunction(this)
    }
-   useNewUpdate(gameObjects){
-      this.engineNew.update(gameObjects,this.loader,this.context);
+   useNewUpdate(){
+      this.engineNew.update(this.loader,this.context);
    }
 }
