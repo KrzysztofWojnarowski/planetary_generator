@@ -1,12 +1,12 @@
 import { Implementation } from "./baseClasses/Implementation.class";
-import { BaseSystem } from "./baseClasses/System.class";
+import { BaseSystem } from "./baseClasses/BaseSystem.class";
 import { GameElement } from "./baseClasses/gameElement.class";
-import { ImageLoaderManager } from "./image-loader-manager";
-import { Physics } from "./physics";
 import { SystemRegistry } from "./registry/system.registry";
 import { PhysicalBodySystem } from "./systems/physicalBody.system";
-import { SpriteSystem } from "./systems/sprite.system";
+import { SpriteSystem } from "./baseSystems/sprite.system";
 import { Config } from "../game/config";
+import { SystemManager } from "./systemManager/system.manager";
+import { StateManager } from "./stateManager/state.manager";
 
 export class EngineNew {
     spriteSystem: SpriteSystem = null;
@@ -15,12 +15,8 @@ export class EngineNew {
 
     constructor() {
         const config = new Config;
-        Object.keys(SystemRegistry).forEach(systemName => {
-            try {
-                SystemRegistry[systemName].init(config[systemName as keyof Config]);
-            } catch {
-                console.warn(`${systemName} is not a valid system - init method missing`);
-            }
+        SystemRegistry.forEach(systemName => {
+            SystemManager.register(systemName);
         });
     }
 
@@ -28,21 +24,10 @@ export class EngineNew {
         EngineNew.state = state;
     }
 
-
-
-    update(loader: ImageLoaderManager, context: CanvasRenderingContext2D) {
-        EngineNew.state.forEach((element: GameElement) => {
-            Object.keys(element.props).forEach(prop => {
-                if (typeof SystemRegistry[element.props[prop].getHandler()] === "function") {
-
-                    SystemRegistry[element.props[prop].getHandler()].update(element.props[prop], element, EngineNew.state);
-
-                } else {
-                    console.log(`This component has no system registered ${prop} `)
-                }
-            });
-        });
-        console.log(EngineNew.state);
+    update() {
+        SystemManager.procesSystems(StateManager.exportState());
+        SystemManager.processDelegates();
+        SystemManager.flushDelegates();
 
     }
 

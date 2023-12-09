@@ -1,4 +1,4 @@
 export interface EventDefinition {
     eventName: string;
-    shallTrigger(): boolean
+    triggerCondition(): boolean
 }

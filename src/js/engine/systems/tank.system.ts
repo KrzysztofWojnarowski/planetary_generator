@@ -1,7 +1,8 @@
-import { BaseSystem } from "../baseClasses/System.class";
+import { BaseSystem } from "../baseClasses/BaseSystem.class";
+import { System } from "../interfaces/system.interface";
 
-export abstract class TankSystem extends BaseSystem{
-    constructor(){
-        super();
+export  class TankSystem extends BaseSystem {
+    static update(){
+
     }
 }

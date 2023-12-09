@@ -4,6 +4,7 @@ export class GameElement {
     props: stringIndexed = null;
     objectType: string = null;
     shallBeRemoved: boolean = false;
+    rawData:stringIndexed;
 
     constructor(objectType: string, props: stringIndexed) {
         this.props = props;
@@ -22,5 +23,23 @@ export class GameElement {
     exportProps() {
         return this.props;
 
+    }
+    query(path: string) {
+        const queryArray: Array<string> = path.split("/");
+        let returnComponent: GameElement = null;
+        queryArray.forEach((prop, index) => {
+            if (index == 0) {
+                returnComponent = this.get(prop);
+            } else {
+                returnComponent = returnComponent.get(prop);
+            }
+        });
+        return returnComponent;
+    }
+    has( property: string): boolean {
+        return typeof this.get(property) != "undefined";
+    }
+    getRaw(){
+        return this.rawData;
     }
 }

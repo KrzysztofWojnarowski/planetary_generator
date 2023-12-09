@@ -42,7 +42,6 @@ function buildMenuContext(engine: Engine){
 async function buildGameplayContext(engine: Engine, keyboardHandler: KeyboardHandler) {
     const builder = engine.builder;
     let system: any = [];
-    EngineNew.importState( builder.buildExperimental(gameElements));
     prebuild.forEach(element => {
         system.push(builder.build(element,engine));
     });

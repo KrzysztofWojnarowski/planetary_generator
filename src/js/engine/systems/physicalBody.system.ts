@@ -1,39 +1,66 @@
 
-import { BaseSystem } from "../baseClasses/System.class";
+import { Config } from "../../game/config";
+import { BaseSystem } from "../baseClasses/BaseSystem.class";
 import { GameElement } from "../baseClasses/gameElement.class";
-import { PhysicsConfigModel } from "../models/PhysicsConfig.model";
+import { GameElementFactory } from "../factory/gameElement.factory";
+import { MathHelper } from "../helpers/math.helper";
 import { PhysicsHelper } from "../helpers/physics.helper";
+import { stringIndexed } from "../interfaces/stringIndexed.interface";
+import { PhysicsConfigModel } from "../models/PhysicsConfig.model";
 import { PhysicalBody } from "../models/physicalBody.model";
+import { Vector } from "../models/vector.model";
 
-export abstract class PhysicalBodySystem extends BaseSystem {
 
-    static config: PhysicsConfigModel;
+export class PhysicalBodySystem extends BaseSystem {
+    config: PhysicsConfigModel=null;
 
-    draw() { }
+    constructor() {
+        super();
+        this.handles = ["physicalBody"];
+        this.config = Config.PhysicalBodySystem
 
-    static update(component: GameElement, ownerElement: GameElement, state: GameElement[]): void {
-
-        let componentBody: PhysicalBody = component.exportProps() as PhysicalBody;
-        state.forEach(item => {
-            if (BaseSystem.has(item, "physicalBody")) {
-                const neighbour: PhysicalBody = item.get("physicalBody").exportProps() as PhysicalBody;
-                if (neighbour != componentBody) {
-                    const newBody = PhysicalBodySystem.processPhysics(componentBody, neighbour);
-                    ownerElement.set("physicalBody", newBody);
-                }
+    }
+    update(element: GameElement, list: Array<GameElement>) {
+        let gravity: Vector = [0, 0];
+        const mass = element.get("m");
+        const position = element.get("position").exportProps();
+        const startVelocity = element.get("velocity").exportProps();
+        const radius = element.get("r");
+        list.forEach(neighbour => {
+            if (element != neighbour) {
+                const neighbourMass = neighbour.get("m");
+                const neighbourPosition = neighbour.get("position").exportProps();
+                const distance = MathHelper.calculateDistance(position, neighbourPosition);
+                gravity = MathHelper.vectorSum(gravity,PhysicsHelper.gravity(mass, neighbourMass, distance,this.config.G));
             }
         });
+        const velocity = PhysicsHelper.speed(startVelocity,gravity,mass,this.config.dt);
+        const newPosition = PhysicsHelper.reposition(position,velocity,gravity,this.config.dt);
+        let newElementBody:PhysicalBody ={
+            position: newPosition,
+            r: radius,
+            m: mass,
+            velocity: velocity,
+            force: gravity
+        }    
+        console.log(newElementBody);    
+        return GameElementFactory.build("physicalBody",newElementBody);
+    }
 
-    }
-    static init(config: { dt: number, G: number }) {
-        PhysicalBodySystem.config = config;
-    }
-    private static processPhysics(focused: PhysicalBody, neighbour: PhysicalBody): GameElement {
-        const updatedBody = focused;
-        updatedBody.force = PhysicsHelper.calculateForce(focused, neighbour, PhysicalBodySystem.config);
-        updatedBody.velocity = PhysicsHelper.calculateSpeed(focused, PhysicalBodySystem.config);
-        updatedBody.position = PhysicsHelper.calculatePosition(focused, PhysicalBodySystem.config);
-        return new GameElement("physicalBody", updatedBody);
+
+
+    private processPhysics(focused: GameElement, neighbour: GameElement): GameElement {
+
+        const updatedBody = focused.getRaw() as PhysicalBody;
+        const neighbourBody = neighbour.getRaw() as PhysicalBody;
+        const force = focused.get("force").exportProps();
+
+
+
+        updatedBody.force = PhysicsHelper.calculateForce(updatedBody, neighbourBody, this.config);
+        updatedBody.velocity = PhysicsHelper.calculateSpeed(updatedBody, this.config);
+        updatedBody.position = PhysicsHelper.calculatePosition(updatedBody, this.config);
+        return GameElementFactory.build("physicalBody", updatedBody);
     }
 
 

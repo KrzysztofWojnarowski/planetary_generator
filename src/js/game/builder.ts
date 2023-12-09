@@ -10,12 +10,7 @@ import { RadarGauge } from "./gauges/radar-gauge";
 import { radar } from "./dataObjects/radar";
 import { SpaceMap } from "./gauges/space-map";
 import Engine from "../engine/engine";
-import { stringIndexed } from "../engine/interfaces/stringIndexed.interface";
-import { GameElement } from "../engine/baseClasses/gameElement.class";
-import { BaseSystem } from "../engine/baseClasses/System.class";
-import { EventManager } from "../engine/eventManager/eventManager";
-import { EventStoreItem } from "../engine/eventManager/eventStoreItem.interface";
-import { eventHandlerRegistry } from "./eventHandlers/eventHandler.registry";
+
 
 
 export class Builder {
@@ -71,39 +66,5 @@ export class Builder {
             }
         }
         )
-    }
-
-    buildGameElement(entityName: string, preset: stringIndexed) {
-        let implementationProps: stringIndexed = [];
-        Object.keys(preset).forEach(propName => {
-            implementationProps[propName] = new GameElement(propName, preset[propName]);
-        });
-        const element = new GameElement(entityName, implementationProps);
-        this.subscribeToEvents(element);
-        return element;
-    }
-
-    subscribeToEvents(element: GameElement) {
-        if (BaseSystem.has(element, "eventListener")) {
-            const eventBaseData = element.get("eventListener").exportProps() as Array<stringIndexed>;       
-              eventBaseData.forEach(event=>{
-                    const eventStoreItem:EventStoreItem = {
-                        type:event.event,
-                        emiterID:event.emiterID||"",
-                        emiterGroup:event.emiterGroup||"",
-                        subscriber:element,
-                        handler:eventHandlerRegistry[event.handler]
-                    }   
-                 EventManager.subscribe(eventStoreItem);
-                });
-        }
-    }
-
-    buildExperimental(gameObjects: stringIndexed) {
-        let gameState: Array<GameElement> = [];
-        for (let i in gameObjects) {
-            gameState.push(this.buildGameElement(i, gameObjects[i]));
-        }
-        return gameState;
     }
 }

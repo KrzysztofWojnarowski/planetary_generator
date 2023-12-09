@@ -2,6 +2,7 @@ import { ImageLoaderManager } from "../image-loader-manager";
 import CellestialImplementation from "../implementation/cellestial.implementation";
 
 export const CellestialSystem= {
+    
 
     draw:(cellestial: CellestialImplementation, imageLoader: ImageLoaderManager, context: CanvasRenderingContext2D) => {
         const sprite = cellestial.getSprite();

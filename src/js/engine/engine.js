@@ -1,7 +1,7 @@
 import { EngineNew } from "./Engine.new";
 import { CellestialSystem } from "./systems/cellestial.system";
 import EventHandlingSystem from "./systems/eventHandling.system";
-import { SpriteSystem } from "./systems/sprite.system";
+import { SpriteSystem } from "./baseSystems/sprite.system";
 
 export default class Engine {
    builder = null;

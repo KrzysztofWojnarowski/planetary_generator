@@ -58,17 +58,17 @@ export const basicCruiser:stringIndexed={
 
     eventListener:[
        {
-        event:"colided",
+        type:"colided",
         emiterGroup:"cellestial",
         handler:"spaceshipColideHandler"
        },
        {
-        event:"keyUp",
+        type:"keyUp",
         emiterGroup:"keyboard",
         handler:"spaceshipControlsKeyUp"
        },
        {
-        event:"keyDown",
+        type:"keyDown",
         emiterGroup:"keyboard",
         handler:"spaceshipControlsKeyDown"
        }

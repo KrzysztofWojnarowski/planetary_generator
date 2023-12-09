@@ -8,6 +8,8 @@ import { Builder } from "./game/builder";
 import { Canvas } from "./engine/canvas";
 import { assemblingFunction } from "./game/assembling-function";
 import { EngineNew } from "./engine/Engine.new";
+import { StateManager } from "./engine/stateManager/state.manager";
+import { gameElements } from "./game/dataObjects/game.elements";
 
 function app() {
     const config = new Config();
@@ -35,6 +37,10 @@ function app() {
     engine.setLoader(imageLoader);
     const context = canvas.getContext();
     engine.bindContext(context);
+    //Refactor abstraction layer - new Engine class in ts to replace old engine
+    StateManager.buildStateFromStringIndexedMap(gameElements);
+    EngineNew.importState(StateManager.exportState());
+    const newEngine = new EngineNew();
     
     imageLoader.eventSystem.addListener("onImagesReady", () => {
         console.log("everything loaded");
@@ -42,13 +48,12 @@ function app() {
             animate();
         });
     });
-    //Refactor abstraction layer - new Engine class in ts to replace old engine
-   
 
     function animate() {
         window.requestAnimationFrame(redraw);
     }
     function redraw() {
+        newEngine.update();
         engine.update();
         camera.update();
         engine.redraw();

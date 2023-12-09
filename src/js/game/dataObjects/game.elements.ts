@@ -10,15 +10,7 @@ import { Venus } from "./planets/venus";
 import { SashaBelli } from "./planets/sashaBelli";
 import { Antani } from "./planets/antani";
 export const gameElements:stringIndexed = {
-    mainStar:Sun,
-    planetMercury:Mercury,
-    planetSaturn:Saturn,
-    planetEarth:Earth,
-    planetGatoo:GattoGrandi,
-    planetKalumni:Calumni,
-    planetVenus:Venus,
-    planetSasha:SashaBelli,
-    planetAntani:Antani,
-    spaceShip:basicCruiser
+    cellestial:[Sun,Mercury,Saturn,Earth,GattoGrandi,Calumni,Venus,SashaBelli,Antani,], 
+    spaceShip:[basicCruiser]
     
 }

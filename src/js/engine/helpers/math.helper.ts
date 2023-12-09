@@ -2,10 +2,10 @@ import { Vector } from "../models/vector.model";
 
 export class MathHelper {
 
-    static calculateDistance(objectA: Vector, objectB: Vector): Vector {
+    static calculateDistance(positionA: Vector, positionB: Vector): Vector {
         return [
-            objectB[0] - objectA[0],
-            objectB[1] - objectA[1]
+            positionB[0] - positionA[0],
+            positionB[1] - positionA[1]
         ];
     }
 

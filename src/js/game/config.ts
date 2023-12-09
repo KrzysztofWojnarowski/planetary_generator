@@ -13,7 +13,7 @@ export class Config {
         G:1e-4,
         dt:3
     }
-    PhysicalBodySystem={
+   static PhysicalBodySystem={
         G:1e-4,
         dt:3
     }

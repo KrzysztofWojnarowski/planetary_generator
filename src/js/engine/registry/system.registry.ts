@@ -1,15 +1,13 @@
-import { EventSystem } from "../event-system";
-import { stringIndexed } from "../interfaces/stringIndexed.interface";
+import { BaseSystem } from "../baseClasses/BaseSystem.class";
 import { CellestialSystem } from "../systems/cellestial.system";
 import { PhysicalBodySystem } from "../systems/physicalBody.system";
-import { SpriteSystem } from "../systems/sprite.system";
+import { SpriteSystem } from "../baseSystems/sprite.system";
 import { TankSystem } from "../systems/tank.system";
+import { EventSystem } from "../systems/event.system";
 
-export const SystemRegistry:stringIndexed = {
-    "PhysicalBodySystem":PhysicalBodySystem,
-    "CellestialSystem":CellestialSystem,
-    "SpriteSystem":SpriteSystem,
-    "TankSystem":TankSystem,
-    "EventSystem":EventSystem
+export const SystemRegistry:Array<BaseSystem> = [
+    new EventSystem(),  new PhysicalBodySystem(),
+    new SpriteSystem()
+];
 
-}
+
