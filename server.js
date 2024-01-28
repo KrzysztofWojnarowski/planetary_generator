@@ -1,14 +1,11 @@
 const express = require("express");
 const path = require("path");
 
-let app = express();
-let distPath = path.join(__dirname,"dist");
-let assetsPath = path.join(distPath,"assets");
-app.use("/assets",express.static(assetsPath));
-app.use("/dist",express.static(distPath));
-app.get("/",function(req,res){
-    res.sendFile(__dirname+"/index.html");
-});
+const app = express();
+const distPath = path.join(__dirname,"dist");
+const assetsPath = path.join(distPath,"assets");
+
+app.use("/",express.static(distPath));
 app.listen(3000,()=>{
-    console.log('server on localhost:3000');
+    console.log('server on http://localhost:3000');
 });
