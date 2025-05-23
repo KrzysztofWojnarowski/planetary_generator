@@ -1,8 +1,7 @@
 export default {
-
-    spaceshipSheet: "../assets/pngegg.png",
-    background: "../assets/background.png",
-    explosionSheet: "../assets/explode.png",
+    spaceship: "assets/pngegg.png",
+    background: "assets/background.png",
+    explosionSheet: "assets/explode.png",
     redDwarfSheet: "../assets/0.png",
     saturnSheet: "../assets/1.png",
     redGiantSheet: "../assets/2.png",
@@ -15,5 +14,9 @@ export default {
     violetStarSheet: "../assets/9.png",
     earth: "../assets/10.png",
     gaugeSheet:"../assets/All.png",
-    iconSheet:"../assets/icons.png"
+    iconSheet:"../assets/icons.png",
+    planet1: "assets/1.png",
+    planet2: "assets/2.png",
+    planet3: "assets/3.png",
+    planet4: "assets/4.png"
 }

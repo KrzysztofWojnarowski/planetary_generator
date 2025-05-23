@@ -51,6 +51,9 @@ export default class SpaceShip {
         this.lastMouseX = 0;
         this.lastMouseY = 0;
 
+        // Initialize lasers array
+        this.lasers = [];
+
         // Add mouse move listener
         const canvas = document.querySelector('#canvas');
         if (canvas) {
@@ -60,6 +63,11 @@ export default class SpaceShip {
                 this.lastMouseY = this.mouseY;
                 this.mouseX = e.clientX - rect.left;
                 this.mouseY = e.clientY - rect.top;
+            });
+
+            // Add mouse click listener for shooting
+            canvas.addEventListener('click', (e) => {
+                this.shoot();
             });
         }
     }
@@ -123,6 +131,28 @@ export default class SpaceShip {
         this.drawChargingCircle(context);
         context.drawImage(this.#image, x, y, w, h, -0.5 * dw, -0.5 * dh, dw, dh);
         context.restore();
+
+        // Draw active lasers
+        if (this.lasers && this.lasers.length > 0) {
+            console.log('Drawing lasers:', this.lasers.length);
+            this.lasers.forEach((laser, index) => {
+                if (laser.active) {
+                    context.save();
+                    // Draw from the center of the spaceship
+                    context.translate(laser.x, laser.y);
+                    context.rotate(laser.angle);
+                    
+                    // Draw red laser beam
+                    context.beginPath();
+                    context.strokeStyle = 'red';
+                    context.lineWidth = laser.width;
+                    context.moveTo(0, 0);
+                    context.lineTo(laser.length, 0);
+                    context.stroke();
+                    context.restore();
+                }
+            });
+        }
     }
     //TODO - use sprite instead of this nasty hack
     getSprite() {
@@ -225,6 +255,27 @@ export default class SpaceShip {
             }
         }
 
+        // Update laser positions
+        if (this.lasers && this.lasers.length > 0) {
+            const currentTime = Date.now();
+            this.lasers.forEach((laser, index) => {
+                if (laser.active) {
+                    // Update laser position
+                    laser.x += Math.cos(laser.angle) * laser.speed;
+                    laser.y += Math.sin(laser.angle) * laser.speed;
+                    
+                    // Deactivate laser after 500ms
+                    if (currentTime - laser.createdAt > 500) {
+                        laser.active = false;
+                        console.log('Laser deactivated after 500ms:', index);
+                    }
+                }
+            });
+            
+            // Remove inactive lasers
+            this.lasers = this.lasers.filter(laser => laser.active);
+        }
+
         let throttleFactor = this.throttle * this.powerQuantum;
         this.body.fx += throttleFactor * Math.cos(this.rotation);
         this.body.fy += throttleFactor * Math.sin(this.rotation);
@@ -291,5 +342,26 @@ export default class SpaceShip {
     }
     handleArrowRightRelease() {
         this.keyReleased("arrowRight");
+    }
+
+    shoot() {
+        if (!this.engine) return;
+
+        // Create laser beam
+        const laser = {
+            x: this.body.x,
+            y: this.body.y,
+            angle: this.rotation,
+            length: 100,
+            width: 2,
+            speed: 10,
+            active: true,
+            createdAt: Date.now() // Add timestamp when laser is created
+        };
+
+        // Add laser to our lasers array
+        this.lasers.push(laser);
+        console.log('Laser shot:', laser);
+        console.log('Total lasers:', this.lasers.length);
     }
 }

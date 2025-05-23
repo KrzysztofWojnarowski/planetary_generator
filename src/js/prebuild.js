@@ -63,6 +63,53 @@ export default [
         frameSize:[300,300],
         vx:0.01,
         vy:-0.0007
+    },
+    {
+        type: "planet",
+        x: 1000,
+        y: 1000,
+        m: 10000,
+        vx: 0,
+        vy: 0,
+        r: 50,
+        image: "assets/1.png",
+        frameCount: 1,
+        frameSize: [1, 1]
+    },
+    {
+        type: "planet",
+        x: 2000,
+        y: 1500,
+        m: 15000,
+        vx: 0,
+        vy: 0,
+        r: 75,
+        image: "assets/2.png",
+        frameCount: 1,
+        frameSize: [1, 1]
+    },
+    {
+        type: "planet",
+        x: 3000,
+        y: 2000,
+        m: 20000,
+        vx: 0,
+        vy: 0,
+        r: 100,
+        image: "assets/3.png",
+        frameCount: 1,
+        frameSize: [1, 1]
+    },
+    {
+        type: "planet",
+        x: 4000,
+        y: 2500,
+        m: 25000,
+        vx: 0,
+        vy: 0,
+        r: 125,
+        image: "assets/4.png",
+        frameCount: 1,
+        frameSize: [1, 1]
     }
-
 ];
