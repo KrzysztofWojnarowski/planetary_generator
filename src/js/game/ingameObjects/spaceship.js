@@ -39,10 +39,29 @@ export default class SpaceShip {
         this.eventSystem.addListener("onCollided", this.onCollision);
         this.eventSystem.addListener("onRemove", this.onRemove);
         this.eventSystem.addListener("onUpdate", (ship, engine) => {
+            this.engine = engine;
             ship.update(engine.getPhysics());
             ship.updateChargeEnergy(ship, engine);
             engine.background.onUpdate(this);
         });
+
+        // Initialize mouse position
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
+
+        // Add mouse move listener
+        const canvas = document.querySelector('#canvas');
+        if (canvas) {
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                this.lastMouseX = this.mouseX;
+                this.lastMouseY = this.mouseY;
+                this.mouseX = e.clientX - rect.left;
+                this.mouseY = e.clientY - rect.top;
+            });
+        }
     }
 
     onRemove(e, s) {
@@ -179,10 +198,33 @@ export default class SpaceShip {
         this.isCharging = chargeMap.size > 0;
     }
 
-    //TODO: Come up with something more reasonable
     update(physics) {
         this.handleKeyboardState();
         this.updatheThrottelEnergy();
+        
+        // Calculate angle to mouse
+        if (this.mouseX !== undefined && this.mouseY !== undefined && this.engine) {
+            const camera = this.engine.camera;
+            if (camera) {
+                const cameraPos = camera.getPosition();
+                const cameraDim = camera.getDimension();
+                
+                // Get spaceship position relative to window
+                const shipX = cameraPos[0] + cameraDim[0]/2 + this.body.x;
+                const shipY = this.body.y + cameraPos[1] + cameraDim[1]/2;
+                
+                // Calculate angle between spaceship and mouse
+                const dx = this.mouseX - shipX + cameraDim[0]/2;
+                const dy = this.mouseY - shipY + cameraDim[1]/2;
+                const targetAngle = Math.atan2(dy, dx);
+                
+                // Only update rotation if mouse has moved
+                if (this.mouseX !== this.lastMouseX || this.mouseY !== this.lastMouseY) {
+                    this.rotation = targetAngle;
+                }
+            }
+        }
+
         let throttleFactor = this.throttle * this.powerQuantum;
         this.body.fx += throttleFactor * Math.cos(this.rotation);
         this.body.fy += throttleFactor * Math.sin(this.rotation);
@@ -192,7 +234,6 @@ export default class SpaceShip {
         let p = physics.calculatePosition(this.getBody());
         this.body.x = p[0];
         this.body.y = p[1];
-
     }
     onCollision(e, f, g) {
         e.body.markForRemoval = true;

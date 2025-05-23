@@ -7,7 +7,7 @@ export default class Camera {
     width = 0;
     height = 0;
     velocity = [0, 0];
-    allowedRange = [this.width*0.2,this.height*0.2];
+    allowedRange = [this.width*0.15,this.height*0.15];
 
 
     constructor(config = {

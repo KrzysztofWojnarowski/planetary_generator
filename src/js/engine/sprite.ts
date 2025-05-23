@@ -19,7 +19,6 @@ export default class Sprite {
         return await ImageLoader.load(url);
     }
     setImage(image: HTMLImageElement, context?: any){
-        console.log('image', image, context)
         this._spriteImage = image;
     }
     setLoaded(){

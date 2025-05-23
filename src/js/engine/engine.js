@@ -25,7 +25,6 @@ export default class Engine {
    processEvents() {
 
       this.store.eventQueue.forEach((v, k) => {
-         console.log(v,k);
          let element = this.store.system.find(e => e.entity.getUUID() === v.uuid);
          element.eventSystem.triggerEvent(v.event, ...v.params);
          this.store.eventQueue.delete(k);
