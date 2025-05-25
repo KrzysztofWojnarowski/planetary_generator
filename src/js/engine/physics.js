@@ -103,8 +103,13 @@ export default class Physics {
         let newVelocity = this.calculateSpeed(tb);
         tb.x = newPosition[0];
         tb.y = newPosition[1];
-        tb.vx = newVelocity[0];
-        tb.vy = newVelocity[1];
+        if (tb.type === "star") {
+            tb.vx = 0;
+            tb.vy = 0;
+        } else {
+            tb.vx = newVelocity[0];
+            tb.vy = newVelocity[1];
+        }
     }
 
     applyNonElasticCollision(target,collider){
