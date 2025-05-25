@@ -6,7 +6,7 @@ export default [
         x:0,
         y:0,
         m:100,
-        r:120,
+        r:150,
         image:"assets/8.png",
         frameSize:[200,200],
         vx:0,
@@ -58,7 +58,7 @@ export default [
         x:100,
         y:300,
         m:0.000000000005,
-        r:80,
+        r:50,
         image:"assets/5.png",
         frameSize:[300,300],
         vx:0.01,
@@ -74,8 +74,8 @@ export default [
         vy:0,
         r:30,
         image:"assets/1.png",
-        frameCount:1,
-        frameSize:[100,100]
+        frameCount:49,
+        frameSize:[300,300]
     },
     {
         label:"Venus",
@@ -87,8 +87,8 @@ export default [
         vy:0,
         r:45,
         image:"assets/2.png",
-        frameCount:1,
-        frameSize:[100,100]
+        frameCount:49,
+        frameSize:[200,200]
     },
     {
         label:"Jupiter",
@@ -96,11 +96,11 @@ export default [
         x:3000,
         y:2000,
         m:8e-5,
-        vx:0,
+        vx:0.03,
         vy:0,
-        r:90,
+        r:50,
         image:"assets/3.png",
-        frameCount:1,
+        frameCount:49,
         frameSize:[100,100]
     },
     {
@@ -109,11 +109,11 @@ export default [
         x:4000,
         y:2500,
         m:1e-4,
-        vx:0,
-        vy:0,
+        vx:0.001,
+        vy:-0.03,
         r:60,
         image:"assets/4.png",
-        frameCount:1,
+        frameCount:49,
         frameSize:[100,100]
     }
 ];

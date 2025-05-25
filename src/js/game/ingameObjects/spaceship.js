@@ -297,6 +297,11 @@ export default class SpaceShip {
         explosion.animation.size = [200, 200];
         g.store.system.push(explosion);
         g.registerAnimation(explosion);
+        
+        // Log the planet's name if it's a planet collision
+        if (f && f.getBody() && f.getBody().label) {
+            console.log(`Spaceship collided with ${f.getBody().label}`);
+        }
     }
 
     getThrottle() {
