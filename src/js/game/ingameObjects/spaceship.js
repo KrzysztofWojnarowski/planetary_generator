@@ -255,7 +255,7 @@ export default class SpaceShip {
             }
         }
 
-        // Update laser positions
+        // Update laser positions and check for collisions
         if (this.lasers && this.lasers.length > 0) {
             const currentTime = Date.now();
             this.lasers.forEach((laser, index) => {
@@ -264,10 +264,29 @@ export default class SpaceShip {
                     laser.x += Math.cos(laser.angle) * laser.speed;
                     laser.y += Math.sin(laser.angle) * laser.speed;
                     
+                    // Check for collisions with enemy ships
+                    if (this.engine && this.engine.store && this.engine.store.system) {
+                        this.engine.store.system.forEach((obj) => {
+                            // Check if object is an enemy ship
+                            if (obj instanceof SpaceShip && obj.constructor.name === 'EnemyShip') {
+                                // Calculate distance between laser and enemy
+                                const dx = laser.x - obj.body.x;
+                                const dy = laser.y - obj.body.y;
+                                const distance = Math.sqrt(dx * dx + dy * dy);
+                                
+                                // If laser hits enemy (within enemy's radius)
+                                if (distance < obj.body.r) {
+                                    console.log('Laser hit enemy ship!');
+                                    obj.handleLaserHit();
+                                    laser.active = false; // Deactivate laser after hit
+                                }
+                            }
+                        });
+                    }
+                    
                     // Deactivate laser after 500ms
                     if (currentTime - laser.createdAt > 500) {
                         laser.active = false;
-                        console.log('Laser deactivated after 500ms:', index);
                     }
                 }
             });

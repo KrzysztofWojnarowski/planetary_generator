@@ -10,6 +10,7 @@ import { EnergyMeter } from "./gauges/energy-meter";
 import { RadarGauge } from "./gauges/radar-gauge";
 import { MenuFrame } from "./menuItems/menu-frame";
 import { MenuContent } from "./menuItems/menu-content";
+import EnemyShip from "./ingameObjects/enemyShip";
 
 export default async function assemblingFunction(engine) {
     console.log("assembling things");
@@ -52,6 +53,15 @@ async function buildGameplayContext(engine,keyboardHandler) {
     engine.store.system.push(ship);
     engine.camera.lockOn(ship.getBody());
     keyboardHandler.bindShipKeys(ship, document);
+
+    // Add enemy ship
+    let enemyShip = new EnemyShip();
+    enemyShip.load().then(image => {
+        enemyShip.setImage(image);
+        enemyShip.setLoaded(true);
+    });
+    engine.store.system.push(enemyShip);
+
     let throttleMeter = new ThrottleMeter(engine);
     let accelerometer = new Accelerometer(engine);
     let energyMeter = new EnergyMeter(engine);
@@ -61,12 +71,7 @@ async function buildGameplayContext(engine,keyboardHandler) {
     throttleMeter.bindOwner(ship);
     accelerometer.bindOwner(ship);
     engine.registerDrawable(radarGauge);
-
-    // Not working
     engine.registerDrawable(throttleMeter);
-    console.log('throttleMeter', throttleMeter);
-
-    // Not working
     engine.registerDrawable(accelerometer);
     engine.registerDrawable(energyMeter);
     engine.store.system.forEach(e => {
