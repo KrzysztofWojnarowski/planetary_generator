@@ -247,6 +247,14 @@ export default class SpaceShip {
         return this.#mesh;
     }
 
+    setMesh(mesh) {
+        this.#mesh = mesh;
+        // Update body properties based on new mesh
+        this.body.m = this.#mesh.m;
+        this.maxSpeed = this.#mesh.maxSpeed;
+        this.powerQuantum = this.#mesh.powerQuantum;
+    }
+
     chargeMap(ship, engine) {
         let system = engine.store.physical;
         let physics = engine.getPhysics();

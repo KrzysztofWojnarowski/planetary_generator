@@ -1,6 +1,7 @@
 import SpaceShip from "./spaceship";
 import EventSystem from "../../engine/eventSystem";
 import Explode from "./explode";
+import spaceshiptypes from "./spaceshiptypes";
 
 export default class EnemyShip extends SpaceShip {
     constructor() {
@@ -20,6 +21,10 @@ export default class EnemyShip extends SpaceShip {
         // Add health
         this.health = 30;
         
+        // Override the mesh with heavy cruiser type
+        const heavyCruiserMesh = JSON.parse(JSON.stringify(spaceshiptypes.heavyCruiser));
+        this.setMesh(heavyCruiserMesh);
+        
         // Set constant energy level for enemy
         this.getMesh().energy = 100;
         this.getMesh().energyCapacity = 100;
@@ -32,6 +37,12 @@ export default class EnemyShip extends SpaceShip {
         this.delayTime = 5000; // 2 seconds delay
         this.isActive = false;
         
+        // Load the ship image
+        this.load().then(image => {
+            this.setImage(image);
+            this.setLoaded(true);
+        });
+        
         // AI state
         this.targetPosition = null;
         this.lastDecisionTime = 0;
@@ -42,16 +53,22 @@ export default class EnemyShip extends SpaceShip {
         this.orbitTarget = null;
         this.orbitRadius = 1500;
         this.orbitAngle = 0;
-        this.avoidanceRadius = 800;  // Increased from 500 to 800
-        this.avoidanceForce = 2.0;   // Increased from 1.0 to 2.0
-        this.avoidanceLookAhead = 400; // Increased from 200 to 400
-        this.shipAvoidanceRadius = 400;
-        this.shipAvoidanceForce = 1.5;
-        this.minSafeDistance = 150;
-        this.emergencyAvoidanceRadius = 250;
-        this.emergencyAvoidanceForce = 2.0;
-        this.planetEmergencyRadius = 400;  // New emergency radius for planets
-        this.planetEmergencyForce = 3.0;   // New emergency force for planets
+        this.avoidanceRadius = 1000;  // Increased from 800 to 1000
+        this.avoidanceForce = 4.0;    // Increased from 2.0 to 4.0
+        this.avoidanceLookAhead = 600; // Increased from 400 to 600
+        this.shipAvoidanceRadius = 600;  // Increased from 400 to 600
+        this.shipAvoidanceForce = 3.0;   // Increased from 1.5 to 3.0
+        this.minSafeDistance = 300;      // Increased from 150 to 300
+        this.emergencyAvoidanceRadius = 400;  // Increased from 250 to 400
+        this.emergencyAvoidanceForce = 4.0;   // Increased from 2.0 to 4.0
+        this.planetEmergencyRadius = 600;     // Increased from 400 to 600
+        this.planetEmergencyForce = 5.0;      // Increased from 3.0 to 5.0
+        this.maxSpeed = 0.03;  // Reduced from 0.05 to 0.03
+        this.lastAvoidanceDx = 0;
+        this.lastAvoidanceDy = 0;
+        this.avoidanceSmoothing = 0.2;
+        this.minMovementThreshold = 0.1;
+        this.idealDistance = 500;
         
         // Position history for better prediction
         this.positionHistory = [];
@@ -398,172 +415,91 @@ export default class EnemyShip extends SpaceShip {
         const dy = this.targetPosition[1] - this.body.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Calculate avoidance force from nearby planets and player ship
+        // Calculate avoidance force from nearby planets and player
         let avoidDx = 0;
         let avoidDy = 0;
         
         if (this.engine && this.engine.store && this.engine.store.system) {
-            // First, handle planet avoidance with improved logic
+            // Handle planet avoidance
             const planets = this.engine.store.system.filter(obj => 
                 obj.constructor.name === 'Planet' && !obj.isStar
             );
 
-            // Calculate multiple look-ahead positions
-            const lookAheadPositions = [];
-            for (let i = 1; i <= 3; i++) {
-                const lookAheadX = this.body.x + Math.cos(this.rotation) * this.avoidanceLookAhead * i;
-                const lookAheadY = this.body.y + Math.sin(this.rotation) * this.avoidanceLookAhead * i;
-                lookAheadPositions.push({ x: lookAheadX, y: lookAheadY });
-            }
+            // Calculate look-ahead position
+            const lookAheadX = this.body.x + Math.cos(this.rotation) * this.avoidanceLookAhead;
+            const lookAheadY = this.body.y + Math.sin(this.rotation) * this.avoidanceLookAhead;
 
+            // Planet avoidance
             for (const planet of planets) {
-                // Check current position and all look-ahead positions
-                let minDistance = Infinity;
-                let closestDx = 0;
-                let closestDy = 0;
-
-                // Check current position
                 const currentDx = this.body.x - planet.body.x;
                 const currentDy = this.body.y - planet.body.y;
                 const currentDistance = Math.sqrt(currentDx * currentDx + currentDy * currentDy);
-                
-                if (currentDistance < minDistance) {
-                    minDistance = currentDistance;
-                    closestDx = currentDx;
-                    closestDy = currentDy;
-                }
 
-                // Check look-ahead positions
-                for (const pos of lookAheadPositions) {
-                    const lookAheadDx = pos.x - planet.body.x;
-                    const lookAheadDy = pos.y - planet.body.y;
-                    const lookAheadDistance = Math.sqrt(lookAheadDx * lookAheadDx + lookAheadDy * lookAheadDy);
-                    
-                    if (lookAheadDistance < minDistance) {
-                        minDistance = lookAheadDistance;
-                        closestDx = lookAheadDx;
-                        closestDy = lookAheadDy;
-                    }
-                }
+                const lookAheadDx = lookAheadX - planet.body.x;
+                const lookAheadDy = lookAheadY - planet.body.y;
+                const lookAheadDistance = Math.sqrt(lookAheadDx * lookAheadDx + lookAheadDy * lookAheadDy);
 
-                // Calculate closing speed to planet
-                const planetDx = this.body.x - planet.body.x;
-                const planetDy = this.body.y - planet.body.y;
-                const planetDistance = Math.sqrt(planetDx * planetDx + planetDy * planetDy);
-                const closingSpeed = (planetDx * this.body.vx + planetDy * this.body.vy) / planetDistance;
+                const planetDistance = Math.min(currentDistance, lookAheadDistance);
+                const planetDx = planetDistance === currentDistance ? currentDx : lookAheadDx;
+                const planetDy = planetDistance === currentDistance ? currentDy : lookAheadDy;
 
-                // Determine which avoidance radius and force to use
-                let avoidanceRadius = this.avoidanceRadius;
-                let avoidanceForce = this.avoidanceForce;
-
-                // If we're closing in too fast or too close, use emergency avoidance
-                if ((closingSpeed < -0.1 && minDistance < this.planetEmergencyRadius) || 
-                    minDistance < this.planetEmergencyRadius) {
-                    avoidanceRadius = this.planetEmergencyRadius;
-                    avoidanceForce = this.planetEmergencyForce;
-                }
-
-                if (minDistance < avoidanceRadius) {
-                    // Calculate base avoidance force
-                    let force = avoidanceForce * Math.pow(1 - minDistance / avoidanceRadius, 2);
-
-                    // Increase force if we're closing in too fast
-                    if (closingSpeed < 0) {
-                        force *= (1 - closingSpeed) * 2;
-                    }
-
-                    // Calculate avoidance angle
-                    const angle = Math.atan2(closestDy, closestDx);
+                if (planetDistance < this.avoidanceRadius) {
+                    // Calculate avoidance force with stronger falloff
+                    const force = this.avoidanceForce * Math.pow(1 - planetDistance / this.avoidanceRadius, 2);
+                    const angle = Math.atan2(planetDy, planetDx);
                     
                     // Add perpendicular component to steer around the planet
                     const perpendicularAngle = angle + Math.PI/2;
-                    
-                    // Add both perpendicular and direct avoidance
                     avoidDx += Math.cos(perpendicularAngle) * force * 2.0;
                     avoidDy += Math.sin(perpendicularAngle) * force * 2.0;
-                    avoidDx += Math.cos(angle) * force;
-                    avoidDy += Math.sin(angle) * force;
 
-                    // If we're too close, add strong direct avoidance
-                    if (minDistance < this.planetEmergencyRadius) {
-                        const emergencyForce = this.planetEmergencyForce * (1 - minDistance / this.planetEmergencyRadius);
-                        avoidDx += Math.cos(angle) * emergencyForce * 2;
-                        avoidDy += Math.sin(angle) * emergencyForce * 2;
+                    // If very close, add strong direct avoidance
+                    if (planetDistance < this.planetEmergencyRadius) {
+                        const emergencyForce = this.planetEmergencyForce * Math.pow(1 - planetDistance / this.planetEmergencyRadius, 2);
+                        avoidDx += Math.cos(angle) * emergencyForce * 3.0;
+                        avoidDy += Math.sin(angle) * emergencyForce * 3.0;
                     }
                 }
             }
 
-            // Then, handle player ship avoidance with improved logic
-            const playerShip = this.engine.store.system.find(obj => 
-                obj.constructor.name === 'SpaceShip' && obj !== this
-            );
-
+            // Player avoidance
+            const playerShip = this.findPlayerShip();
             if (playerShip) {
-                // Calculate relative velocity
-                const relativeVx = this.body.vx - playerShip.body.vx;
-                const relativeVy = this.body.vy - playerShip.body.vy;
-                const relativeSpeed = Math.sqrt(relativeVx * relativeVx + relativeVy * relativeVy);
+                const playerDx = this.body.x - playerShip.body.x;
+                const playerDy = this.body.y - playerShip.body.y;
+                const playerDistance = Math.sqrt(playerDx * playerDx + playerDy * playerDy);
 
-                // Predict future position based on relative velocity
-                const predictionTime = Math.min(relativeSpeed * 2, 1.0); // Scale prediction time with relative speed
-                const predictedPlayerX = playerShip.body.x + playerShip.body.vx * predictionTime;
-                const predictedPlayerY = playerShip.body.y + playerShip.body.vy * predictionTime;
-
-                // Calculate distance to predicted position
-                const shipDx = this.body.x - predictedPlayerX;
-                const shipDy = this.body.y - predictedPlayerY;
-                const shipDistance = Math.sqrt(shipDx * shipDx + shipDy * shipDy);
-
-                // Calculate closing speed (negative means approaching)
-                const closingSpeed = (shipDx * relativeVx + shipDy * relativeVy) / shipDistance;
-
-                // Determine which avoidance radius and force to use
-                let avoidanceRadius = this.shipAvoidanceRadius;
-                let avoidanceForce = this.shipAvoidanceForce;
-
-                // If we're closing in too fast, use emergency avoidance
-                if (closingSpeed < -0.1 && shipDistance < this.emergencyAvoidanceRadius) {
-                    avoidanceRadius = this.emergencyAvoidanceRadius;
-                    avoidanceForce = this.emergencyAvoidanceForce;
-                }
-
-                if (shipDistance < avoidanceRadius) {
-                    // Calculate base avoidance force
-                    let force = avoidanceForce * Math.pow(1 - shipDistance / avoidanceRadius, 2);
-
-                    // Increase force if we're closing in too fast
-                    if (closingSpeed < 0) {
-                        force *= (1 - closingSpeed);
-                    }
-
-                    // Calculate avoidance angle
-                    const angle = Math.atan2(shipDy, shipDx);
+                if (playerDistance < this.shipAvoidanceRadius) {
+                    const force = this.shipAvoidanceForce * (1 - playerDistance / this.shipAvoidanceRadius);
+                    const angle = Math.atan2(playerDy, playerDx);
                     
-                    // Add perpendicular component to steer around the ship
+                    // Add perpendicular component to steer around the player
                     const perpendicularAngle = angle + Math.PI/2;
-                    
-                    // Add some direct avoidance as well
-                    avoidDx += Math.cos(perpendicularAngle) * force * 1.5;
-                    avoidDy += Math.sin(perpendicularAngle) * force * 1.5;
-                    avoidDx += Math.cos(angle) * force * 0.5;
-                    avoidDy += Math.sin(angle) * force * 0.5;
+                    avoidDx += Math.cos(perpendicularAngle) * force * 2.0;
+                    avoidDy += Math.sin(perpendicularAngle) * force * 2.0;
 
-                    // If we're too close, add strong direct avoidance
-                    if (shipDistance < this.minSafeDistance) {
-                        const emergencyForce = this.emergencyAvoidanceForce * (1 - shipDistance / this.minSafeDistance);
-                        avoidDx += Math.cos(angle) * emergencyForce;
-                        avoidDy += Math.sin(angle) * emergencyForce;
+                    // If too close, add direct avoidance
+                    if (playerDistance < this.minSafeDistance) {
+                        const emergencyForce = this.emergencyAvoidanceForce * (1 - playerDistance / this.minSafeDistance);
+                        avoidDx += Math.cos(angle) * emergencyForce * 3.0;
+                        avoidDy += Math.sin(angle) * emergencyForce * 3.0;
                     }
                 }
             }
         }
+
+        // Smooth avoidance forces
+        avoidDx = this.lastAvoidanceDx * (1 - this.avoidanceSmoothing) + avoidDx * this.avoidanceSmoothing;
+        avoidDy = this.lastAvoidanceDy * (1 - this.avoidanceSmoothing) + avoidDy * this.avoidanceSmoothing;
+        this.lastAvoidanceDx = avoidDx;
+        this.lastAvoidanceDy = avoidDy;
 
         // Calculate desired movement direction
         let targetX = this.targetPosition[0];
         let targetY = this.targetPosition[1];
 
         // Add avoidance force to target position
-        targetX += avoidDx * 3000;  // Increased from 2000 to 3000
+        targetX += avoidDx * 3000;
         targetY += avoidDy * 3000;
 
         // Calculate direction to adjusted target
@@ -571,18 +507,30 @@ export default class EnemyShip extends SpaceShip {
         const moveDy = targetY - this.body.y;
         const moveAngle = Math.atan2(moveDy, moveDx);
 
-        // Set rotation to face adjusted target
-        this.rotation = moveAngle;
+        // Only update rotation if movement is significant
+        const movementMagnitude = Math.sqrt(moveDx * moveDx + moveDy * moveDy);
+        if (movementMagnitude > this.minMovementThreshold) {
+            this.rotation = moveAngle;
+        }
 
-        // Apply thrust with reduced force when avoiding
-        const thrustForce = (Math.abs(avoidDx) > 0 || Math.abs(avoidDy) > 0) ? 0.15 : (distance > 500 ? 0.3 : 0.2);
+        // Adjust thrust based on distance to player
+        let thrustForce;
+        if (distance > this.idealDistance * 1.5) {
+            thrustForce = 0.2;  // Reduced from 0.3 to 0.2
+        } else if (distance < this.idealDistance * 0.5) {
+            thrustForce = 0.05;  // Reduced from 0.1 to 0.05
+        } else {
+            thrustForce = 0.15;  // Reduced from 0.2 to 0.15
+        }
+
+        // Apply thrust
         this.body.vx += Math.cos(moveAngle) * thrustForce;
         this.body.vy += Math.sin(moveAngle) * thrustForce;
 
         // Apply additional avoidance force
         if (Math.abs(avoidDx) > 0 || Math.abs(avoidDy) > 0) {
-            this.body.vx += avoidDx * this.avoidanceForce * 3;  // Increased from 2 to 3
-            this.body.vy += avoidDy * this.avoidanceForce * 3;
+            this.body.vx += avoidDx * this.avoidanceForce * 1.5;  // Reduced from 2.0 to 1.5
+            this.body.vy += avoidDy * this.avoidanceForce * 1.5;
         }
     }
 
@@ -610,10 +558,9 @@ export default class EnemyShip extends SpaceShip {
         }
 
         // Apply velocity limits
-        const maxSpeed = 0.05;
         const currentSpeed = Math.sqrt(this.body.vx * this.body.vx + this.body.vy * this.body.vy);
-        if (currentSpeed > maxSpeed) {
-            const scale = maxSpeed / currentSpeed;
+        if (currentSpeed > this.maxSpeed) {
+            const scale = this.maxSpeed / currentSpeed;
             this.body.vx *= scale;
             this.body.vy *= scale;
         }
