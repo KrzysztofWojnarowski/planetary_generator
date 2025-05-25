@@ -14,7 +14,7 @@ export default class SpaceShip {
     url = "assets/pngegg.png";
     #isLoaded = false;
     #image = {};
-    #mesh = spaceshiptypes.bascicCrousier;
+    #mesh = null;  // Will be initialized in constructor
     position = [100, 1900];
     velocity = [0, 0];
     rotation = Math.PI / 2;
@@ -26,6 +26,10 @@ export default class SpaceShip {
     physics = {};
     constructor() {
         this.entity = new Entity();
+        
+        // Create a new mesh instance by deep copying the template
+        this.#mesh = JSON.parse(JSON.stringify(spaceshiptypes.bascicCrousier));
+        
         this.body.m = this.#mesh.m;
         this.body.x = this.position[0];
         this.body.y = this.position[1];
@@ -38,6 +42,11 @@ export default class SpaceShip {
         // Add health
         this.health = 30;  // Changed to 30 health points
         this.maxHealth = 30;  // Changed to 30 max health
+        
+        // Initialize energy from mesh configuration
+        this.#mesh.energy = 30000;
+        this.#mesh.energyCapacity = 30000;
+        console.log('Initial energy set in constructor:', this.#mesh.energy);
         
         this.eventSystem = new EventSystem(this);
         this.eventSystem.registerEvent("onCollided");
@@ -190,12 +199,15 @@ export default class SpaceShip {
 
     updatheThrottelEnergy() {
         let mesh = this.getMesh();
+        console.log('Current energy before throttle:', mesh.energy);
         if (mesh.energy > 0 && mesh.energy < mesh.energyCapacity) {
             mesh.energy -= this.throttle;
+            console.log('Energy after throttle:', mesh.energy, 'Throttle value:', this.throttle);
         }
         if (mesh.energy < 0) {
             mesh.energy = 0;
             this.throttle = 0;
+            console.log('Energy depleted, set to 0');
         }
     }
     hasEnergy() {
@@ -248,10 +260,12 @@ export default class SpaceShip {
     updateChargeEnergy(ship, engine) {
         let chargeMap = this.chargeMap(ship, engine);
         let mesh = ship.getMesh();
+        console.log('Current energy before charging:', mesh.energy);
         chargeMap.forEach(e => {
             let energyAdditon = this.chargeFromObject(e);
             if (energyAdditon + mesh.energy < mesh.energyCapacity) {
                 mesh.energy += energyAdditon;
+                console.log('Energy after charging:', mesh.energy, 'Added:', energyAdditon);
             }
         });
         this.isCharging = chargeMap.size > 0;

@@ -20,11 +20,17 @@ export default class EnemyShip extends SpaceShip {
         // Add health
         this.health = 30;
         
-        // Set constant energy level
+        // Set constant energy level for enemy
         this.getMesh().energy = 100;
+        this.getMesh().energyCapacity = 100;
         
         // Initialize lasers array
         this.lasers = [];
+        
+        // Add delay timer
+        this.startTime = Date.now();
+        this.delayTime = 5000; // 2 seconds delay
+        this.isActive = false;
         
         // AI state
         this.targetPosition = null;
@@ -36,6 +42,16 @@ export default class EnemyShip extends SpaceShip {
         this.orbitTarget = null;
         this.orbitRadius = 1500;
         this.orbitAngle = 0;
+        this.avoidanceRadius = 800;  // Increased from 500 to 800
+        this.avoidanceForce = 2.0;   // Increased from 1.0 to 2.0
+        this.avoidanceLookAhead = 400; // Increased from 200 to 400
+        this.shipAvoidanceRadius = 400;
+        this.shipAvoidanceForce = 1.5;
+        this.minSafeDistance = 150;
+        this.emergencyAvoidanceRadius = 250;
+        this.emergencyAvoidanceForce = 2.0;
+        this.planetEmergencyRadius = 400;  // New emergency radius for planets
+        this.planetEmergencyForce = 3.0;   // New emergency force for planets
         
         // Position history for better prediction
         this.positionHistory = [];
@@ -92,82 +108,94 @@ export default class EnemyShip extends SpaceShip {
         this.update = (physics) => {
             const currentTime = Date.now();
             
-            // Make decisions very frequently for better control
-            if (currentTime - this.lastDecisionTime > this.decisionInterval) {
-                this.makeDecision();
-                this.lastDecisionTime = currentTime;
+            // Check if delay period is over
+            if (!this.isActive && currentTime - this.startTime >= this.delayTime) {
+                this.isActive = true;
+                console.log('Enemy ship activated after delay');
             }
             
-            // Execute current decision
-            this.executeDecision();
+            // Check if marked for removal
+            if (this.body.markForRemoval) {
+                return;
+            }
             
-            // Apply physics forces
+            // Apply basic physics and bounds checking regardless of active state
             this.applyPhysics(physics);
-            
-            // Keep within bounds
             this.keepWithinBounds();
+            
+            // Only make decisions and take actions if active
+            if (this.isActive) {
+                // Make decisions very frequently for better control
+                if (currentTime - this.lastDecisionTime > this.decisionInterval) {
+                    this.makeDecision();
+                    this.lastDecisionTime = currentTime;
+                }
+                
+                // Execute current decision
+                this.executeDecision();
+                
+                // Maintain constant energy level
+                this.getMesh().energy = 100;
 
-            // Maintain constant energy level
-            this.getMesh().energy = 100;
+                // Update laser positions and check for collisions
+                if (this.lasers && this.lasers.length > 0) {
+                    this.lasers = this.lasers.filter(laser => {
+                        if (!laser.active) return false;
 
-            // Update laser positions and check for collisions
-            if (this.lasers && this.lasers.length > 0) {
-                this.lasers = this.lasers.filter(laser => {
-                    if (!laser.active) return false;
-
-                    // Update laser position
-                    laser.x += Math.cos(laser.angle) * laser.speed;
-                    laser.y += Math.sin(laser.angle) * laser.speed;
-                    
-                    // Check for collisions with player ship
-                    if (this.engine && this.engine.store && this.engine.store.system) {
-                        for (const obj of this.engine.store.system) {
-                            if (obj instanceof SpaceShip && obj.constructor.name === 'SpaceShip' && obj !== this) {
-                                const dx = laser.x - obj.body.x;
-                                const dy = laser.y - obj.body.y;
-                                const distance = Math.sqrt(dx * dx + dy * dy);
-                                
-                                if (distance < obj.body.r) {
-                                    console.log('Enemy laser hit player ship!');
-                                    this.lastHitTime = currentTime;
-                                    this.currentReward += this.hitReward;
-                                    this.successfulShots++;
-                                    console.log('Hit reward:', this.hitReward, 'Total reward:', this.currentReward);
+                        // Update laser position
+                        laser.x += Math.cos(laser.angle) * laser.speed;
+                        laser.y += Math.sin(laser.angle) * laser.speed;
+                        
+                        // Check for collisions with player ship
+                        if (this.engine && this.engine.store && this.engine.store.system) {
+                            for (const obj of this.engine.store.system) {
+                                if (obj instanceof SpaceShip && obj.constructor.name === 'SpaceShip' && obj !== this) {
+                                    const dx = laser.x - obj.body.x;
+                                    const dy = laser.y - obj.body.y;
+                                    const distance = Math.sqrt(dx * dx + dy * dy);
                                     
-                                    // Update learning based on successful hit
-                                    this.updateLearningFromHit(laser);
-                                    
-                                    // Call player's handleLaserHit method
-                                    obj.handleLaserHit();
-                                    return false; // Remove this laser
+                                    if (distance < obj.body.r) {
+                                        console.log('Enemy laser hit player ship!');
+                                        this.lastHitTime = currentTime;
+                                        this.currentReward += this.hitReward;
+                                        this.successfulShots++;
+                                        console.log('Hit reward:', this.hitReward, 'Total reward:', this.currentReward);
+                                        
+                                        // Update learning based on successful hit
+                                        this.updateLearningFromHit(laser);
+                                        
+                                        // Call player's handleLaserHit method
+                                        obj.handleLaserHit();
+                                        return false; // Remove this laser
+                                    }
                                 }
                             }
                         }
-                    }
-                    
-                    // Remove laser after 500ms
-                    if (currentTime - laser.createdAt > 500) {
-                        if (!laser.hit) {
-                            this.currentReward -= this.missPenalty;
-                            console.log('Miss penalty:', this.missPenalty, 'Total reward:', this.currentReward);
-                            
-                            // Update learning based on miss
-                            this.updateLearningFromMiss(laser);
+                        
+                        // Remove laser after 500ms
+                        if (currentTime - laser.createdAt > 500) {
+                            if (!laser.hit) {
+                                this.currentReward -= this.missPenalty;
+                                console.log('Miss penalty:', this.missPenalty, 'Total reward:', this.currentReward);
+                                
+                                // Update learning based on miss
+                                this.updateLearningFromMiss(laser);
+                            }
+                            return false;
                         }
-                        return false;
-                    }
-                    
-                    return true; // Keep laser if no collision and not expired
-                });
-            }
+                        
+                        return true; // Keep laser if no collision and not expired
+                    });
+                }
 
-            // Try to shoot at player if in range
-            if (this.targetPosition) {
-                const dx = this.targetPosition[0] - this.body.x;
-                const dy = this.targetPosition[1] - this.body.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 800) {
-                    this.shoot();
+                // Try to shoot at player if in range
+                if (this.targetPosition) {
+                    const dx = this.targetPosition[0] - this.body.x;
+                    const dy = this.targetPosition[1] - this.body.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 800) {
+                        this.shoot();
+                    }
                 }
             }
         };
@@ -332,21 +360,31 @@ export default class EnemyShip extends SpaceShip {
             this.targetPosition = [playerShip.body.x, playerShip.body.y];
         }
 
-        // Find nearest star for orbital mechanics
+        // Only consider orbital mechanics if we're too far from the player
         const nearestStar = this.findNearestStar();
-        if (nearestStar) {
-            const dx = this.body.x - nearestStar.body.x;
-            const dy = this.body.y - nearestStar.body.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+        if (nearestStar && this.targetPosition) {
+            const dx = this.targetPosition[0] - this.body.x;
+            const dy = this.targetPosition[1] - this.body.y;
+            const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
             
-            // If we're too close to the star, move away
-            if (distance < this.orbitRadius * 0.8) {
+            // If we're too far from the player, use star for positioning
+            if (distanceToPlayer > 1000) {
+                const starDx = this.body.x - nearestStar.body.x;
+                const starDy = this.body.y - nearestStar.body.y;
+                const distanceToStar = Math.sqrt(starDx * starDx + starDy * starDy);
+                
+                // If we're too close to the star, move away
+                if (distanceToStar < this.orbitRadius * 0.8) {
+                    this.orbitTarget = null;
+                }
+                // Try to enter orbit if we're at a good distance
+                else if (distanceToStar > this.orbitRadius * 0.8 && distanceToStar < this.orbitRadius * 1.2) {
+                    this.orbitTarget = nearestStar;
+                    this.orbitAngle = Math.atan2(starDy, starDx);
+                }
+            } else {
+                // If we're close to the player, abandon orbital mechanics
                 this.orbitTarget = null;
-            }
-            // Try to enter orbit if we're at a good distance
-            else if (distance > this.orbitRadius * 0.8 && distance < this.orbitRadius * 1.2) {
-                this.orbitTarget = nearestStar;
-                this.orbitAngle = Math.atan2(dy, dx);
             }
         }
     }
@@ -355,67 +393,196 @@ export default class EnemyShip extends SpaceShip {
     executeDecision() {
         if (!this.targetPosition) return;
 
-        // Handle orbital mechanics
-        if (this.orbitTarget) {
-            const dx = this.body.x - this.orbitTarget.body.x;
-            const dy = this.body.y - this.orbitTarget.body.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            // Calculate desired orbit position
-            const targetX = this.orbitTarget.body.x + Math.cos(this.orbitAngle) * this.orbitRadius;
-            const targetY = this.orbitTarget.body.y + Math.sin(this.orbitAngle) * this.orbitRadius;
-            
-            // Calculate direction to target position
-            const targetDx = targetX - this.body.x;
-            const targetDy = targetY - this.body.y;
-            const targetAngle = Math.atan2(targetDy, targetDx);
-            
-            // Calculate perpendicular direction for orbital motion
-            const orbitAngle = targetAngle + Math.PI / 2;
-            
-            // Adjust orbit angle
-            this.orbitAngle += 0.02;
-            
-            // Apply thrust to achieve orbit
-            const thrustForce = 0.5;
-            this.body.vx += Math.cos(orbitAngle) * thrustForce;
-            this.body.vy += Math.sin(orbitAngle) * thrustForce;
-            
-            // Set rotation for shooting
-            if (this.targetPosition) {
-                const playerDx = this.targetPosition[0] - this.body.x;
-                const playerDy = this.targetPosition[1] - this.body.y;
-                this.rotation = Math.atan2(playerDy, playerDx);
-            }
-        } else {
-            // If not in orbit, move towards target aggressively
-            const dx = this.targetPosition[0] - this.body.x;
-            const dy = this.targetPosition[1] - this.body.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+        // Calculate distance to player
+        const dx = this.targetPosition[0] - this.body.x;
+        const dy = this.targetPosition[1] - this.body.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Set rotation to face target
-            this.rotation = Math.atan2(dy, dx);
+        // Calculate avoidance force from nearby planets and player ship
+        let avoidDx = 0;
+        let avoidDy = 0;
+        
+        if (this.engine && this.engine.store && this.engine.store.system) {
+            // First, handle planet avoidance with improved logic
+            const planets = this.engine.store.system.filter(obj => 
+                obj.constructor.name === 'Planet' && !obj.isStar
+            );
 
-            // Calculate desired position based on safe distance
-            let targetX = this.targetPosition[0];
-            let targetY = this.targetPosition[1];
-
-            // If too close, move away while still facing the target
-            if (distance < this.safeDistance) {
-                const angle = Math.atan2(dy, dx);
-                targetX = this.targetPosition[0] - Math.cos(angle) * this.safeDistance;
-                targetY = this.targetPosition[1] - Math.sin(angle) * this.safeDistance;
+            // Calculate multiple look-ahead positions
+            const lookAheadPositions = [];
+            for (let i = 1; i <= 3; i++) {
+                const lookAheadX = this.body.x + Math.cos(this.rotation) * this.avoidanceLookAhead * i;
+                const lookAheadY = this.body.y + Math.sin(this.rotation) * this.avoidanceLookAhead * i;
+                lookAheadPositions.push({ x: lookAheadX, y: lookAheadY });
             }
 
-            // Calculate direction to desired position
-            const moveDx = targetX - this.body.x;
-            const moveDy = targetY - this.body.y;
-            const moveAngle = Math.atan2(moveDy, moveDx);
+            for (const planet of planets) {
+                // Check current position and all look-ahead positions
+                let minDistance = Infinity;
+                let closestDx = 0;
+                let closestDy = 0;
 
-            // Apply thrust without energy consumption
-            const thrustForce = 0.5;
-            this.body.vx += Math.cos(moveAngle) * thrustForce;
-            this.body.vy += Math.sin(moveAngle) * thrustForce;
+                // Check current position
+                const currentDx = this.body.x - planet.body.x;
+                const currentDy = this.body.y - planet.body.y;
+                const currentDistance = Math.sqrt(currentDx * currentDx + currentDy * currentDy);
+                
+                if (currentDistance < minDistance) {
+                    minDistance = currentDistance;
+                    closestDx = currentDx;
+                    closestDy = currentDy;
+                }
+
+                // Check look-ahead positions
+                for (const pos of lookAheadPositions) {
+                    const lookAheadDx = pos.x - planet.body.x;
+                    const lookAheadDy = pos.y - planet.body.y;
+                    const lookAheadDistance = Math.sqrt(lookAheadDx * lookAheadDx + lookAheadDy * lookAheadDy);
+                    
+                    if (lookAheadDistance < minDistance) {
+                        minDistance = lookAheadDistance;
+                        closestDx = lookAheadDx;
+                        closestDy = lookAheadDy;
+                    }
+                }
+
+                // Calculate closing speed to planet
+                const planetDx = this.body.x - planet.body.x;
+                const planetDy = this.body.y - planet.body.y;
+                const planetDistance = Math.sqrt(planetDx * planetDx + planetDy * planetDy);
+                const closingSpeed = (planetDx * this.body.vx + planetDy * this.body.vy) / planetDistance;
+
+                // Determine which avoidance radius and force to use
+                let avoidanceRadius = this.avoidanceRadius;
+                let avoidanceForce = this.avoidanceForce;
+
+                // If we're closing in too fast or too close, use emergency avoidance
+                if ((closingSpeed < -0.1 && minDistance < this.planetEmergencyRadius) || 
+                    minDistance < this.planetEmergencyRadius) {
+                    avoidanceRadius = this.planetEmergencyRadius;
+                    avoidanceForce = this.planetEmergencyForce;
+                }
+
+                if (minDistance < avoidanceRadius) {
+                    // Calculate base avoidance force
+                    let force = avoidanceForce * Math.pow(1 - minDistance / avoidanceRadius, 2);
+
+                    // Increase force if we're closing in too fast
+                    if (closingSpeed < 0) {
+                        force *= (1 - closingSpeed) * 2;
+                    }
+
+                    // Calculate avoidance angle
+                    const angle = Math.atan2(closestDy, closestDx);
+                    
+                    // Add perpendicular component to steer around the planet
+                    const perpendicularAngle = angle + Math.PI/2;
+                    
+                    // Add both perpendicular and direct avoidance
+                    avoidDx += Math.cos(perpendicularAngle) * force * 2.0;
+                    avoidDy += Math.sin(perpendicularAngle) * force * 2.0;
+                    avoidDx += Math.cos(angle) * force;
+                    avoidDy += Math.sin(angle) * force;
+
+                    // If we're too close, add strong direct avoidance
+                    if (minDistance < this.planetEmergencyRadius) {
+                        const emergencyForce = this.planetEmergencyForce * (1 - minDistance / this.planetEmergencyRadius);
+                        avoidDx += Math.cos(angle) * emergencyForce * 2;
+                        avoidDy += Math.sin(angle) * emergencyForce * 2;
+                    }
+                }
+            }
+
+            // Then, handle player ship avoidance with improved logic
+            const playerShip = this.engine.store.system.find(obj => 
+                obj.constructor.name === 'SpaceShip' && obj !== this
+            );
+
+            if (playerShip) {
+                // Calculate relative velocity
+                const relativeVx = this.body.vx - playerShip.body.vx;
+                const relativeVy = this.body.vy - playerShip.body.vy;
+                const relativeSpeed = Math.sqrt(relativeVx * relativeVx + relativeVy * relativeVy);
+
+                // Predict future position based on relative velocity
+                const predictionTime = Math.min(relativeSpeed * 2, 1.0); // Scale prediction time with relative speed
+                const predictedPlayerX = playerShip.body.x + playerShip.body.vx * predictionTime;
+                const predictedPlayerY = playerShip.body.y + playerShip.body.vy * predictionTime;
+
+                // Calculate distance to predicted position
+                const shipDx = this.body.x - predictedPlayerX;
+                const shipDy = this.body.y - predictedPlayerY;
+                const shipDistance = Math.sqrt(shipDx * shipDx + shipDy * shipDy);
+
+                // Calculate closing speed (negative means approaching)
+                const closingSpeed = (shipDx * relativeVx + shipDy * relativeVy) / shipDistance;
+
+                // Determine which avoidance radius and force to use
+                let avoidanceRadius = this.shipAvoidanceRadius;
+                let avoidanceForce = this.shipAvoidanceForce;
+
+                // If we're closing in too fast, use emergency avoidance
+                if (closingSpeed < -0.1 && shipDistance < this.emergencyAvoidanceRadius) {
+                    avoidanceRadius = this.emergencyAvoidanceRadius;
+                    avoidanceForce = this.emergencyAvoidanceForce;
+                }
+
+                if (shipDistance < avoidanceRadius) {
+                    // Calculate base avoidance force
+                    let force = avoidanceForce * Math.pow(1 - shipDistance / avoidanceRadius, 2);
+
+                    // Increase force if we're closing in too fast
+                    if (closingSpeed < 0) {
+                        force *= (1 - closingSpeed);
+                    }
+
+                    // Calculate avoidance angle
+                    const angle = Math.atan2(shipDy, shipDx);
+                    
+                    // Add perpendicular component to steer around the ship
+                    const perpendicularAngle = angle + Math.PI/2;
+                    
+                    // Add some direct avoidance as well
+                    avoidDx += Math.cos(perpendicularAngle) * force * 1.5;
+                    avoidDy += Math.sin(perpendicularAngle) * force * 1.5;
+                    avoidDx += Math.cos(angle) * force * 0.5;
+                    avoidDy += Math.sin(angle) * force * 0.5;
+
+                    // If we're too close, add strong direct avoidance
+                    if (shipDistance < this.minSafeDistance) {
+                        const emergencyForce = this.emergencyAvoidanceForce * (1 - shipDistance / this.minSafeDistance);
+                        avoidDx += Math.cos(angle) * emergencyForce;
+                        avoidDy += Math.sin(angle) * emergencyForce;
+                    }
+                }
+            }
+        }
+
+        // Calculate desired movement direction
+        let targetX = this.targetPosition[0];
+        let targetY = this.targetPosition[1];
+
+        // Add avoidance force to target position
+        targetX += avoidDx * 3000;  // Increased from 2000 to 3000
+        targetY += avoidDy * 3000;
+
+        // Calculate direction to adjusted target
+        const moveDx = targetX - this.body.x;
+        const moveDy = targetY - this.body.y;
+        const moveAngle = Math.atan2(moveDy, moveDx);
+
+        // Set rotation to face adjusted target
+        this.rotation = moveAngle;
+
+        // Apply thrust with reduced force when avoiding
+        const thrustForce = (Math.abs(avoidDx) > 0 || Math.abs(avoidDy) > 0) ? 0.15 : (distance > 500 ? 0.3 : 0.2);
+        this.body.vx += Math.cos(moveAngle) * thrustForce;
+        this.body.vy += Math.sin(moveAngle) * thrustForce;
+
+        // Apply additional avoidance force
+        if (Math.abs(avoidDx) > 0 || Math.abs(avoidDy) > 0) {
+            this.body.vx += avoidDx * this.avoidanceForce * 3;  // Increased from 2 to 3
+            this.body.vy += avoidDy * this.avoidanceForce * 3;
         }
     }
 

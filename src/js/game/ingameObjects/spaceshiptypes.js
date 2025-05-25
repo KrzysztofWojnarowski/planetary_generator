@@ -6,8 +6,8 @@ export default {
             sizeSource:[55,55],
             sizeDestination:[30,30]
         },
-        energy:4000,
-        energyCapacity:10000,
+        energy:30000,
+        energyCapacity:30000,
         effectiveRange:100,
         chargingSpeed:5,
         power:5,
