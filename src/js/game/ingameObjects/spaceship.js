@@ -36,8 +36,8 @@ export default class SpaceShip {
         this.powerQuantum = this.#mesh.powerQuantum;
         
         // Add health
-        this.health = 5;
-        this.maxHealth = 5;
+        this.health = 30;  // Changed to 30 health points
+        this.maxHealth = 30;  // Changed to 30 max health
         
         this.eventSystem = new EventSystem(this);
         this.eventSystem.registerEvent("onCollided");
@@ -425,6 +425,9 @@ export default class SpaceShip {
         console.log('Health after hit:', this.health);
         console.log('Position when hit:', { x: this.body.x, y: this.body.y });
         
+        // Create small explosion at hit point
+        this.createSmallExplosion();
+        
         if (this.health <= 0) {
             console.log('=== SPACESHIP DESTROYED ===');
             console.log('Final position:', { x: this.body.x, y: this.body.y });
@@ -432,6 +435,35 @@ export default class SpaceShip {
             this.body.markForRemoval = true;
         }
         console.log('====================');
+    }
+
+    // Helper method to create small explosion
+    createSmallExplosion() {
+        if (!this.engine) {
+            console.error('Engine not available for explosion');
+            return;
+        }
+
+        try {
+            let explosion = new Explode();
+            
+            const gameImages = this.engine.loader.getGameImages();
+            if (!gameImages || !gameImages.explosionSheet) {
+                console.error('Explosion sheet not available');
+                return;
+            }
+            
+            explosion.sprite.setImage(gameImages.explosionSheet.getImage());
+            explosion.animation.position = [this.body.x, this.body.y];
+            explosion.animation.size = [30, 30];  // Increased to 30px explosion
+            
+            if (this.engine.store && this.engine.store.system) {
+                this.engine.store.system.push(explosion);
+                this.engine.registerAnimation(explosion);
+            }
+        } catch (error) {
+            console.error('Error creating small explosion:', error);
+        }
     }
 
     // Helper method to create explosion

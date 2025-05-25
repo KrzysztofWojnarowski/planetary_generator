@@ -18,7 +18,7 @@ export default class EnemyShip extends SpaceShip {
         this.body.r = 30;
         
         // Add health
-        this.health = 3;
+        this.health = 30;
         
         // Set constant energy level
         this.getMesh().energy = 100;
@@ -46,11 +46,19 @@ export default class EnemyShip extends SpaceShip {
         this.lastPlayerPos = null;
         this.lastPlayerVel = null;
         
-        // Hit tracking
+        // Hit tracking and learning
         this.lastHitTime = 0;
-        this.hitReward = 1000; // High reward for hitting
+        this.hitReward = 1000;  // High reward for hitting
         this.missPenalty = 50;  // Small penalty for missing
         this.currentReward = 0;
+        this.learningRate = 0.1;  // How quickly the enemy learns
+        this.shootConfidence = 0.5;  // Initial confidence in shooting
+        this.minShootConfidence = 0.3;  // Minimum confidence to shoot
+        this.maxShootConfidence = 0.9;  // Maximum confidence to shoot
+        this.successfulShots = 0;
+        this.totalShots = 0;
+        this.shotHistory = [];  // Keep track of last 10 shots
+        this.maxShotHistory = 10;
         
         // Create new empty event system
         this.eventSystem = new EventSystem(this);
@@ -123,7 +131,11 @@ export default class EnemyShip extends SpaceShip {
                                     console.log('Enemy laser hit player ship!');
                                     this.lastHitTime = currentTime;
                                     this.currentReward += this.hitReward;
+                                    this.successfulShots++;
                                     console.log('Hit reward:', this.hitReward, 'Total reward:', this.currentReward);
+                                    
+                                    // Update learning based on successful hit
+                                    this.updateLearningFromHit(laser);
                                     
                                     // Call player's handleLaserHit method
                                     obj.handleLaserHit();
@@ -138,6 +150,9 @@ export default class EnemyShip extends SpaceShip {
                         if (!laser.hit) {
                             this.currentReward -= this.missPenalty;
                             console.log('Miss penalty:', this.missPenalty, 'Total reward:', this.currentReward);
+                            
+                            // Update learning based on miss
+                            this.updateLearningFromMiss(laser);
                         }
                         return false;
                     }
@@ -157,7 +172,7 @@ export default class EnemyShip extends SpaceShip {
             }
         };
 
-        // Override shoot method to implement AI shooting with improved prediction and rewards
+        // Override shoot method to implement AI shooting with improved prediction and learning
         this.shoot = () => {
             const currentTime = Date.now();
             if (this.targetPosition && currentTime - this.lastShootTime > this.shootCooldown) {
@@ -173,27 +188,83 @@ export default class EnemyShip extends SpaceShip {
                 // Only shoot if we're reasonably aligned with the target (within 30 degrees)
                 const angleDiff = Math.abs(this.rotation - angleToTarget);
                 if (angleDiff < Math.PI / 6) { // 30 degrees
-                    this.rotation = angleToTarget;
+                    // Calculate distance to target
+                    const distance = Math.sqrt(dx * dx + dy * dy);
                     
-                    // Create laser beam
-                    const laser = {
-                        x: this.body.x,
-                        y: this.body.y,
-                        angle: this.rotation,
-                        length: 100,
-                        width: 2,
-                        speed: 10,
-                        active: true,
-                        createdAt: currentTime,
-                        hit: false // Track if this laser hits
-                    };
+                    // Update shooting confidence based on history
+                    this.updateShootConfidence();
+                    
+                    // Decide whether to shoot based on confidence and distance
+                    const shouldShoot = this.shootConfidence > this.minShootConfidence && 
+                                      distance < 800;  // Removed safe distance check
+                    
+                    if (shouldShoot) {
+                        this.rotation = angleToTarget;
+                        
+                        // Create laser beam
+                        const laser = {
+                            x: this.body.x,
+                            y: this.body.y,
+                            angle: this.rotation,
+                            length: 100,
+                            width: 2,
+                            speed: 10,
+                            active: true,
+                            createdAt: currentTime,
+                            hit: false,
+                            predictedPos: targetPos,  // Store predicted position for learning
+                            actualPos: this.targetPosition  // Store actual position for learning
+                        };
 
-                    // Add laser to our lasers array
-                    this.lasers.push(laser);
-                    this.lastShootTime = currentTime;
-                    console.log('Enemy shooting at predicted position!');
+                        // Add laser to our lasers array
+                        this.lasers.push(laser);
+                        this.lastShootTime = currentTime;
+                        this.totalShots++;
+                        
+                        // Add to shot history
+                        this.shotHistory.push({
+                            predictedPos: targetPos,
+                            actualPos: this.targetPosition,
+                            distance: distance,
+                            angle: angleToTarget,
+                            timestamp: currentTime
+                        });
+                        
+                        // Keep history at max length
+                        if (this.shotHistory.length > this.maxShotHistory) {
+                            this.shotHistory.shift();
+                        }
+                        
+                        console.log('Enemy shooting with confidence:', this.shootConfidence.toFixed(2));
+                    }
                 }
             }
+        };
+
+        // Update shooting confidence based on history
+        this.updateShootConfidence = () => {
+            if (this.shotHistory.length === 0) return;
+            
+            // Calculate success rate from history
+            const recentSuccesses = this.shotHistory.filter(shot => {
+                const dx = shot.predictedPos[0] - shot.actualPos[0];
+                const dy = shot.predictedPos[1] - shot.actualPos[1];
+                const predictionError = Math.sqrt(dx * dx + dy * dy);
+                return predictionError < 50;  // Consider a shot successful if prediction error is less than 50 pixels
+            }).length;
+            
+            const successRate = recentSuccesses / this.shotHistory.length;
+            
+            // Update confidence using learning rate
+            this.shootConfidence = this.shootConfidence * (1 - this.learningRate) + 
+                                 successRate * this.learningRate;
+            
+            // Clamp confidence between min and max
+            this.shootConfidence = Math.max(this.minShootConfidence, 
+                                          Math.min(this.maxShootConfidence, this.shootConfidence));
+            
+            console.log('Updated shoot confidence:', this.shootConfidence.toFixed(2), 
+                       'Success rate:', (successRate * 100).toFixed(1) + '%');
         };
 
         // Override energy consumption methods
@@ -476,10 +547,43 @@ export default class EnemyShip extends SpaceShip {
     handleLaserHit() {
         console.log('Enemy ship hit! Health:', this.health);
         this.health--;
+        
+        // Create small explosion at hit point
+        this.createSmallExplosion();
+        
         if (this.health <= 0) {
             console.log('Enemy ship destroyed! Creating explosion...');
             this.createExplosion();
             this.body.markForRemoval = true;
+        }
+    }
+
+    // Helper method to create small explosion
+    createSmallExplosion() {
+        if (!this.engine) {
+            console.error('Engine not available for explosion');
+            return;
+        }
+
+        try {
+            let explosion = new Explode();
+            
+            const gameImages = this.engine.loader.getGameImages();
+            if (!gameImages || !gameImages.explosionSheet) {
+                console.error('Explosion sheet not available');
+                return;
+            }
+            
+            explosion.sprite.setImage(gameImages.explosionSheet.getImage());
+            explosion.animation.position = [this.body.x, this.body.y];
+            explosion.animation.size = [30, 30];  // Increased to 30px explosion
+            
+            if (this.engine.store && this.engine.store.system) {
+                this.engine.store.system.push(explosion);
+                this.engine.registerAnimation(explosion);
+            }
+        } catch (error) {
+            console.error('Error creating small explosion:', error);
         }
     }
 
@@ -514,5 +618,40 @@ export default class EnemyShip extends SpaceShip {
         const predictedY = latestPos.y + (avgVy * this.predictionFrames);
         
         return [predictedX, predictedY];
+    }
+
+    // Update learning from successful hit
+    updateLearningFromHit(laser) {
+        // Calculate prediction accuracy
+        const dx = laser.predictedPos[0] - laser.actualPos[0];
+        const dy = laser.predictedPos[1] - laser.actualPos[1];
+        const predictionError = Math.sqrt(dx * dx + dy * dy);
+        
+        // Update prediction frames based on accuracy
+        if (predictionError < 30) {
+            // If prediction was very accurate, increase prediction frames
+            this.predictionFrames = Math.min(this.predictionFrames + 1, 60);
+        } else if (predictionError > 100) {
+            // If prediction was poor, decrease prediction frames
+            this.predictionFrames = Math.max(this.predictionFrames - 1, 10);
+        }
+        
+        console.log('Learning from hit - Prediction error:', predictionError.toFixed(1),
+                   'New prediction frames:', this.predictionFrames);
+    }
+
+    // Update learning from miss
+    updateLearningFromMiss(laser) {
+        // Calculate prediction accuracy
+        const dx = laser.predictedPos[0] - laser.actualPos[0];
+        const dy = laser.predictedPos[1] - laser.actualPos[1];
+        const predictionError = Math.sqrt(dx * dx + dy * dy);
+        
+        // If miss was due to poor prediction, adjust prediction frames
+        if (predictionError > 100) {
+            this.predictionFrames = Math.max(this.predictionFrames - 2, 10);
+            console.log('Learning from miss - Prediction error:', predictionError.toFixed(1),
+                       'New prediction frames:', this.predictionFrames);
+        }
     }
 } 
