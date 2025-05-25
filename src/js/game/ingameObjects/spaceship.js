@@ -29,11 +29,16 @@ export default class SpaceShip {
         this.body.m = this.#mesh.m;
         this.body.x = this.position[0];
         this.body.y = this.position[1];
-        this.body.r = this.#mesh.r;
+        this.body.r = 30;  // Set hit radius to 30 pixels
         this.vx = 0;
         this.vy = 0;
         this.maxSpeed = this.#mesh.maxSpeed;
         this.powerQuantum = this.#mesh.powerQuantum;
+        
+        // Add health
+        this.health = 5;
+        this.maxHealth = 5;
+        
         this.eventSystem = new EventSystem(this);
         this.eventSystem.registerEvent("onCollided");
         this.eventSystem.addListener("onCollided", this.onCollision);
@@ -124,6 +129,7 @@ export default class SpaceShip {
         let [x, y] = sprite.position;
         let [w, h] = sprite.sizeSource;
         let [dw, dh] = sprite.sizeDestination;
+
         context.beginPath();
         context.strokeStyle = "rgba(0,200,150,0.2)";
         context.fillStyle = "rgba(0,200,150,0.1)";
@@ -132,17 +138,40 @@ export default class SpaceShip {
         context.drawImage(this.#image, x, y, w, h, -0.5 * dw, -0.5 * dh, dw, dh);
         context.restore();
 
+        // Draw health indicator in top right corner
+        if (this.engine && this.engine.camera) {
+            const camera = this.engine.camera;
+            const cameraPos = camera.getPosition();
+            const cameraDim = camera.getDimension();
+            
+            // Position in top right corner, 150px from top
+            const indicatorX = cameraPos[0] + cameraDim[0] - 200;
+            const indicatorY = cameraPos[1] + 150;
+            
+            // Draw health bar background
+            context.save();
+            context.fillStyle = "rgba(0,0,0,0.5)";
+            context.fillRect(indicatorX, indicatorY, 200, 20);
+            
+            // Draw health segments
+            const segmentWidth = 35;
+            const segmentGap = 5;
+            for (let i = 0; i < this.maxHealth; i++) {
+                const x = indicatorX + (i * (segmentWidth + segmentGap));
+                context.fillStyle = i < this.health ? "rgba(0,255,0,0.8)" : "rgba(255,0,0,0.8)";
+                context.fillRect(x, indicatorY, segmentWidth, 20);
+            }
+            context.restore();
+        }
+
         // Draw active lasers
         if (this.lasers && this.lasers.length > 0) {
-            console.log('Drawing lasers:', this.lasers.length);
-            this.lasers.forEach((laser, index) => {
+            this.lasers.forEach((laser) => {
                 if (laser.active) {
                     context.save();
-                    // Draw from the center of the spaceship
                     context.translate(laser.x, laser.y);
                     context.rotate(laser.angle);
                     
-                    // Draw red laser beam
                     context.beginPath();
                     context.strokeStyle = 'red';
                     context.lineWidth = laser.width;
@@ -258,41 +287,40 @@ export default class SpaceShip {
         // Update laser positions and check for collisions
         if (this.lasers && this.lasers.length > 0) {
             const currentTime = Date.now();
-            this.lasers.forEach((laser, index) => {
-                if (laser.active) {
-                    // Update laser position
-                    laser.x += Math.cos(laser.angle) * laser.speed;
-                    laser.y += Math.sin(laser.angle) * laser.speed;
-                    
-                    // Check for collisions with enemy ships
-                    if (this.engine && this.engine.store && this.engine.store.system) {
-                        this.engine.store.system.forEach((obj) => {
-                            // Check if object is an enemy ship
-                            if (obj instanceof SpaceShip && obj.constructor.name === 'EnemyShip') {
-                                // Calculate distance between laser and enemy
-                                const dx = laser.x - obj.body.x;
-                                const dy = laser.y - obj.body.y;
-                                const distance = Math.sqrt(dx * dx + dy * dy);
-                                
-                                // If laser hits enemy (within enemy's radius)
-                                if (distance < obj.body.r) {
-                                    console.log('Laser hit enemy ship!');
-                                    obj.handleLaserHit();
-                                    laser.active = false; // Deactivate laser after hit
-                                }
+            this.lasers = this.lasers.filter(laser => {
+                if (!laser.active) return false;
+
+                // Update laser position
+                laser.x += Math.cos(laser.angle) * laser.speed;
+                laser.y += Math.sin(laser.angle) * laser.speed;
+                
+                // Check for collisions with enemy ships
+                if (this.engine && this.engine.store && this.engine.store.system) {
+                    for (const obj of this.engine.store.system) {
+                        // Check if object is an enemy ship
+                        if (obj instanceof SpaceShip && obj.constructor.name === 'EnemyShip') {
+                            // Calculate distance between laser and enemy
+                            const dx = laser.x - obj.body.x;
+                            const dy = laser.y - obj.body.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            // If laser hits enemy (within enemy's radius)
+                            if (distance < obj.body.r) {
+                                console.log('Laser hit enemy ship!');
+                                obj.handleLaserHit();
+                                return false; // Remove this laser
                             }
-                        });
-                    }
-                    
-                    // Deactivate laser after 500ms
-                    if (currentTime - laser.createdAt > 500) {
-                        laser.active = false;
+                        }
                     }
                 }
+                
+                // Remove laser after 500ms
+                if (currentTime - laser.createdAt > 500) {
+                    return false;
+                }
+                
+                return true; // Keep laser if no collision and not expired
             });
-            
-            // Remove inactive lasers
-            this.lasers = this.lasers.filter(laser => laser.active);
         }
 
         let throttleFactor = this.throttle * this.powerQuantum;
@@ -387,5 +415,53 @@ export default class SpaceShip {
         this.lasers.push(laser);
         console.log('Laser shot:', laser);
         console.log('Total lasers:', this.lasers.length);
+    }
+
+    // Add method to handle laser hits
+    handleLaserHit() {
+        console.log('=== SPACESHIP HIT ===');
+        console.log('Current health before hit:', this.health);
+        this.health--;
+        console.log('Health after hit:', this.health);
+        console.log('Position when hit:', { x: this.body.x, y: this.body.y });
+        
+        if (this.health <= 0) {
+            console.log('=== SPACESHIP DESTROYED ===');
+            console.log('Final position:', { x: this.body.x, y: this.body.y });
+            this.createExplosion();
+            this.body.markForRemoval = true;
+        }
+        console.log('====================');
+    }
+
+    // Helper method to create explosion
+    createExplosion() {
+        if (!this.engine) {
+            console.error('Engine not available for explosion');
+            return;
+        }
+
+        try {
+            console.log('Creating explosion at position:', this.body.x, this.body.y);
+            let explosion = new Explode();
+            
+            const gameImages = this.engine.loader.getGameImages();
+            if (!gameImages || !gameImages.explosionSheet) {
+                console.error('Explosion sheet not available');
+                return;
+            }
+            
+            explosion.sprite.setImage(gameImages.explosionSheet.getImage());
+            explosion.animation.position = [this.body.x, this.body.y];
+            explosion.animation.size = [200, 200];
+            
+            if (this.engine.store && this.engine.store.system) {
+                this.engine.store.system.push(explosion);
+                this.engine.registerAnimation(explosion);
+                console.log('Explosion added to game system');
+            }
+        } catch (error) {
+            console.error('Error creating explosion:', error);
+        }
     }
 }
